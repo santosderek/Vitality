@@ -1,0 +1,18 @@
+{
+    "flask" : {
+    }, 
+
+    "mongodb" : {
+        "uri" : "mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]"
+    }, 
+
+    "googlemaps" : {
+        "client_id" : "",
+        "client_secret": ""
+    },
+
+    "youtube" : {
+        "client_id" : "",
+        "client_secret": ""
+    }
+}
