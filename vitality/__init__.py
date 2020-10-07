@@ -1,10 +1,13 @@
-from flask import Flask, render_template, url_for
+from flask import Flask,  render_template, url_for
+from flask_pymongo import PyMongo
+
+
 import os
 # from markupsafe import escape # Used to escape characters
 
 
 def create_app():
-   
+
     app = Flask(__name__, instance_relative_config=True)
     logger = app.logger
     
