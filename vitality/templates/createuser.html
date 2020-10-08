@@ -1,0 +1,40 @@
+<!doctype html>
+<html class="html2">
+<head>
+<meta charset="utf-8">
+<title>createuser</title>
+	<link rel = "stylesheet" type = "text/css" href = "{{url_for("static", filename="login.css")}">
+</head>
+
+<body>
+	<header>
+  		<nav class="navd">                                      <!--Navagation Bar-->
+    		<ul>
+      			<li><a href="index.html">Log In</a></li>
+     			<li><a href="createuser.html">Creat Account</a></li>
+    		</ul>
+  		</nav>
+  	 	  
+	</header>
+<main>
+	<h1 class="creat">Creat Account</h1>
+<div class="container">
+    <label for="uname"><b>Name</b></label>
+    <input type="text" placeholder="First" name="uname" required>
+	<input type="text" placeholder="Last" name="uname" required>
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="psw" required>
+	<input type="password" placeholder="Renter Password" name="psw" required>
+	<label for="locate"><b>Location</b></label>
+	<input type="text" placeholder="City and State" name="locate" required>
+	<label for="num"><b>Phone</b></label><br>
+	<input type="number" placeholder="Area Code & Number" name="num" required><br>
+    <button class="creatbtn" type="submit">Create</button>
+ </div>
+</main>
+<footer class="Validation">                                              <!--Validate HTML and CSS--> 
+	<a href="https://validator.w3.org/check?uri=referer">Validate HTML</a> 
+	<a href="https://jigsaw.w3.org/css-validator/check/referer">Validate CSS</a>
+</footer>
+</body>
+</html>
