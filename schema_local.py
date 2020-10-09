@@ -1,6 +1,9 @@
 from pymongo import MongoClient
+from vitality.configuration import Configuration
 
-client = MongoClient('mongodb://localhost:27017/')
+url = Configuration(path='vitality/configuration.json')
+client = MongoClient(url.get_local_uri())
+
 user = {
  "username": "admin",
  "password": "password",

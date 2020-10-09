@@ -1,4 +1,8 @@
 from pymongo import MongoClient
+from vitality.configuration import Configuration
+
+url = Configuration(path='vitality/configuration.json')
+cluster = MongoClient(url.get_atlas_uri())
 
 user = {
  "username": "admin",
@@ -23,7 +27,6 @@ trainer = {
  "t_focus": "arms"
  }
 
-cluster = MongoClient("mongodb+srv://laruffaelijah:4155_8675@cluster0.zq0eb.mongodb.net/admin_user?retryWrites=true&w=majority")
 db = cluster["admin_user"]
 collection_user = db["user"]
 collection_workout = db["workout"]

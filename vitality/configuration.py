@@ -11,6 +11,12 @@ class Configuration ():
     def get_mongodb_uri(self):
         return self.__data['mongodb']['uri']
 
+    def get_local_uri(self):
+        return self.__data['mongodb']['localuri']
+
+    def get_atlas_uri(self):
+        return self.__data['mongodb']['atlasuri']
+
     def get_googlemaps_client_id(self):
         return self.__data['googlemaps']['client_id']
 
