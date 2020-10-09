@@ -5,5 +5,10 @@
 {% endblock %}
 
 {% block content %}
-    <p>This is some content that will be injected into the content block of base.html.</p>
+    <p>Placeholder .... This is some content that will be injected into the content block of base.html.</p>
+    <br /> 
+    <a href="{{ url_for("login") }}">Log In</a>
+    <br /> 
+    <a href="{{ url_for("createuser") }}">Create Account</a>
+    <br /> 
 {% endblock %}

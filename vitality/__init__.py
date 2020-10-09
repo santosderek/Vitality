@@ -16,6 +16,16 @@ def create_app():
         logger.info('Rendering Index')
         return render_template("index.html")
 
+    @app.route('/login', methods=["GET"])
+    def login():
+        logger.info('Rendering Index')
+        return render_template("login.html")
+
+    @app.route('/createuser', methods=["GET"])
+    def createuser():
+        logger.info('Rendering Index')
+        return render_template("createuser.html")
+
     @app.errorhandler(403)
     def page_not_found(e):
         logger.info('Rendering 403')
