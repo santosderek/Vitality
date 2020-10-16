@@ -93,7 +93,7 @@ def create_app():
 
                 new_user = User(len(users) + 1, username, password, location, phone)
                 users.append(new_user)
-                redirect(url_for('login'))
+                return redirect(url_for('login'))
                 #TODO: need to show user it was successful. 
 
         return render_template("createuser.html")
