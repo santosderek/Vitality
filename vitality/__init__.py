@@ -9,6 +9,7 @@ from flask import (
 )
 from flask_pymongo import PyMongo
 from .user import User
+# from markupsafe import escape # Used to escape characters
 
 
 ### TODO: need to replace this with looking into the database. 
@@ -16,9 +17,6 @@ users = []
 users.append(User(id=1, username='derek', password='derek'))
 users.append(User(id=2, username='bryson', password='bryson'))
 
-
-import os
-# from markupsafe import escape # Used to escape characters
 
 
 def create_app():
@@ -53,14 +51,11 @@ def create_app():
         if request.method == 'POST': 
             # Removing the last session id if there is one already
             session.pop('user_id', None)
-
             username = request.form['username']
             password = request.form['password']
 
             # This needs to be replaced once we get the database up and running
-
             found_user = None
-
             for user in users:
                 if user.username == username and user.password == password:
                     found_user = user
@@ -82,7 +77,6 @@ def create_app():
         if request.method == 'POST':
 
             session.pop('user_id', None)
-
             username = request.form['username']
             password = request.form['password']
             re_password = request.form['repassword']
@@ -90,7 +84,6 @@ def create_app():
             phone = request.form['phone']
 
             if username and password == re_password:
-
                 new_user = User(len(users) + 1, username, password, location, phone)
                 users.append(new_user)
                 return redirect(url_for('login'))
@@ -104,7 +97,6 @@ def create_app():
 
         if not g.user:
             return redirect(url_for('login'))
-        
         return render_template("profile.html")
 
     @app.errorhandler(403)
@@ -126,9 +118,6 @@ def create_app():
     def page_not_found(e):
         logger.info('Rendering 500')
         return "500", 500
-
-
-
 
     # Return for Application Factory
     return app
