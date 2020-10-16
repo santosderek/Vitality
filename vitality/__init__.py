@@ -52,12 +52,16 @@ def create_app():
             password = request.form['password']
 
             # This needs to be replaced once we get the database up and running
-            # TODO: This errors out when no username is found, handle that...
-            user = [x for x in users if x.username == username][0]
 
-            if user and user.password == password:
+            found_user = None
+
+            for user in users:
+                if user.username == username and user.password == password:
+                    found_user = user
+
+            if found_user:
                 logger.debug('User exists')
-                session['user_id'] = user.id
+                session['user_id'] = found_user.id
                 return redirect(url_for('profile'))
             
             # If username != correct password return back to login
