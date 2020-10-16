@@ -32,8 +32,14 @@ def create_app():
         g.user = None
 
         if 'user_id' in session:
-            user = [x for x in users if x.id == session['user_id']][0]
-            g.user = user
+
+            found_user = None
+
+            for user in users:
+                if user.id == session['user_id']:
+                    found_user = user
+
+            g.user = found_user
 
     @app.route('/', methods=["GET"])
     def index():
@@ -85,7 +91,7 @@ def create_app():
 
             if username and password == re_password:
 
-                new_user = User(username, password, location, phone)
+                new_user = User(len(users) + 1, username, password, location, phone)
                 users.append(new_user)
                 redirect(url_for('login'))
                 #TODO: need to show user it was successful. 
