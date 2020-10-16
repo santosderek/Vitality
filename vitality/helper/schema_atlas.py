@@ -34,3 +34,4 @@ collection_trainer = db["trainer"]
 collection_user.insert_one(user)
 collection_workout.insert_one(workout)
 collection_trainer.insert_one(trainer)
+
