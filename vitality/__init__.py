@@ -42,7 +42,7 @@ def create_app():
 
     @app.route('/login', methods=["GET", "POST"])
     def login():
-        logger.info('Rendering Index')
+        logger.info('Rendering Login')
         
         if request.method == 'POST': 
             # Removing the last session id if there is one already
@@ -69,14 +69,32 @@ def create_app():
 
         return render_template("login.html")
 
-    @app.route('/createuser', methods=["GET"])
+    @app.route('/createuser', methods=["GET", "POST"])
     def createuser():
-        logger.info('Rendering Index')
+        logger.info('Rendering Create User')
+
+        if request.method == 'POST':
+
+            session.pop('user_id', None)
+
+            username = request.form['username']
+            password = request.form['password']
+            re_password = request.form['repassword']
+            location = request.form['location']
+            phone = request.form['phone']
+
+            if username and password == re_password:
+
+                new_user = User(username, password, location, phone)
+                users.append(new_user)
+                redirect(url_for('login'))
+                #TODO: need to show user it was successful. 
+
         return render_template("createuser.html")
 
     @app.route('/profile', methods=["GET"])
     def profile():
-        logger.info('Rendering Index')
+        logger.info('Rendering Profile')
 
         if not g.user:
             return redirect(url_for('login'))

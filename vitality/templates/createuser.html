@@ -8,7 +8,7 @@
 
 <body>
 	<header>
-  		<nav class="navd">                                      <!--Navagation Bar-->
+  		<nav class="navd">                                      
     		<ul>
       			<li><a href="{{ url_for("login") }}">Log In</a></li>
      			<li><a href="{{ url_for("createuser") }}">Create Account</a></li>
@@ -19,22 +19,22 @@
 <main>
 	<h1 class="create">Create Account</h1>
 <div class="container">
-    <label for="username"><b>Name</b></label>
-    <input type="text" placeholder="First" name="username" required>
-	<input type="text" placeholder="Last" name="username" required>
-    <label for="password"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="password" required>
-	<input type="password" placeholder="Renter Password" name="password" required>
-	<label for="locate"><b>Location</b></label>
-	<input type="text" placeholder="City and State" name="locate" required>
-	<label for="num"><b>Phone</b></label><br>
-	<input type="number" placeholder="Area Code & Number" name="num" required><br>
-    <button class="creatbtn" type="submit">Create</button>
+	<form action="/createuser" method="POST">
+		<label for="username"><b>Name</b></label>
+		<input type="text" placeholder="Username" name="username" required>
+		<input type="text" placeholder="First" name="firstname" required>
+		<input type="text" placeholder="Last" name="lastname" required>
+		<label for="password"><b>Password</b></label>
+		<input type="password" placeholder="Enter Password" name="password" required>
+		<input type="password" placeholder="Renter Password" name="repassword" required>
+		<label for="location"><b>Location</b></label>
+		<input type="text" placeholder="City and State" name="location" required>
+		<label for="phone"><b>Phone</b></label><br>
+		<input type="number" placeholder="Area Code & Number" name="phone" required><br>
+		<input type="submit" value="Create">
+	</form>
+    
  </div>
 </main>
-<footer class="Validation">                                              <!--Validate HTML and CSS--> 
-	<a href="https://validator.w3.org/check?uri=referer">Validate HTML</a> 
-	<a href="https://jigsaw.w3.org/css-validator/check/referer">Validate CSS</a>
-</footer>
 </body>
 </html>
