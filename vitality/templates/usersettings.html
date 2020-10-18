@@ -1,0 +1,59 @@
+<!doctype html>
+<html class="html2">
+    <head>
+        <meta charset="utf-8">
+        <title>User Settings</title>
+        <link rel = "stylesheet" type = "text/css" href = "{{ url_for("static", filename="login.css") }}">
+    </head>
+
+    <body>
+        <header>
+            <nav class="navd">                                      
+                <ul>
+                      <li><a href="{{ url_for("profile") }}">Profile</a></li>
+                </ul>
+              </nav>
+        </header>
+
+        <main>
+            <h1>User Settings</h1>
+            <button onclick="makeChanges()">Make Changes</button>
+            <button onclick="cancel()">Cancel</button>
+            <div class="container">
+                <form action="/usersettings" method="POST">
+                    <label for="username"><b>Username</b></label>
+                    <input class="fields" type="text" placeholder="{{g.user.username}}" name="username" required disabled>
+                    <label for="username"><b>First Name</b></label>
+                    <input class="fields" type="text" placeholder="{{g.user.firstname}}" name="firstname" required disabled>
+                    <label for="username"><b>Last Name</b></label>
+                    <input class="fields" type="text" placeholder="{{g.user.lastname}}" name="lastname" required disabled>
+                    <label for="password"><b>Password</b></label>
+		            <input class="fields" type="password" placeholder="{{g.user.password}}" name="password" required disabled>
+		            <input class="fields" type="password" placeholder="{{g.user.password}}" name="repassword" required disabled>
+		            <label for="location"><b>Location</b></label>
+		            <input class="fields" type="text" placeholder="{{g.user.location}}" name="location" required disabled>
+		            <label for="phone"><b>Phone</b></label><br>
+		            <input class="fields" type="number" placeholder="{{g.user.phone}}" name="phone" required disabled><br>
+		            <input class="fields" type="submit" value="Submit Changes" disabled>
+                </form>
+            </div>
+            <script>
+                function makeChanges(){
+                    var arr = document.getElementsByClassName("fields");
+                    for(var i = 0; i < arr.length; i++){
+                        arr[i].disabled = false;
+                    }
+                }
+
+                function cancel(){
+                    var arr = document.getElementsByClassName("fields");
+                    for(var i = 0; i < arr.length; i++){
+                        arr[i].disabled = true;
+                        arr[i].value = "";
+                    }
+                }
+                
+            </script>
+        </main>
+    </body>
+</html>

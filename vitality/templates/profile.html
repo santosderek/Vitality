@@ -1,6 +1,13 @@
 {%extends 'base.html'%}
 {% block content%}
-
+<header>
+    <nav class="navd">                                      
+        <ul>
+              <li><a href="{{ url_for("profile") }}">Profile</a></li>
+              <li><a href="{{ url_for("usersettings") }}">Settings</a></li>
+        </ul>
+      </nav>
+</header>
 <p>Welcome back {{g.user.username}}</p>
 <p>User number is {{g.user.id}}</p>
 
