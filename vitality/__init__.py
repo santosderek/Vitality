@@ -117,12 +117,12 @@ def create_app():
             phone = request.form['phone']
 
             if username and password == re_password:
-                g.user.username = username
-                g.user.password = password
-                g.user.firstname = firstname
-                g.user.lastname = lastname
-                g.user.location = location
-                g.user.phone = phone
+                new_user = User(g.user.id, username, password, firstname, lastname, location, phone)
+                g.user = new_user
+                for index in range(len(users)):
+                    if g.user.id == users[index].id:
+                        users[index] = new_user
+
                 return redirect(url_for('usersettings'))
 
             

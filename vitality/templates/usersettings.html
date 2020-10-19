@@ -22,19 +22,19 @@
             <div class="container">
                 <form action="/usersettings" method="POST">
                     <label for="username"><b>Username</b></label>
-                    <input class="fields" type="text" placeholder="{{g.user.username}}" name="username" required disabled>
+                    <input class="fields" type="text" placeholder="{{g.user.username}}" name="username" disabled>
                     <label for="username"><b>First Name</b></label>
-                    <input class="fields" type="text" placeholder="{{g.user.firstname}}" name="firstname" required disabled>
+                    <input class="fields" type="text" placeholder="{{g.user.firstname}}" name="firstname" disabled>
                     <label for="username"><b>Last Name</b></label>
-                    <input class="fields" type="text" placeholder="{{g.user.lastname}}" name="lastname" required disabled>
+                    <input class="fields" type="text" placeholder="{{g.user.lastname}}" name="lastname" disabled>
                     <label for="password"><b>Password</b></label>
-		            <input class="fields" type="password" placeholder="{{g.user.password}}" name="password" required disabled>
-		            <input class="fields" type="password" placeholder="{{g.user.password}}" name="repassword" required disabled>
+		            <input class="fields" type="password" placeholder="" name="password" disabled>
+		            <input class="fields" type="password" placeholder="" name="repassword" disabled>
 		            <label for="location"><b>Location</b></label>
-		            <input class="fields" type="text" placeholder="{{g.user.location}}" name="location" required disabled>
+		            <input class="fields" type="text" placeholder="{{g.user.location}}" name="location" disabled>
 		            <label for="phone"><b>Phone</b></label><br>
-		            <input class="fields" type="number" placeholder="{{g.user.phone}}" name="phone" required disabled><br>
-		            <input class="fields" type="submit" value="Submit Changes" disabled>
+		            <input class="fields" type="number" placeholder="{{g.user.phone}}" name="phone" disabled><br>
+		            <input class="fields" type="submit" placeholder="Submit Changes" value="Submit Changes" disabled>
                 </form>
             </div>
             <script>
@@ -42,14 +42,18 @@
                     var arr = document.getElementsByClassName("fields");
                     for(var i = 0; i < arr.length; i++){
                         arr[i].disabled = false;
+                        arr[i].value = arr[i].placeholder;
                     }
+
                 }
 
                 function cancel(){
                     var arr = document.getElementsByClassName("fields");
                     for(var i = 0; i < arr.length; i++){
                         arr[i].disabled = true;
-                        arr[i].value = "";
+                        if(arr[i].type != "submit"){
+                            arr[i].value = "";
+                        }
                     }
                 }
                 
