@@ -45,7 +45,7 @@ def create_app():
         logger.info('Rendering Login')
         
         if request.method == 'POST': 
-            # Removing the last session id if there is one already
+            logger.debug("Poping out the the user id if found in the session.")
             session.pop('user_id', None)
             username = escape(request.form['username'])
             password = escape(request.form['password'])
