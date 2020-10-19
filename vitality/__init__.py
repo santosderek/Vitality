@@ -9,7 +9,7 @@ from flask import (
 )
 from flask_pymongo import PyMongo
 from .user import User
-# from markupsafe import escape # Used to escape characters
+from markupsafe import escape
 
 
 ### TODO: need to replace this with looking into the database. 
@@ -27,15 +27,11 @@ def create_app():
     @app.before_request
     def before_request():
         g.user = None
-
         if 'user_id' in session:
-
             found_user = None
-
             for user in users:
                 if user.id == session['user_id']:
                     found_user = user
-
             g.user = found_user
 
     @app.route('/', methods=["GET"])
@@ -50,8 +46,8 @@ def create_app():
         if request.method == 'POST': 
             # Removing the last session id if there is one already
             session.pop('user_id', None)
-            username = request.form['username']
-            password = request.form['password']
+            username = escape(request.form['username'])
+            password = escape(request.form['password'])
 
             # This needs to be replaced once we get the database up and running
             found_user = None
@@ -76,13 +72,13 @@ def create_app():
         if request.method == 'POST':
 
             session.pop('user_id', None)
-            username = request.form['username']
-            password = request.form['password']
-            firstname = request.form['firstname']
-            lastname = request.form['lastname']
-            re_password = request.form['repassword']
-            location = request.form['location']
-            phone = request.form['phone']
+            username = escape(request.form['username'])
+            password = escape(request.form['password'])
+            firstname = escape(request.form['firstname'])
+            lastname = escape(request.form['lastname'])
+            re_password = escape(request.form['repassword'])
+            location = escape(request.form['location'])
+            phone = escape(request.form['phone'])
 
             if username and password == re_password:
                 new_user = User(len(users) + 1, username, password, firstname, lastname, location, phone)
