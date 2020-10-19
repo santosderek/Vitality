@@ -23,6 +23,7 @@ def create_app():
 
     app = Flask(__name__, instance_relative_config=True)
     app.secret_key = 'somethingverysecret'
+    app.config["MONGO_URI"] = "mongodb://localhost:27017/flaskDatabase"
     logger = app.logger
     
     @app.before_request
