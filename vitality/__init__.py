@@ -18,7 +18,6 @@ users.append(User(id=1, username='derek', password='derek'))
 users.append(User(id=2, username='bryson', password='bryson'))
 
 
-
 def create_app():
 
     app = Flask(__name__, instance_relative_config=True)
@@ -79,12 +78,14 @@ def create_app():
             session.pop('user_id', None)
             username = request.form['username']
             password = request.form['password']
+            firstname = request.form['firstname']
+            lastname = request.form['lastname']
             re_password = request.form['repassword']
             location = request.form['location']
             phone = request.form['phone']
 
             if username and password == re_password:
-                new_user = User(len(users) + 1, username, password, location, phone)
+                new_user = User(len(users) + 1, username, password, firstname, lastname, location, phone)
                 users.append(new_user)
                 return redirect(url_for('login'))
                 #TODO: need to show user it was successful. 
@@ -98,6 +99,34 @@ def create_app():
         if not g.user:
             return redirect(url_for('login'))
         return render_template("profile.html")
+    
+    @app.route('/usersettings', methods=["GET","POST"])
+    def usersettings():
+        logger.info('Rendering User Settings')
+
+        if not g.user:
+            return redirect(url_for('login'))
+
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            firstname = request.form['firstname']
+            lastname = request.form['lastname']
+            re_password = request.form['repassword']
+            location = request.form['location']
+            phone = request.form['phone']
+
+            if username and password == re_password:
+                new_user = User(g.user.id, username, password, firstname, lastname, location, phone)
+                g.user = new_user
+                for index in range(len(users)):
+                    if g.user.id == users[index].id:
+                        users[index] = new_user
+
+                return redirect(url_for('usersettings'))
+
+            
+        return render_template("usersettings.html")
 
     @app.errorhandler(403)
     def page_not_found(e):
