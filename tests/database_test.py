@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_pymongo import PyMongo
-from database import Database
+from vitality.database import Database
 from vitality.user import User
 
 app = Flask(__name__)
