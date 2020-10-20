@@ -70,12 +70,6 @@ class Database:
         }
         })
 
-    def set_phone(self, id, phone):
-        self.mongo.db.user.update_one({"_id": ObjectId(id)}, {"$set": {
-            "phone": phone
-        }
-        })
-
     def set_firstname(self, id, firstname):
         self.mongo.db.user.update_one({"_id": ObjectId(id)}, {"$set": {
             "firstname": firstname
