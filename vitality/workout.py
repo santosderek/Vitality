@@ -1,8 +1,8 @@
 class Workout:
-    def __init__(self, w_name, difficulty, w_id, about, exp_rewards):
-        self.w_name = w_name
+    def __init__(self, name, difficulty, id, about=None, exp_rewards=None):
+        self.name = name
         self.difficulty = difficulty
-        self.w_id = w_id
+        self.id = id
         self.about = about
         self.exp_rewards = exp_rewards
 
@@ -10,7 +10,7 @@ class Workout:
         return {
             "w_name" : self.w_name,
             "difficulty" : self.difficulty,
-            "w_id" : self.w_id,
+            "id" : self.id,
             "about" : self.about,
             "exp_rewards" : self.exp_rewards
         }
