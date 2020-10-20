@@ -12,9 +12,9 @@ class Database:
             username  = found_user['username'],
             password  = found_user['password'],
             firstname = found_user['firstname'],
-            lastname  = found_user['firstname'],
-            location  = found_user['firstname'],
-            phone     = found_user['firstname']
+            lastname  = found_user['lastname'],
+            location  = found_user['location'],
+            phone     = found_user['phone']
         )
         return user
 
