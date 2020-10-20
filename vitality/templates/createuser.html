@@ -20,17 +20,31 @@
 	<h1 class="create">Create Account</h1>
 <div class="container">
 	<form action="/createuser" method="POST">
+
 		<label for="username"><b>Name</b></label>
 		<input type="text" placeholder="Username" name="username" required>
-		<input type="text" placeholder="First" name="firstname" required>
-		<input type="text" placeholder="Last" name="lastname" required>
-		<label for="password"><b>Password</b></label>
+
+		<label for="firstname"><b>First Name:</b></label>
+		<input type="text" placeholder="First Name" name="firstname" required>
+
+		<label for="lastname"><b>Last Name:</b></label>
+		<input type="text" placeholder="Last Name" name="lastname" required>
+
+		<label for="password"><b>Password:</b></label>
 		<input type="password" placeholder="Enter Password" name="password" required>
-		<input type="password" placeholder="Renter Password" name="repassword" required>
+
+		<label for="repassword"><b>Re-Enter Password:</b></label>
+		<input type="password" placeholder="Re-enter Password" name="repassword" required>
+
 		<label for="location"><b>Location</b></label>
 		<input type="text" placeholder="City and State" name="location" required>
-		<label for="phone"><b>Phone</b></label><br>
-		<input type="number" placeholder="Area Code & Number" name="phone" required><br>
+
+		<label for="phone"><b>Phone</b></label>
+		</br>
+		<input type="number" placeholder="Area Code & Number" name="phone" required>
+		
+		<br/>
+		<br/>
 		<input type="submit" value="Create">
 	</form>
     

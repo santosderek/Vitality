@@ -10,7 +10,7 @@ from flask import (
 from flask_pymongo import PyMongo
 from .user import User
 from markupsafe import escape
-from database import Database
+from .database import Database
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
@@ -70,7 +70,14 @@ def create_app():
             phone = escape(request.form['phone'])
 
             if username and password == re_password:
-                new_user = User(None, username, password, firstname, lastname, location, phone)
+                new_user = User(
+                    id = None, 
+                    username = username, 
+                    password = password, 
+                    firstname = firstname, 
+                    lastname = lastname, 
+                    location = location, 
+                    phone = phone)
                 database.add_user(new_user)
                 return redirect(url_for('login'))
                 #TODO: need to show user it was successful. 
@@ -102,12 +109,14 @@ def create_app():
             phone = escape(request.form['phone'])
 
             if username and password == re_password:
-                new_user = User(g.user.id, username, password, firstname, lastname, location, phone)
-                g.user = new_user
-                for index in range(len(users)):
-                    if g.user.id == users[index].id:
-                        users[index] = new_user
+                database.set_username(g.user.id, username)
+                database.set_password(g.user.id, password)
+                database.set_location(g.user.id, location)
+                database.set_phone(g.user.id, phone)
+                database.set_firstname(g.user.id, firstname)
+                database.set_lastname(g.user.id, lastname)
 
+                g.user = database.get_user_class_by_id(g.user.id)
                 return redirect(url_for('usersettings'))
 
             
