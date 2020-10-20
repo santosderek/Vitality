@@ -3,10 +3,11 @@ from flask import Flask
 from flask_pymongo import PyMongo
 from vitality.database import Database
 from vitality.user import User
-
+from vitality.configuration import Configuration
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/flaskDatabase"
+config = Configuration()
+app.config["MONGO_URI"] = config.get_local_uri()
 mongo = PyMongo(app)
 
 class TestDatabase(unittest.TestCase):

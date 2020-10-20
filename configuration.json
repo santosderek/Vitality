@@ -3,8 +3,7 @@
     }, 
 
     "mongodb" : {
-        "uri" : "mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]",
-		"localuri" : "mongodb://localhost:27017/",
+		"localuri" : "mongodb://localhost:27017/flaskDatabase",
 		"atlasuri" : "mongodb+srv://laruffaelijah:4155_8675@cluster0.zq0eb.mongodb.net/admin_user?retryWrites=true&w=majority"
     }, 
 
