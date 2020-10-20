@@ -8,7 +8,7 @@ class Workout:
 
     def as_dict(self):
         return {
-            "w_name" : self.w_name,
+            "name" : self.name,
             "difficulty" : self.difficulty,
             "id" : self.id,
             "about" : self.about,
