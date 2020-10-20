@@ -13,7 +13,7 @@ user = {
  }
 
 workout = {
- "w_name": "curls",
+ "name": "curls",
  "difficulty": "easy",
  "id": 0,
  "about": "biceps",
