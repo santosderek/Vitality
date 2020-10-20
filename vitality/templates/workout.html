@@ -10,20 +10,22 @@
 
 <!-- <header></header> -->
 
+
+
 <main>
-    <img src="images/lunge.jpg" alt="New Workout Routine"><br><br>
+    <img src="{{ url_for("static", filename="images/lunge.jpg") }}" alt="New Workout Routine"><br><br>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br>
         Nulla vestibulum mauris ut diam vulputate, nec scelerisque <br>
         magna maximus. Suspendisse sit amet ex vestibulum, semper nunc quis, <br>
         consequat arcu. Pellentesque feugiat molestie enim a aliquam. </p>
     <button onclick="window.location.href='newroutine.html'">New</button><br><br>
-    <img src="images/pushup.jpg" alt="Search"><br><br>
+    <img src="{{ url_for("static", filename="images/pushup.jpg") }}" alt="Search"><br><br>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br>
         Nulla vestibulum mauris ut diam vulputate, nec scelerisque <br>
         magna maximus. Suspendisse sit amet ex vestibulum, semper nunc quis, <br>
         consequat arcu. Pellentesque feugiat molestie enim a aliquam. </p>
     <button onclick="window.location.href='search.html'">Search</button><br><br>
-    <img src="images/equipment.jpg" alt="Workout List"><br><br>
+    <img src="{{ url_for("static", filename="images/equipment.jpg") }}" alt="Workout List"><br><br>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br>
         Nulla vestibulum mauris ut diam vulputate, nec scelerisque <br>
         magna maximus. Suspendisse sit amet ex vestibulum, semper nunc quis, <br>
