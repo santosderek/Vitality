@@ -8,14 +8,16 @@ from flask import (
     g
 )
 from flask_pymongo import PyMongo
-from .user import User
 from markupsafe import escape
+from .user import User
 from .database import Database
+from .configuration import Configuration
 
 def create_app():
+    config = Configuration()
     app = Flask(__name__, instance_relative_config=True)
     app.secret_key = 'somethingverysecret'
-    app.config["MONGO_URI"] = "mongodb://localhost:27017/flaskDatabase"
+    app.config["MONGO_URI"] = config.get_local_uri()
     logger = app.logger
     database = Database(app)
     
