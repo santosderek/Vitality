@@ -1,0 +1,33 @@
+
+<!-- {% extends 'base.html' %} -->
+
+{% block header %}
+
+<title>Workout List</title>
+
+{% endblock %}
+
+{% block content %}
+
+<!-- <header></header> -->
+
+<main>
+    <h2>Your Favorite Workouts</h2>
+
+    <ul>
+        <li>Workout 1</li>
+        <button onclick="window.location.href='{{ url_for("workoutlist") }}'">Select</button><br><br>
+        <li>Workout 2</li>
+        <button onclick="window.location.href='{{ url_for("workoutlist") }}'">Select</button><br><br>
+        <li>Workout 3</li>
+        <button onclick="window.location.href='{{ url_for("workoutlist") }}'">Select</button><br><br>
+        <li>Workout 4</li>
+        <button onclick="window.location.href='{{ url_for("workoutlist") }}'">Select</button><br><br>
+        <li>Workout 5</li>
+        <button onclick="window.location.href='{{ url_for("workoutlist") }}'">Select</button><br><br>
+        <li>Workout 6</li>
+        <button onclick="window.location.href='{{ url_for("workoutlist") }}'">Select</button><br><br>
+    </ul>  
+</main>
+
+{% endblock %}
