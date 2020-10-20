@@ -1,9 +1,22 @@
 from flask_pymongo import PyMongo
-
+from user import User 
 
 class Database:
     def __init__(self, app):
         self.mongo = PyMongo(app)
+
+    def get_user_class_by_id(self, id):
+        found_user = self.mongo.db.user.find_one({"id": id})
+        user = User(
+            id        = found_user['id'],
+            username  = found_user['username'],
+            password  = found_user['password'],
+            firstname = found_user['firstname'],
+            lastname  = found_user['firstname'],
+            location  = found_user['firstname'],
+            phone     = found_user['firstname']
+        )
+        return user
 
     def get_by_id(self, id):
         return self.mongo.db.user.find_one({"id": id})
