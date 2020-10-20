@@ -18,6 +18,19 @@ class Database:
         )
         return user
 
+    def get_user_class_by_username(self, username):
+        found_user = self.mongo.db.user.find_one({"username": username})
+        user = User(
+            id        = found_user['id'],
+            username  = found_user['username'],
+            password  = found_user['password'],
+            firstname = found_user['firstname'],
+            lastname  = found_user['lastname'],
+            location  = found_user['location'],
+            phone     = found_user['phone']
+        )
+        return user
+
     def get_by_id(self, id):
         return self.mongo.db.user.find_one({"id": id})
     
