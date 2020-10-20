@@ -10,6 +10,47 @@ app.config["MONGO_URI"] = "mongodb://localhost:27017/flaskDatabase"
 mongo = PyMongo(app)
 
 class TestDatabase(unittest.TestCase):
+
+    def test_add_user(self):
+        
+        # Creating database object
+        database = Database(app)
+
+        # Creating new User object
+        new_user = User(
+            None, 
+            username="test", 
+            password="password",
+            firstname="first",
+            lastname="last",
+            location="Earth",
+            phone=1234567890)
+
+        # Remove test user
+        while database.get_user_class_by_username(new_user.username):
+            db_user = database.get_user_class_by_username(new_user.username)
+            database.remove_user(db_user.id)
+
+        # Adding new user
+        database.add_user(new_user)
+
+        # Geting the new user by their username 
+        db_user = database.get_user_class_by_username(new_user.username)
+
+        # Check if the user was properly added
+        db_user_dict = db_user.as_dict()
+        db_user_dict.pop('id')
+
+        new_user_dict = new_user.as_dict()
+        new_user_dict.pop('id')
+
+        self.assertTrue (db_user_dict == new_user_dict)
+
+        # Removing temp user from database
+        database.remove_user(db_user.id)
+        self.assertTrue(database.get_by_id(db_user.id) == None)
+
+
     def test_set_username(self):
         
         # Creating database object
