@@ -105,13 +105,13 @@ def create_app():
             return redirect(url_for('login'))
 
         if request.method == 'POST':
-            username = request.form['username']
-            password = request.form['password']
-            firstname = request.form['firstname']
-            lastname = request.form['lastname']
-            re_password = request.form['repassword']
-            location = request.form['location']
-            phone = request.form['phone']
+            username = escape(request.form['username'])
+            password = escape(request.form['password'])
+            firstname = escape(request.form['firstname'])
+            lastname = escape(request.form['lastname'])
+            re_password = escape(request.form['repassword'])
+            location = escape(request.form['location'])
+            phone = escape(request.form['phone'])
 
             if username and password == re_password:
                 new_user = User(g.user.id, username, password, firstname, lastname, location, phone)
