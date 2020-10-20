@@ -10,30 +10,21 @@ from flask import (
 from flask_pymongo import PyMongo
 from .user import User
 from markupsafe import escape
-
-
-### TODO: need to replace this with looking into the database. 
-users = []
-users.append(User(id=1, username='derek', password='derek'))
-users.append(User(id=2, username='bryson', password='bryson'))
-
+from .database import Database
 
 def create_app():
-
     app = Flask(__name__, instance_relative_config=True)
     app.secret_key = 'somethingverysecret'
     app.config["MONGO_URI"] = "mongodb://localhost:27017/flaskDatabase"
     logger = app.logger
+    database = Database(app)
     
     @app.before_request
     def before_request():
         g.user = None
         if 'user_id' in session:
-            found_user = None
-            for user in users:
-                if user.id == session['user_id']:
-                    found_user = user
-            g.user = found_user
+            suspected_user = database.get_user_class_by_id(session['user_id'])
+            g.user = suspected_user if suspected_user and suspected_user.id == session['user_id'] else None
 
     @app.route('/', methods=["GET"])
     def index():
@@ -51,17 +42,15 @@ def create_app():
             password = escape(request.form['password'])
 
             # This needs to be replaced once we get the database up and running
-            found_user = None
-            for user in users:
-                if user.username == username and user.password == password:
-                    found_user = user
+            suspected_user = database.get_user_class_by_username(username)
+            found_user = suspected_user if suspected_user and suspected_user.password == password else None
 
             if found_user:
-                logger.debug('User exists')
+                logger.debug('Adding user_id to session')
                 session['user_id'] = found_user.id
                 return redirect(url_for('profile'))
             
-            # If username != correct password return back to login
+            # If username and password do not match
             return redirect(url_for('login'))
 
         return render_template("login.html")
@@ -71,7 +60,6 @@ def create_app():
         logger.info('Rendering Create User')
 
         if request.method == 'POST':
-
             session.pop('user_id', None)
             username = escape(request.form['username'])
             password = escape(request.form['password'])
@@ -82,8 +70,15 @@ def create_app():
             phone = escape(request.form['phone'])
 
             if username and password == re_password:
-                new_user = User(len(users) + 1, username, password, firstname, lastname, location, phone)
-                users.append(new_user)
+                new_user = User(
+                    id = None, 
+                    username = username, 
+                    password = password, 
+                    firstname = firstname, 
+                    lastname = lastname, 
+                    location = location, 
+                    phone = phone)
+                database.add_user(new_user)
                 return redirect(url_for('login'))
                 #TODO: need to show user it was successful. 
 
@@ -114,12 +109,14 @@ def create_app():
             phone = escape(request.form['phone'])
 
             if username and password == re_password:
-                new_user = User(g.user.id, username, password, firstname, lastname, location, phone)
-                g.user = new_user
-                for index in range(len(users)):
-                    if g.user.id == users[index].id:
-                        users[index] = new_user
+                database.set_username(g.user.id, username)
+                database.set_password(g.user.id, password)
+                database.set_location(g.user.id, location)
+                database.set_phone(g.user.id, phone)
+                database.set_firstname(g.user.id, firstname)
+                database.set_lastname(g.user.id, lastname)
 
+                g.user = database.get_user_class_by_id(g.user.id)
                 return redirect(url_for('usersettings'))
 
             
