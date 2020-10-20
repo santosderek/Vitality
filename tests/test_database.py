@@ -37,14 +37,10 @@ class TestDatabase(unittest.TestCase):
         # Geting the new user by their username 
         db_user = database.get_user_class_by_username(new_user.username)
 
-        # Check if the user was properly added
-        db_user_dict = db_user.as_dict()
-        db_user_dict.pop('id')
+        # Setting our current user object's id as mongodb id
+        new_user.id = db_user.id
 
-        new_user_dict = new_user.as_dict()
-        new_user_dict.pop('id')
-
-        self.assertTrue (db_user_dict == new_user_dict)
+        self.assertTrue (db_user.as_dict() == new_user.as_dict())
 
         # Removing temp user from database
         database.remove_user(db_user.id)
