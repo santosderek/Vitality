@@ -4,7 +4,7 @@ from flask_pymongo import PyMongo
 from vitality.database import Database
 from vitality.user import User
 from vitality.workout import Workout
-
+from vitality.configuration import Configuration
 
 app = Flask(__name__)
 config = Configuration()
