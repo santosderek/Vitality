@@ -8,9 +8,6 @@ class Configuration ():
         with open(path, 'r') as current_file:
             self.__data = json.loads( current_file.read() )
 
-    def get_mongodb_uri(self):
-        return self.__data['mongodb']['uri']
-
     def get_local_uri(self):
         return self.__data['mongodb']['localuri']
 

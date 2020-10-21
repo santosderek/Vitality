@@ -7,21 +7,22 @@ from vitality.workout import Workout
 
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/flaskDatabase"
+config = Configuration()
+app.config["MONGO_URI"] = config.get_local_uri()
 mongo = PyMongo(app)
 
 
 class TestDatabase(unittest.TestCase):
 
     def test_add_user(self):
-        
+
         # Creating database object
         database = Database(app)
 
         # Creating new User object
         new_user = User(
-            None, 
-            username="test", 
+            None,
+            username="test",
             password="password",
             firstname="first",
             lastname="last",
@@ -36,7 +37,7 @@ class TestDatabase(unittest.TestCase):
         # Adding new user
         database.add_user(new_user)
 
-        # Geting the new user by their username 
+        # Geting the new user by their username
         db_user = database.get_user_class_by_username(new_user.username)
 
         # Setting our current user object's id as mongodb id
@@ -101,14 +102,14 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(database.get_by_id(db_user.id) == None)
 
     def test_set_username(self):
-        
+
         # Creating database object
         database = Database(app)
 
         # Creating new User object
         new_user = User(
-            None, 
-            username="test", 
+            None,
+            username="test",
             password="password",
             firstname="first",
             lastname="last",
@@ -123,7 +124,7 @@ class TestDatabase(unittest.TestCase):
         # Adding new user
         database.add_user(new_user)
 
-        # Geting the new user by their username 
+        # Geting the new user by their username
         db_user_1 = database.get_user_class_by_username(new_user.username)
 
         # Setting our current user object's id as mongodb id
@@ -145,15 +146,15 @@ class TestDatabase(unittest.TestCase):
         database.remove_user(db_user_2.id)
         self.assertTrue(database.get_by_id(db_user_2.id) == None)
 
-    def test_set_password(self): 
+    def test_set_password(self):
 
         # Creating database object
         database = Database(app)
 
         # Creating new User object
         new_user = User(
-            None, 
-            username="test", 
+            None,
+            username="test",
             password="password",
             firstname="first",
             lastname="last",
@@ -168,7 +169,7 @@ class TestDatabase(unittest.TestCase):
         # Adding new user
         database.add_user(new_user)
 
-        # Updating user object to database user 
+        # Updating user object to database user
         new_user = database.get_user_class_by_username(new_user.username)
 
         # Changing password
@@ -182,15 +183,15 @@ class TestDatabase(unittest.TestCase):
         database.remove_user(db_user.id)
         self.assertTrue(database.get_user_class_by_id(db_user.id) == None)
 
-    def test_set_location(self): 
+    def test_set_location(self):
 
         # Creating database object
         database = Database(app)
 
         # Creating new User object
         new_user = User(
-            None, 
-            username="test", 
+            None,
+            username="test",
             password="password",
             firstname="first",
             lastname="last",
@@ -205,7 +206,7 @@ class TestDatabase(unittest.TestCase):
         # Adding new user
         database.add_user(new_user)
 
-        # Updating user object to database user 
+        # Updating user object to database user
         new_user = database.get_user_class_by_username(new_user.username)
 
         # Changing location
@@ -219,15 +220,15 @@ class TestDatabase(unittest.TestCase):
         database.remove_user(db_user.id)
         self.assertTrue(database.get_user_class_by_id(db_user.id) == None)
 
-        def test_set_phone(self): 
+        def test_set_phone(self):
 
             # Creating database object
             database = Database(app)
 
             # Creating new User object
             new_user = User(
-                None, 
-                username="test", 
+                None,
+                username="test",
                 password="password",
                 firstname="first",
                 lastname="last",
@@ -242,7 +243,7 @@ class TestDatabase(unittest.TestCase):
             # Adding new user
             database.add_user(new_user)
 
-            # Updating user object to database user 
+            # Updating user object to database user
             new_user = database.get_user_class_by_username(new_user.username)
 
             # Changing phone
@@ -256,15 +257,15 @@ class TestDatabase(unittest.TestCase):
             database.remove_user(db_user.id)
             self.assertTrue(database.get_user_class_by_id(db_user.id) == None)
 
-    def test_set_firstname(self): 
+    def test_set_firstname(self):
 
         # Creating database object
         database = Database(app)
 
         # Creating new User object
         new_user = User(
-            None, 
-            username="test", 
+            None,
+            username="test",
             password="password",
             firstname="first",
             lastname="last",
@@ -279,7 +280,7 @@ class TestDatabase(unittest.TestCase):
         # Adding new user
         database.add_user(new_user)
 
-        # Updating user object to database user 
+        # Updating user object to database user
         new_user = database.get_user_class_by_username(new_user.username)
 
         # Changing firstname
@@ -293,15 +294,15 @@ class TestDatabase(unittest.TestCase):
         database.remove_user(db_user.id)
         self.assertTrue(database.get_user_class_by_username(db_user.id) == None)
 
-    def test_set_lastname(self): 
+    def test_set_lastname(self):
 
         # Creating database object
         database = Database(app)
 
         # Creating new User object
         new_user = User(
-            None, 
-            username="test", 
+            None,
+            username="test",
             password="password",
             firstname="first",
             lastname="last",
@@ -316,7 +317,7 @@ class TestDatabase(unittest.TestCase):
         # Adding new user
         database.add_user(new_user)
 
-        # Updating user object to database user 
+        # Updating user object to database user
         new_user = database.get_user_class_by_username(new_user.username)
 
         # Changing lastname
