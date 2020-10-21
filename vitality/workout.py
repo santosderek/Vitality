@@ -1,5 +1,5 @@
 class Workout:
-    def __init__(self, id, creator_id, name, difficulty, about=None, exp_rewards=None):
+    def __init__(self, id, creator_id, name, difficulty="easy", about=None, exp_rewards=None):
         self.id = id
         self.creator_id = creator_id
         self.name = name

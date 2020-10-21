@@ -71,7 +71,7 @@ class TestDatabase(unittest.TestCase):
         # Adding new user
         database.add_user(new_user)
 
-        database.get_user_class_by_username(new_user.username)
+        db_user = database.get_user_class_by_username(new_user.username)
         # Creating a new Workout object
         new_workout = Workout(
             None,
@@ -83,19 +83,16 @@ class TestDatabase(unittest.TestCase):
 
         database.add_workout(new_workout)
         # Getting the new user by their username
-        db_user = database.get_user_class_by_username(new_user.username)
+
         # Getting the workout by their name
         db_workout = database.get_workout_class_by_name(new_workout.name)
-
-        # Setting our current workout object's id as mongodb id of user in string format
-        new_workout.creator_id = str(db_user.id)
 
         # Sets the id
         new_workout.id = db_workout.id
 
         #sets creator's id
-        new_workout.creator_id = str(db_user.id)
-        self.assertTrue(str(db_user.id) == new_workout.creator_id)
+        new_workout.creator_id = db_user.id
+        self.assertTrue(db_user.id == new_workout.creator_id)
 
         # Removing temp workout from database
         database.remove_workout(new_workout.id)
