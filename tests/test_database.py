@@ -92,8 +92,9 @@ class TestDatabase(unittest.TestCase):
 
         #sets creator's id
         new_workout.creator_id = db_user.id
+        db_workout.creator_id = new_workout.creator_id
         self.assertTrue(db_user.id == new_workout.creator_id)
-
+        self.assertTrue(db_workout.as_dict() == new_workout.as_dict())
         # Removing temp workout from database
         database.remove_workout(new_workout.id)
         self.assertTrue(database.get_workout_class_by_id(db_workout.id) == None)
