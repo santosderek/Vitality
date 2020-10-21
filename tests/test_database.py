@@ -3,11 +3,13 @@ from flask import Flask
 from flask_pymongo import PyMongo
 from vitality.database import Database
 from vitality.user import User
+from vitality.workout import Workout
 
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/flaskDatabase"
 mongo = PyMongo(app)
+
 
 class TestDatabase(unittest.TestCase):
 
@@ -46,6 +48,57 @@ class TestDatabase(unittest.TestCase):
         database.remove_user(db_user.id)
         self.assertTrue(database.get_by_id(db_user.id) == None)
 
+    def test_add_workout(self):
+        # Creating database object
+        database = Database(app)
+
+        # Creating new User object
+        new_user = User(
+            None,
+            username="test",
+            password="password",
+            firstname="first",
+            lastname="last",
+            location="Mars",
+            phone=9876543210)
+
+        # Remove test user
+        while database.get_user_class_by_username(new_user.username):
+            db_user = database.get_user_class_by_username(new_user.username)
+            database.remove_user(db_user.id)
+
+        # Adding new user
+        database.add_user(new_user)
+
+        # Creating a new Workout object
+        new_workout = Workout(
+            None,
+            name="testing",
+            difficulty="easy",
+            id=1,
+            about="workout",
+            exp_rewards=10)
+
+        database.add_workout(new_workout)
+        # Getting the new user by their username
+        db_user = database.get_user_class_by_username(new_user.username)
+        # Getting the workout by their name
+        db_workout = database.get_workout_class_by_name(new_workout.name)
+
+        # Setting our current workout object's id as mongodb id of user in string format
+        new_workout.creator = str(db_user.id)
+        # Sets the creator's id
+        database.set_workout_creator(new_workout.id, new_workout.creator)
+        new_workout.creator = str(db_user.id)
+        self.assertTrue(str(db_user.id) == new_workout.creator)
+
+        # Removing temp workout from database
+        database.remove_workout(new_workout.creator)
+        self.assertTrue(database.get_workout_class_by_creator_id(db_workout.creator) == None)
+
+        # Removing temp user from database
+        database.remove_user(db_user.id)
+        self.assertTrue(database.get_by_id(db_user.id) == None)
 
     def test_set_username(self):
         
@@ -127,7 +180,7 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(db_user.password == new_user.password)
 
         database.remove_user(db_user.id)
-        self.assertTrue(database.get_user_class_by_username(db_user.id) == None)
+        self.assertTrue(database.get_user_class_by_id(db_user.id) == None)
 
     def test_set_location(self): 
 
@@ -164,8 +217,7 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(db_user.location == new_user.location)
 
         database.remove_user(db_user.id)
-        self.assertTrue(database.get_user_class_by_username(db_user.id) == None)
-
+        self.assertTrue(database.get_user_class_by_id(db_user.id) == None)
 
         def test_set_phone(self): 
 
@@ -202,7 +254,7 @@ class TestDatabase(unittest.TestCase):
             self.assertTrue(db_user.phone == new_user.phone)
 
             database.remove_user(db_user.id)
-            self.assertTrue(database.get_user_class_by_username(db_user.id) == None)
+            self.assertTrue(database.get_user_class_by_id(db_user.id) == None)
 
     def test_set_firstname(self): 
 
@@ -276,9 +328,7 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(db_user.lastname == new_user.lastname)
 
         database.remove_user(db_user.id)
-        self.assertTrue(database.get_user_class_by_username(db_user.id) == None)
-
-
+        self.assertTrue(database.get_user_class_by_id(db_user.id) == None)
 
 if __name__ == '__main__':
     unittest.main()
