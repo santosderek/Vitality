@@ -1,7 +1,6 @@
 class Trainer(User):
-    def __init__(self, t_time=None, t_focus=None):
-        self.t_time = t_time
-        self.t_focus = t_focus
+    def __init__(self, trainees):
+        self.trainees = trainees
 
     def as_dict(self):
         return {
@@ -12,7 +11,11 @@ class Trainer(User):
             "lastname" : self.lastname,
             "location" : self.location,
             "phone" : self.phone
-            "t_time" : self.t_time
-            "t_focus" : self.t_focus
+            "trainees" : self.trainees
         }
 
+    def add_trainee(user_id):
+        self.trainees.append(user_id)
+
+    def remove_trainee(user_id):
+        self.trainees.remove(user_id)
