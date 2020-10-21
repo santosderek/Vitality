@@ -1,16 +1,12 @@
+from user import *
 class Trainer(User):
-    def __init__(self, trainees):
+    def __init__(self, id, username, password, trainees=None, firstname=None, lastname=None, location=None, phone=None):
+        super().__init__(id, username, password, firstname, lastname, location, phone)
         self.trainees = trainees
 
     def as_dict(self):
         return {
-            "id" : self.id,
-            "username" : self.username,
-            "password" : self.password,
-            "firstname" : self.firstname,
-            "lastname" : self.lastname,
-            "location" : self.location,
-            "phone" : self.phone
+            **super().as_dict(),
             "trainees" : self.trainees
         }
 
