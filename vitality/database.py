@@ -39,15 +39,15 @@ class Database:
             return user
         return None
 
-    def get_workout_class_by_creator_id(self, id):
-        found_workout = self.mongo.db.workout.find_one({"creator": id})
+    def get_workout_class_by_id(self, id):
+        found_workout = self.mongo.db.workout.find_one({"_id": ObjectId(id)})
 
         if found_workout:
             workout = Workout(
-                creator = found_workout['creator'],
+                id         = str(found_workout['_id']),
+                creator_id = found_workout['creator_id'],
                 name = found_workout['name'],
                 difficulty = found_workout['difficulty'],
-                id = found_workout['id'],
                 about = found_workout['about'],
                 exp_rewards = found_workout['exp_rewards']
             )
@@ -60,10 +60,10 @@ class Database:
 
         if found_workout:
             workout = Workout(
-                creator = found_workout['creator'],
+                id         = str(found_workout['_id']),
+                creator_id = found_workout['creator_id'],
                 name = found_workout['name'],
                 difficulty = found_workout['difficulty'],
-                id = found_workout['id'],
                 about = found_workout['about'],
                 exp_rewards = found_workout['exp_rewards']
             )
@@ -114,38 +114,38 @@ class Database:
         }
         })
 
-    def set_workout_creator(self, id, creator):
-        self.mongo.db.workout.update_one({"id": id}, {"$set": {
-            "creator": creator
+    def set_workout_creator_id(self, id, creator_id):
+        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
+            "creator_id": creator_id
         }
         })
 
     def set_workout_name(self, id, name):
-        self.mongo.db.workout.update_one({"creator": id}, {"$set": {
+        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
             "name": name
         }
         })
 
     def set_workout_difficulty(self, id, difficulty):
-        self.mongo.db.workout.update_one({"creator": id}, {"$set": {
+        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
             "difficulty": difficulty
         }
         })
 
     def set_workout_id(self, id, local_id):
-        self.mongo.db.workout.update_one({"creator": id}, {"$set": {
+        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
             "id": local_id
         }
         })
 
     def set_workout_about(self, id, about):
-        self.mongo.db.workout.update_one({"creator": id}, {"$set": {
+        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
             "about": about
         }
         })
 
     def set_workout_exp(self, id, exp):
-        self.mongo.db.workout.update_one({"creator": id}, {"$set": {
+        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
             "exp_rewards": exp
         }
         })
@@ -155,7 +155,7 @@ class Database:
         self.mongo.db.user.delete_one({"_id": ObjectId(id)})
 
     def remove_workout(self, id):
-        self.mongo.db.workout.delete_one({"creator": id})
+        self.mongo.db.workout.delete_one({"_id": ObjectId(id)})
 
     def check_id(self, id):
         if self.mongo.db.user.find_one({"_id": ObjectId(id)}):
@@ -164,13 +164,13 @@ class Database:
             return True
 
     def check_workout_id(self, id):
-        if self.mongo.db.workout.find_one({"id": id}):
+        if self.mongo.db.workout.find_one({"_id": ObjectId(id)}):
             return False
         else:
             return True
 
-    def check_workout_creator(self, id):
-        if self.mongo.db.workout.find_one({"creator": id}):
+    def check_workout_creator_id(self, id):
+        if self.mongo.db.workout.find_one({"creator_id": id}):
             return False
         else:
             return True
@@ -186,9 +186,8 @@ class Database:
 
     def add_workout(self, workout):
         self.mongo.db.workout.insert_one({
-            "creator": workout.creator,
+            "creator_id": workout.creator_id,
             'name': workout.name,
             "difficulty": workout.difficulty,
-            "id": workout.id,
             "about": workout.about,
             "exp_rewards": workout.exp_rewards})
