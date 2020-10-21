@@ -1,4 +1,4 @@
-from user import *
+from .user import User
 class Trainer(User):
     def __init__(self, id, username, password, trainees=None, firstname=None, lastname=None, location=None, phone=None):
         super().__init__(id, username, password, firstname, lastname, location, phone)
