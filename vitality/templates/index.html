@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block header %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="base.css") }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="base.css") }}">
 {% endblock %}
 
 {% block content %}
-    <p>Placeholder .... This is some content that will be injected into the content block of base.html.</p>
-    <br /> 
-    <a href="{{ url_for("login") }}">Log In</a>
-    <br /> 
-    <a href="{{ url_for("createuser") }}">Create Account</a>
-    <br /> 
+<p>Placeholder .... This is some content that will be injected into the content block of base.html.</p>
+<br />
+<a href="{{ url_for("login") }}">Log In</a>
+<br />
+<a href="{{ url_for("createuser") }}">Create Account</a>
+<br />
 {% endblock %}
