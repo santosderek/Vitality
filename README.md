@@ -1,1 +1,1 @@
-![](vitality/static/HeartLogo.png)
+![](vitality/static/images/heartlogo.png)
