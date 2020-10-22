@@ -1,54 +1,58 @@
-<!doctype html>
-<html class="html2">
-<head>
-<meta charset="utf-8">
-<title>createuser</title>
-	<link rel = "stylesheet" type = "text/css" href = "{{ url_for("static", filename="login.css") }}">
-</head>
+{% extends 'base.html' %}
 
-<body>
-	<header>
-  		<nav class="navd">                                      
-    		<ul>
-      			<li><a href="{{ url_for("login") }}">Log In</a></li>
-     			<li><a href="{{ url_for("createuser") }}">Create Account</a></li>
-    		</ul>
-  		</nav>
-  	 	  
-	</header>
+{% block content %}
+<header>
+	<nav class="navd">
+		<ul>
+			<li><a href="{{ url_for("login") }}">Log In</a></li>
+			<li><a href="{{ url_for("createuser") }}">Create Account</a></li>
+		</ul>
+	</nav>
+</header>
 <main>
+	{% if creation_successful %}
+	<h1 style="color: green;">Account was created!</h1>
+	{% else %}
+
+	{% if error_message %}
+	<p style="color: red;">Could not create account!</p>
+	{% endif %}
+	
 	<h1 class="create">Create Account</h1>
-<div class="container">
-	<form action="/createuser" method="POST">
+	<div class="container">
+		<form action="/createuser" method="POST">
+			<label for="username"><b>Name</b></label>
+			<input type="text" placeholder="Username" name="username" required>
+			<br />
 
-		<label for="username"><b>Name</b></label>
-		<input type="text" placeholder="Username" name="username" required>
+			<label for="firstname"><b>First Name:</b></label>
+			<input type="text" placeholder="First Name" name="firstname" required>
+			<br />
 
-		<label for="firstname"><b>First Name:</b></label>
-		<input type="text" placeholder="First Name" name="firstname" required>
+			<label for="lastname"><b>Last Name:</b></label>
+			<input type="text" placeholder="Last Name" name="lastname" required>
+			<br />
 
-		<label for="lastname"><b>Last Name:</b></label>
-		<input type="text" placeholder="Last Name" name="lastname" required>
+			<label for="password"><b>Password:</b></label>
+			<input type="password" placeholder="Enter Password" name="password" required>
+			<br />
 
-		<label for="password"><b>Password:</b></label>
-		<input type="password" placeholder="Enter Password" name="password" required>
+			<label for="repassword"><b>Re-Enter Password:</b></label>
+			<input type="password" placeholder="Re-enter Password" name="repassword" required>
+			<br />
 
-		<label for="repassword"><b>Re-Enter Password:</b></label>
-		<input type="password" placeholder="Re-enter Password" name="repassword" required>
+			<label for="location"><b>Location</b></label>
+			<input type="text" placeholder="City and State" name="location" required>
+			<br />
 
-		<label for="location"><b>Location</b></label>
-		<input type="text" placeholder="City and State" name="location" required>
+			<label for="phone"><b>Phone</b></label>
+			<input type="number" placeholder="Area Code & Number" name="phone" required>
+			<br />
+			<br />
 
-		<label for="phone"><b>Phone</b></label>
-		</br>
-		<input type="number" placeholder="Area Code & Number" name="phone" required>
-		
-		<br/>
-		<br/>
-		<input type="submit" value="Create">
-	</form>
-    
- </div>
-</main>
-</body>
-</html>
+			<input type="submit" value="Create">
+		</form>
+	</div>
+	{% endif %}
+
+	{% endblock %}

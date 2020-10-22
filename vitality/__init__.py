@@ -52,10 +52,10 @@ def create_app():
                 session['user_id'] = found_user.id
                 return redirect(url_for('profile'))
             
-            # If username and password do not match
-            return redirect(url_for('login'))
+            # If no user found, alert user, and reload page
+            return render_template("login.html", login_error = True)
 
-        return render_template("login.html")
+        return render_template("login.html", login_error = False)
 
     @app.route('/createuser', methods=["GET", "POST"])
     def createuser():
@@ -81,15 +81,17 @@ def create_app():
                     location = location, 
                     phone = phone)
                 database.add_user(new_user)
-                return redirect(url_for('login'))
-                #TODO: need to show user it was successful. 
+                # If username and password successful    
+                return render_template("createuser.html", creation_successful = True, error_message = False)
 
-        return render_template("createuser.html")
+            # If username and password failed, render error messsage 
+            return render_template("createuser.html", creation_successful = True, error_message = True)
+
+        return render_template("createuser.html", creation_successful = False, error_message = False)
 
     @app.route('/profile', methods=["GET"])
     def profile():
         logger.info('Rendering Profile')
-
         if not g.user:
             return redirect(url_for('login'))
         return render_template("profile.html")
