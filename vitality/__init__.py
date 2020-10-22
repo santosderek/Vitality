@@ -55,9 +55,9 @@ def create_app():
                 return redirect(url_for('profile'))
 
             # If no user found, alert user, and reload page
-            return render_template("login.html", login_error=True)
+            return render_template("account/login.html", login_error=True)
 
-        return render_template("login.html", login_error=False)
+        return render_template("account/login.html", login_error=False)
 
     @app.route('/createuser', methods=["GET", "POST"])
     def createuser():
@@ -84,19 +84,19 @@ def create_app():
                     phone=phone)
                 database.add_user(new_user)
                 # If username and password successful
-                return render_template("createuser.html", creation_successful=True, error_message=False)
+                return render_template("account/createuser.html", creation_successful=True, error_message=False)
 
             # If username and password failed, render error messsage
-            return render_template("createuser.html", creation_successful=True, error_message=True)
+            return render_template("account/createuser.html", creation_successful=True, error_message=True)
 
-        return render_template("createuser.html", creation_successful=False, error_message=False)
+        return render_template("account/createuser.html", creation_successful=False, error_message=False)
 
     @app.route('/profile', methods=["GET"])
     def profile():
         logger.info('Rendering Profile')
         if not g.user:
             return redirect(url_for('login'))
-        return render_template("profile.html")
+        return render_template("account/profile.html")
 
     @app.route('/usersettings', methods=["GET", "POST"])
     def usersettings():
@@ -136,7 +136,7 @@ def create_app():
 
                 return redirect(url_for('usersettings'))
 
-        return render_template("usersettings.html")
+        return render_template("account/usersettings.html")
 
     @app.route('/logout', methods=["GET", "POST"])
     def logout():
