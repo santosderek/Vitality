@@ -124,6 +124,16 @@ def create_app():
             
         return render_template("usersettings.html")
 
+    @app.route('/logout', methods=["GET","POST"])
+    def logout():
+        logger.debug('User {} has logged out.'.format( str(session['user_id']) ))
+        g.user = None
+        if 'user_id' in session: 
+            session.pop('user_id', None)
+        return redirect(url_for('index'))
+
+            
+
     @app.errorhandler(403)
     def page_not_found(e):
         logger.info('Rendering 403')
