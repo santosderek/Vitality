@@ -91,12 +91,13 @@ def create_app():
 
         return render_template("account/createuser.html", creation_successful=False, error_message=False)
 
-    @app.route('/profile', methods=["GET"])
-    def profile():
+    @app.route('/profile/<username>', methods=["GET"])
+    def profile(username):
         logger.info('Rendering Profile')
-        if not g.user:
-            return redirect(url_for('login'))
-        return render_template("account/profile.html")
+        username = escape(username)
+        user = database.get_user_class_by_username(username)
+        return render_template("account/profile.html", user=user)
+
 
     @app.route('/usersettings', methods=["GET", "POST"])
     def usersettings():
