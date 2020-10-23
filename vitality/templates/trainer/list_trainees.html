@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<nav class="sidebar">
+    <a href=""><img src="{{ url_for("index") }}" alt="Vitality Logo" width="200" height="100"></a>
+    <a href="">Trainees</a>
+    <a href="">Workouts</a>
+    <a href="">Schedule</a>
+    <a href="">Diets</a>
+</nav>
+
+<main style="display: block;">
+    <div class="trainees" style="display: block;">
+        {% if trainees|length < 1 %}
+        <div class="trainee">
+            <p style="color: red;">No trainees found!</p>
+        </div>
+        {% else %}
+        {% for trainee in trainees %}
+        <div class="trainee" style="display: flex; align-items: center; text-align: center; padding: 10px 20px;">
+            <a href="{{ url_for("profile") }}">
+                <img src="{{ url_for("static", filename="images/profile.svg") }}" alt="Trainee {{ trainee.username }}"
+                    width="100" heigh="100">
+                <h3 class="trainee_name">{{ trainee.username }}</h3>
+            </a>
+            <button type="button" style="padding: 10px 20px; width: 200px; height:80px; text-align: center;">
+                Assigned Workouts
+            </button>
+            <button type="button" style="padding: 10px 20px; width: 200px; height:80px; text-align: center;">
+                Info
+            </button>
+            <button type="button" style="padding: 10px 20px; width: 200px; height:80px; text-align: center;">
+                Accept | Remove
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

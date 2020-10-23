@@ -12,7 +12,7 @@ from markupsafe import escape
 from .user import User
 from .database import Database
 from .configuration import Configuration
-
+from .workout import Workout
 
 def create_app():
     config = Configuration()
@@ -27,8 +27,11 @@ def create_app():
         g.user = None
         if 'user_id' in session:
             suspected_user = database.get_user_class_by_id(session['user_id'])
-            g.user = suspected_user if suspected_user and suspected_user.id == session[
-                'user_id'] else None
+            if suspected_user and suspected_user.id == session['user_id']:
+                g.user = suspected_user
+
+            else:
+                g.user = None
 
     @app.route('/', methods=["GET"])
     def index():
@@ -145,6 +148,51 @@ def create_app():
         if 'user_id' in session:
             session.pop('user_id', None)
         return redirect(url_for('index'))
+
+
+    """ Trainer pages """
+    
+    @app.route('/trainer_overview', methods=["GET"])
+    def trainer_overview():
+        if not g.user:
+            logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        logger.debug('Trainer {} is loaded Trainer Overview.'.format(str(session['user_id'])))
+        return render_template("trainer/overview.html", 
+            trainees=[
+                database.get_user_class_by_username("derek"),
+                database.get_user_class_by_username("bryson"),
+                database.get_user_class_by_username("elijah")], 
+            workouts=[
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0),
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0),
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0)
+            ],
+            events=[])
+
+    @app.route('/trainer_list_trainees', methods=["GET"])
+    def trainer_list_trainees():
+        if not g.user:
+            logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        logger.debug('Trainer {} is loaded Trainer List Trainees.'.format(str(session['user_id'])))
+        return render_template("trainer/list_trainees.html", 
+            trainees=[
+                database.get_user_class_by_username("derek"),
+                database.get_user_class_by_username("bryson"),
+                database.get_user_class_by_username("elijah")])
+    
+    @app.route('/trainer_schedule', methods=["GET"])
+    def trainer_schedule():
+        if not g.user:
+            logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        logger.debug('Trainer {} is loaded Trainer Schedule.'.format(str(session['user_id'])))
+        return render_template("trainer/schedule.html", 
+            events=[])
 
     @app.errorhandler(403)
     def page_not_found(e):

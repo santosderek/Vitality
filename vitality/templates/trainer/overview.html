@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav class="sidebar"> 
+    <a href=""><img src="{{ url_for("index") }}" alt="Vitality Logo" width="200" height="100"></a>
+    <a href="">Trainees</a>
+    <a href="">Workouts</a>
+    <a href="">Schedule</a>
+    <a href="">Diets</a>
+</nav> 
+
+<main style="display: block;"> 
+    <div class="trainees" style="display: flex;">
+        {% if trainees|length < 1 %}
+        <div class="trainee">
+            <p style="color: red;">No trainees found!</p>
+        </div>
+        {% else %}
+        {% for trainee in trainees %}
+        <div class="trainee" style="align-items: center; text-align: center; padding: 10px 20px;">
+            <a href="{{ url_for("profile") }}">
+                <img src="{{ url_for("static", filename="images/profile.svg") }}" alt="Trainee {{ trainee.username }}" width="100" heigh="100">
+                <h3 class="trainee_name">{{ trainee.username }}</h3>
+            </a>
+        </div>
+        {% endfor %}
+        {% endif %}
+        
+    </div>
+    <div class="workouts" style="display: flex;">
+        {% if workouts|length < 1 %}
+        <div class="workout">
+            <p style="color: red;">No workouts found!</p>
+        </div>
+        {% else %}
+        {% for workout in workouts %}
+        <div class="workout" style="align-items: center; text-align: center; padding: 10px 20px;">
+            <a href="">
+                <img src="{{ url_for("static", filename="images/profile.svg") }}" alt="workout {{ workout.name }}" width="100" heigh="100">
+                <h3 class="workout_name">{{ workout.name }}</h3>
+            </a>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="schedule" style="display: flex;">
+        {% if events|length < 1 %}
+        <div class="event">
+            <p style="color: red;">No events found!</p>
+        </div>
+        {% else %}
+        {% for event in events %}
+        <div class="event" style="align-items: center; text-align: center; padding: 10px 20px;">
+            <a href="">
+                <img src="{{ url_for("static", filename="images/profile.svg") }}" alt="event {{ event.name }}" width="100" heigh="100">
+                <h3 class="event_name">{{ event.name }}</h3>
+            </a>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
