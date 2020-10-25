@@ -2,14 +2,32 @@
 {% block content%}
 <header>
       <nav class="navd">
-            <ul>
-                  <li><a href="{{ url_for("profile") }}">Profile</a></li>
-                  <li><a href="{{ url_for("usersettings") }}">Settings</a></li>
-                  <li><a href="{{ url_for("logout") }}">logout</a></li>
-            </ul>
+            <a href="">Overview</a>
+            <a href="{{ url_for("usersettings") }}">Settings</a>
+            <a href="{{ url_for("logout") }}">logout</a>
       </nav>
 </header>
-<p>Welcome back {{g.user.username}}</p>
-<p>User number is {{g.user.id}}</p>
 
+<main> 
+      {% if user %}
+      <div>
+            <img src=" {{ url_for("static", filename="images/heartlogo.png") }}" alt="Profile Picture">
+            <p>Username: {{ user.username }}</p>
+            <p>Name: {{ user.firstname}} {{ user.lastname }}</p>
+            <p>Location: {{ user.location }}</p>
+            <p>Phone: {{ user.phone }}</p>
+            <p>Height:</p>
+            <p>Weight:</p>
+            <p>Experience Points:</p>
+            <p>Goal Weight:</p>
+            <p>Body Fat:</p>
+      </div>
+      {% else %}
+      <div>
+            <p style="color: red;">No User Found!</p>
+      </div>
+      {% endif %}
+      
+
+</main>
 {% endblock %}
