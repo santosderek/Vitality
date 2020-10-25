@@ -176,6 +176,9 @@ class Database:
             return True
 
     def add_user(self, user):
+        if (self.get_by_username(user.username)): 
+            raise UsernameTakenError("Username was taken.")
+
         self.mongo.db.user.insert_one({
             'username': user.username, 
             'password': user.password, 
@@ -184,6 +187,8 @@ class Database:
             'location': user.location, 
             'phone': user.phone})
 
+        
+
     def add_workout(self, workout):
         self.mongo.db.workout.insert_one({
             "creator_id": workout.creator_id,
@@ -191,3 +196,9 @@ class Database:
             "difficulty": workout.difficulty,
             "about": workout.about,
             "exp_rewards": workout.exp_rewards})
+
+
+
+class UsernameTakenError(ValueError): 
+    """If a username was taken within the database class"""
+    pass

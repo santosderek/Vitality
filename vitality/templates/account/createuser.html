@@ -13,6 +13,10 @@
 	{% if creation_successful %}
 	<h1 style="color: green;">Account was created!</h1>
 	{% else %}
+	
+	{% if username_taken %}
+	<p style="color: red;">Username was taken!</p>
+	{% endif %}
 
 	{% if error_message %}
 	<p style="color: red;">Could not create account!</p>
@@ -21,7 +25,7 @@
 	<h1 class="create">Create Account</h1>
 	<div class="container">
 		<form action="/createuser" method="POST">
-			<label for="username"><b>Name</b></label>
+			<label for="username"><b>Username:</b></label>
 			<input type="text" placeholder="Username" name="username" required>
 			<br />
 
