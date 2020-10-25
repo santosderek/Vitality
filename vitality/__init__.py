@@ -55,7 +55,7 @@ def create_app():
             if found_user:
                 logger.debug('Adding user_id to session')
                 session['user_id'] = found_user.id
-                return redirect(url_for('profile'))
+                return redirect(url_for('profile', username=found_user.username))
 
             # If no user found, alert user, and reload page
             return render_template("account/login.html", login_error=True)
