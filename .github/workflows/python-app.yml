@@ -34,7 +34,6 @@ jobs:
     - name: MongoDB in GitHub Actions
       uses: supercharge/mongodb-github-action@1.3.0
       with:
-        # MongoDB version to use (default "latest")
         mongodb-version: latest
     - name: Test with pytest
       run: |
