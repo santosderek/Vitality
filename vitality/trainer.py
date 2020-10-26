@@ -12,10 +12,10 @@ class Trainer(User):
             "trainees" : self.trainees
         }
 
-    def add_trainee(user_id):
+    def add_trainee(self, user_id):
         """Adds the trainee's user id to Trainer's list of trainees."""
         self.trainees.append(user_id)
 
-    def remove_trainee(user_id):
+    def remove_trainee(self, user_id):
         """Removes a trainee's user id to Trainer's list of trainees."""
         self.trainees.remove(user_id)
