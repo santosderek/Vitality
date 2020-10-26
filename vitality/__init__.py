@@ -15,6 +15,7 @@ from .configuration import Configuration
 from .workout import Workout
 
 def create_app():
+    """Application factory for our flask web server"""
     config = Configuration()
     app = Flask(__name__, instance_relative_config=True)
     app.secret_key = 'somethingverysecret'
@@ -24,6 +25,7 @@ def create_app():
 
     @app.before_request
     def before_request():
+        """Actions to take before each request"""
         g.user = None
         if 'user_id' in session:
             suspected_user = database.get_user_class_by_id(session['user_id'])
@@ -35,11 +37,13 @@ def create_app():
 
     @app.route('/', methods=["GET"])
     def index():
+        """The home page of Vitality"""
         logger.info('Rendering Index')
         return render_template("index.html")
 
     @app.route('/login', methods=["GET", "POST"])
     def login():
+        """Login page for Vitality"""
         logger.info('Rendering Login')
 
         if request.method == 'POST':
@@ -55,7 +59,7 @@ def create_app():
             if found_user:
                 logger.debug('Adding user_id to session')
                 session['user_id'] = found_user.id
-                return redirect(url_for('profile'))
+                return redirect(url_for('profile', username=found_user.username))
 
             # If no user found, alert user, and reload page
             return render_template("account/login.html", login_error=True)
@@ -64,6 +68,7 @@ def create_app():
 
     @app.route('/createuser', methods=["GET", "POST"])
     def createuser():
+        """Sign up page for Vitality"""
         logger.info('Rendering Create User')
 
         if request.method == 'POST':
@@ -96,6 +101,7 @@ def create_app():
 
     @app.route('/profile/<username>', methods=["GET"])
     def profile(username):
+        """Profile page for a given username"""
         logger.info('Rendering Profile')
         username = escape(username)
         user = database.get_user_class_by_username(username)
@@ -104,6 +110,7 @@ def create_app():
 
     @app.route('/usersettings', methods=["GET", "POST"])
     def usersettings():
+        """User settings for logged in user"""
         logger.info('Rendering User Settings')
 
         if not g.user:
@@ -144,6 +151,7 @@ def create_app():
 
     @app.route('/logout', methods=["GET", "POST"])
     def logout():
+        """Logout route"""
         logger.debug('User {} has logged out.'.format(str(session['user_id'])))
         g.user = None
         if 'user_id' in session:
@@ -155,6 +163,7 @@ def create_app():
     
     @app.route('/trainer_overview', methods=["GET"])
     def trainer_overview():
+        """Trainer overview page populated by current logged in user's database settings"""
         if not g.user:
             logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
@@ -174,6 +183,7 @@ def create_app():
 
     @app.route('/trainer_list_trainees', methods=["GET"])
     def trainer_list_trainees():
+        """Trainer list trainees page which will look for all trainees that the trainer has added."""
         if not g.user:
             logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
@@ -187,6 +197,7 @@ def create_app():
     
     @app.route('/trainer_schedule', methods=["GET"])
     def trainer_schedule():
+        """Trainer schedule page which gets populated by stored event list."""
         if not g.user:
             logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
@@ -197,23 +208,27 @@ def create_app():
 
     @app.errorhandler(403)
     def page_not_found(e):
+        """Error handler for 403 page"""
         logger.info('Rendering 403')
         return "403", 403
 
     @app.errorhandler(404)
     def page_not_found(e):
+        """Error handler for 404 page"""
         logger.info('Rendering 404')
         return "404", 404
 
     @app.errorhandler(410)
     def page_not_found(e):
+        """Error handler for 410 page"""
         logger.info('Rendering 410')
         return "410", 410
 
     @app.errorhandler(500)
     def page_not_found(e):
+        """Error handler for 500 page"""
         logger.info('Rendering 500')
         return "500", 500
 
-    # Return for Application Factory
+    # Return created flask app
     return app
