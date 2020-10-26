@@ -1,5 +1,6 @@
 class User:
     def __init__(self, id, username, password, firstname=None, lastname=None, location=None, phone=None):
+        """Constructor for User class."""
         self.id = id
         self.username = username
         self.password = password
@@ -9,6 +10,7 @@ class User:
         self.phone = phone
     
     def as_dict(self):
+        """Returns all attributes of the User class as a dictionary."""
         return {
             "id" : self.id,
             "username" : self.username,
