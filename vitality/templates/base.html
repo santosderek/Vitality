@@ -18,9 +18,9 @@
 <body>
     <div class="container">
 
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <nav class="navbar navbar-expand-lg">
             <a class="navbar-brand" href="{{ url_for("home") }}">
-                <img src="{{ url_for("static", filename="images/heartlogo.png") }}" alt="Vitality Logo">
+                <img style="max-height: 50px;" src="{{ url_for("static", filename="images/heartlogo.png") }}" alt="Vitality Logo">
             </a>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -43,7 +43,7 @@
                 </ul>
             </div>
         </nav>
-        
+
         {% block content %}{% endblock %}
     </div>
 </body>

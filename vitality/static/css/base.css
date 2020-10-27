@@ -1,6 +1,28 @@
-body {
+.navbar-toggler, .btn {
+    background-color: #47525E;
 }
 
-nav {
-
+.btn:hover{
+    background-color: #2f455e;
 }
+
+.navbar, .navbar-expand-lg{
+    background-color: #E5E9F2 !important;
+}
+
+.navbar li a{
+    color: #47525E;
+}
+
+.navbar li a:hover {
+    color: #F95F62;
+}
+
+.jumbotron h1 {
+    color: #F95F62;
+}
+
+/* .additionalContent {
+    background-color: #8492A6;
+    color: white; 
+} */
