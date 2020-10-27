@@ -140,7 +140,7 @@ class TestDatabase(unittest.TestCase):
         database.set_username(new_user.id, new_user.username)
 
         # Checking if database updated
-        db_user_2 = database.get_user_class_by_username(new_user.username)
+        db_user_2 = database.get_user_class_by_id(new_user.id)
 
         self.assertTrue (db_user_2.as_dict() == new_user.as_dict())
 
