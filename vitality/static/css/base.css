@@ -1,3 +1,10 @@
+button {
+    background-color: #47525E;
+    border: 0px;
+    color: white; 
+    border-radius: 5px;
+}
+
 .navbar-toggler, .btn {
     background-color: #47525E;
 }
@@ -22,6 +29,10 @@
     color: #F95F62;
 }
 
+.darkbg {
+    background-color: #8492A6;
+    color: white;
+}
 /* .additionalContent {
     background-color: #8492A6;
     color: white; 
