@@ -4,6 +4,13 @@
 <head>
     <title>Vitality</title>
 
+    <nav>
+        <a href="{{ url_for("home") }}">Home</a>
+        <a href="">Features</a>
+        <a href="{{ url_for("login")}}">Login</a>
+        <a href="{{ url_for("signup") }}">Sign up</a>
+    </nav>
+
     {% block header %}{% endblock %}
 
 </head>
