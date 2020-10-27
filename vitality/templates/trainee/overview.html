@@ -2,6 +2,10 @@
 
 {% block content %}
 <style>
+    #contentblock {
+        background-color: #8492A6;
+        color: white;
+    }
 
     a {
         color: white;
@@ -16,13 +20,9 @@
         color: #47525E;
     }
 
-    .btn-outline-light {
+    .btn {
         background-color: #8492A6;
         border-color: white;
-    }
-
-    .btn-outline-light:hover {
-        background-color: #D3DCE6;
     }
 
     .navbar,
@@ -34,27 +34,19 @@
     .flex-column .nav-item {
         border-bottom: 1px solid #D3DCE6;
     }
-
-    #contentblock {
-        background-color: #8492A6;
-        color: white;
-    }
 </style>
 <div class="row">
     <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
         <div class="sidebar-sticky pt-3">
             <ul class="nav flex-column">
                 <li class="nav-item pb-2">
-                    <a class="nav-link" href="{{ url_for("trainer_overview") }}"><b>Overview</b></a>
-                </li>
-                <li class="nav-item pb-2">
-                    <a class="nav-link" href="{{ url_for("trainer_list_trainees") }}"><b>Trainees</b></a>
+                    <a class="nav-link" href="{{ url_for("trainee_overview") }}"><b>Overview</b></a>
                 </li>
                 <li class="nav-item pb-2">
                     <a class="nav-link" href=""><b>Workouts</b></a>
                 </li>
                 <li class="nav-item pb-2">
-                    <a class="nav-link" href="{{ url_for("trainer_schedule") }}"><b>Schedule</b></a>
+                    <a class="nav-link" href=""><b>Schedule</b></a>
                 </li>
                 <li class="nav-item pb-2">
                     <a class="nav-link" href=""><b>Diets</b></a>
@@ -66,20 +58,22 @@
     <div id="contentblock" class="col-md-9 pt-3">
         <div class="row trainees">
             <div class="col-sm-12 text-center">
-                <a class="btn btn-outline-light btn-lg" href="{{ url_for("trainer_list_trainees") }}" role="button">See Trainees</a>
+                <a class="btn btn-primary btn-lg" href="" role="button">See Trainers</a>
             </div>
-            {% if trainees|length < 1 %}
+            
+
+            {% if trainers|length < 1 %}
             <div class="col trainee text-center p-3">
                 <p style="color: #47525E;"><b>No trainees found!</b></p>
             </div>
             {% else %}
-            {% for trainee in trainees %}
-            {% if trainee %}
+            {% for trainer in trainers %}
+            {% if trainer %}
             <div class="col-sm-12 col-md trainee" style="align-items: center; text-align: center; padding: 10px 20px;">
-                <a href="{{ url_for("profile", username=trainee.username) }}">
+                <a href="{{ url_for("profile", username=trainer.username) }}">
                     <img src="{{ url_for("static", filename="images/profile.svg") }}"
-                        alt="Trainee {{ trainee.username }}" width="100" heigh="100">
-                    <h3 class="trainee_name">{{ trainee.username }}</h3>
+                        alt="Trainee {{ trainer.username }}" width="100" heigh="100">
+                    <h3 class="trainer_name">{{ trainer.username }}</h3>
                 </a>
             </div>
             {% endif%}
@@ -89,7 +83,7 @@
         </div>
         <div class="row workouts">
             <div class="col-sm-12 text-center">
-                <a class="btn btn-outline-light btn-lg" href="" role="button">Workouts</a>
+                <a class="btn btn-primary btn-lg" href="" role="button">Workouts</a>
             </div>
             {% if workouts|length < 1 %}
             <div class="col workout text-center p-3">
@@ -112,7 +106,7 @@
 
         <div class="row schedule">
             <div class="col-sm-12 text-center">
-                <a class="btn btn-outline-light btn-lg" href="{{ url_for("trainer_schedule") }}" role="button">Schedule</a>
+                <a class="btn btn-primary btn-lg" href="" role="button">Schedule</a>
             </div>
             {% if events|length < 1 %}
             <div class="col event text-center p-3">

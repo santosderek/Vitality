@@ -4,4 +4,55 @@
 {% endblock %}
 
 {% block content %}
+
+<style>
+    .btn {
+        color: white;
+    }
+
+    .navbar,
+    .navbar-expand-lg,
+    .jumbotron {
+        background-color: #ffffff !important;
+    }
+
+    .card {
+        border: none; 
+        border-bottom: 1px solid #47525E;
+    }
+
+    #contentblock, .card{
+        background-color: #8492A6;
+        color: white;
+        
+    }
+    
+</style>
+<div class="row">
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
+        <div class="sidebar-sticky pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainer_overview") }}"><b>Overview</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainer_list_trainees") }}"><b>Trainees</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href=""><b>Workouts</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainer_schedule") }}"><b>Schedule</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href=""><b>Diets</b></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="col text-center " id="contentblock">
+        <p>Schedule...</p>
+    </div>
+</div>
 {% endblock %}

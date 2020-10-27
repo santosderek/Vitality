@@ -10,6 +10,7 @@ from flask import (
 from flask_pymongo import PyMongo
 from markupsafe import escape
 from .user import User
+from .trainer import Trainer
 from .database import Database, UsernameTakenError
 from .configuration import Configuration
 from .workout import Workout
@@ -41,6 +42,8 @@ def create_app():
         logger.info('Rendering home')
         return render_template("home.html")
 
+    """Account Management""" 
+    
     @app.route('/login', methods=["GET", "POST"])
     def login():
         """Login page for Vitality"""
@@ -56,10 +59,15 @@ def create_app():
             suspected_user = database.get_user_class_by_username(username)
             found_user = suspected_user if suspected_user and suspected_user.password == password else None
 
-            if found_user:
+            if found_user and type(found_user) == Trainer:
                 logger.debug('Adding user_id to session')
                 session['user_id'] = found_user.id
-                return redirect(url_for('profile', username=found_user.username))
+                return redirect(url_for('trainer_overview'))
+
+            elif found_user and type(found_user) == User:
+                logger.debug('Adding user_id to session')
+                session['user_id'] = found_user.id
+                return redirect(url_for('trainee_overview'))
 
             # If no user found, alert user, and reload page
             return render_template("account/login.html", login_error=True)
@@ -93,10 +101,10 @@ def create_app():
                 try: 
                     database.add_user(new_user)
                     # If username and password successful
-                    return render_template("account/createuser.html", creation_successful=True)
+                    return render_template("account/signup.html", creation_successful=True)
                 except UsernameTakenError as err: 
                     logger.debug("Username {} was taken.".format(new_user))
-                    return render_template("account/createuser.html", username_taken=True)
+                    return render_template("account/signup.html", username_taken=True)
 
             # If username and password failed, render error messsage
             return render_template("account/signup.html", creation_successful=True, error_message=True)
@@ -106,6 +114,9 @@ def create_app():
     @app.route('/profile/<username>', methods=["GET"])
     def profile(username):
         """Profile page for a given username"""
+        if not g.user:
+            return redirect(url_for('login'))
+
         logger.info('Rendering Profile')
         username = escape(username)
         user = database.get_user_class_by_username(username)
@@ -209,6 +220,26 @@ def create_app():
         logger.debug('Trainer {} is loaded Trainer Schedule.'.format(str(session['user_id'])))
         return render_template("trainer/schedule.html", 
             events=[])
+
+    """ Trainee pages """
+    @app.route('/trainee_overview', methods=["GET"])
+    def trainee_overview():
+        """Trainee overview page which gets populated by stored event list."""
+        if not g.user:
+            logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        logger.debug('Trainee {} has loaded Trainee Overview.'.format(str(session['user_id'])))
+        return render_template("trainee/overview.html",
+            trainers=[
+                database.get_user_class_by_username("derek"),
+                database.get_user_class_by_username("bryson"),
+                database.get_user_class_by_username("elijah")],
+            workouts=[
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0),
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0),
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0)]
+                )
 
     @app.errorhandler(403)
     def page_not_found(e):
