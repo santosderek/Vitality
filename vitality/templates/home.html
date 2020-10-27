@@ -1,14 +1,50 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="css/base.css") }}">
 {% endblock %}
 
 {% block content %}
-<p>Placeholder .... This is some content that will be injected into the content block of base.html.</p>
-<br />
-<a href="{{ url_for("login") }}">Log In</a>
-<br />
-<a href="{{ url_for("signup") }}">Create Account</a>
-<br />
+
+<main>
+    <div class="jumbotron text-center mb-0">
+        <h3 class="">Workout & Train</h3>
+        <h1 class="display-4">Prolong Your Vitality.</h1>
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="{{ url_for("login") }}" role="button">Change your life!</a>
+        </p>
+    </div>
+    <div class="row additionalContent">
+        <div class="col-sm-12 text-left mt-4 mb-5">
+            <div class="row">
+                <div class="col-sm-12 col-md-4 text-center">
+                    <img style="max-height: 100px; filter: invert(17%) sepia(0%) saturate(1641%) hue-rotate(158deg) brightness(96%) contrast(93%);"
+                        src="{{ url_for("static", filename="images/map.svg") }}" alt="Feature Image Block Right">
+                </div>
+                <div class="col-sm-12 col-md-8 text-center">
+                    <h3>Find trainers near you</h3>
+                    <p>Find top notch trainers right around the corner from you just waiting for you, to provide the
+                        best workout you have ever had.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 text-right mb-5">
+            <div class="row">
+                <div class="col-sm-12 col-md-8 text-center">
+                    <div>
+                        <h3>Create Unique Workouts</h3>
+                        <p>Amazing workouts that are customized just for you, running, swimming, weights, aerobics,
+                            endurance, whatever you want, it can be done.</p>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 text-center">
+                    <img style="max-height: 100px; filter: invert(17%) sepia(0%) saturate(1641%) hue-rotate(158deg) brightness(96%) contrast(93%);"
+                        src="{{ url_for("static", filename="images/list.svg") }}" alt="Feature Image Block Left">
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</main>
 {% endblock %}

@@ -1,62 +1,49 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<header>
-	<nav class="navd">
-		<ul>
-			<li><a href="{{ url_for("login") }}">Log In</a></li>
-			<li><a href="{{ url_for("signup") }}">Create Account</a></li>
-		</ul>
-	</nav>
-</header>
-<main>
-	{% if creation_successful %}
-	<h1 style="color: green;">Account was created!</h1>
-	{% else %}
-	
-	{% if username_taken %}
-	<p style="color: red;">Username was taken!</p>
-	{% endif %}
+<main class="darkbg">
 
-	{% if error_message %}
-	<p style="color: red;">Could not create account!</p>
-	{% endif %}
+	<div class="row text-center">
+		<div class="col-sm-12 mb-1 mt-2">
+			<h1>Sign up!</h1>
+		</div>
+		<div class="col-sm-12 mb-1">
+			{% if creation_successful %}
+			<h1 style="color: green;">Account was created!</h1>
+			{% else %}
+			{% if error_message %}
+			<p style="color: red;">Could not create account!</p>
+			{% endif %}
+		</div>
+		<div class="col-sm-12 mb-1">
+			<form action="/signup" method="POST">
+				<input type="text" placeholder="Username" name="username" required>
+				<br />
 
-	<h1 class="create">Create Account</h1>
-	<div class="container">
-		<form action="/signup" method="POST">
-			<label for="username"><b>Username:</b></label>
-			<input type="text" placeholder="Username" name="username" required>
-			<br />
+				<input type="text" placeholder="First Name" name="firstname" required>
+				<br />
 
-			<label for="firstname"><b>First Name:</b></label>
-			<input type="text" placeholder="First Name" name="firstname" required>
-			<br />
+				<input type="text" placeholder="Last Name" name="lastname" required>
+				<br />
 
-			<label for="lastname"><b>Last Name:</b></label>
-			<input type="text" placeholder="Last Name" name="lastname" required>
-			<br />
+				<input type="password" placeholder="Enter Password" name="password" required>
+				<br />
 
-			<label for="password"><b>Password:</b></label>
-			<input type="password" placeholder="Enter Password" name="password" required>
-			<br />
+				<input type="password" placeholder="Re-enter Password" name="repassword" required>
+				<br />
 
-			<label for="repassword"><b>Re-Enter Password:</b></label>
-			<input type="password" placeholder="Re-enter Password" name="repassword" required>
-			<br />
+				<input type="text" placeholder="City and State" name="location" required>
+				<br />
 
-			<label for="location"><b>Location</b></label>
-			<input type="text" placeholder="City and State" name="location" required>
-			<br />
+				<input type="tel" placeholder="Phone Number" name="phone" required>
+				<br />
+				<br />
 
-			<label for="phone"><b>Phone</b></label>
-			<input type="number" placeholder="Area Code & Number" name="phone" required>
-			<br />
-			<br />
-
-			<input type="submit" value="Create">
-		</form>
+				<button style="width: 19%; height: 50px;" type="submit">Create</button>
+			</form>
+		</div>
 	</div>
+
 	{% endif %}
 
 	{% endblock %}
