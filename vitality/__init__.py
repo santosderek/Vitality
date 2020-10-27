@@ -114,6 +114,9 @@ def create_app():
     @app.route('/profile/<username>', methods=["GET"])
     def profile(username):
         """Profile page for a given username"""
+        if not g.user:
+            return redirect(url_for('login'))
+
         logger.info('Rendering Profile')
         username = escape(username)
         user = database.get_user_class_by_username(username)
@@ -227,7 +230,16 @@ def create_app():
             return redirect(url_for('login'))
 
         logger.debug('Trainee {} has loaded Trainee Overview.'.format(str(session['user_id'])))
-        return render_template("trainee/overview.html")
+        return render_template("trainee/overview.html",
+            trainees=[
+                database.get_user_class_by_username("derek"),
+                database.get_user_class_by_username("bryson"),
+                database.get_user_class_by_username("elijah")],
+            workouts=[
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0),
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0),
+                Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0)]
+                )
 
     @app.errorhandler(403)
     def page_not_found(e):

@@ -1,17 +1,9 @@
 {%extends 'base.html'%}
 {% block content%}
-<header>
-      <nav class="navd">
-            <a href="">Overview</a>
-            <a href="{{ url_for("usersettings") }}">Settings</a>
-            <a href="{{ url_for("logout") }}">logout</a>
-      </nav>
-</header>
 
 <main> 
       {% if user %}
       <div>
-            <img src=" {{ url_for("static", filename="images/heartlogo.png") }}" alt="Profile Picture">
             <p>Username: {{ user.username }}</p>
             <p>Name: {{ user.firstname}} {{ user.lastname }}</p>
             <p>Location: {{ user.location }}</p>
@@ -27,7 +19,5 @@
             <p style="color: red;">No User Found!</p>
       </div>
       {% endif %}
-      
-
 </main>
 {% endblock %}
