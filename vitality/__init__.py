@@ -231,7 +231,7 @@ def create_app():
 
         logger.debug('Trainee {} has loaded Trainee Overview.'.format(str(session['user_id'])))
         return render_template("trainee/overview.html",
-            trainees=[
+            trainers=[
                 database.get_user_class_by_username("derek"),
                 database.get_user_class_by_username("bryson"),
                 database.get_user_class_by_username("elijah")],
