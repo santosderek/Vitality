@@ -6,7 +6,7 @@
     <script src="{{ url_for("static", filename="js/jquery-3.5.1.min.js") }}"></script>
     <script src="{{ url_for("static", filename="js/bootstrap.bundle.min.js") }}"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for("static", filename="css/base.css") }}">
 
     <title>Vitality</title>
@@ -41,7 +41,7 @@
                         <a class="nav-link" href="{{ url_for("trainee_overview") }}"><b>Overview</b></a>
                     </li>
                     {% endif %}
-                    
+
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for("profile", username=g.user.username)}}"><b>Profile</b></a>
                     </li>

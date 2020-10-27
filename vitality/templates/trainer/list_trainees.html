@@ -4,40 +4,83 @@
 {% endblock %}
 
 {% block content %}
-<nav class="sidebar">
-    <a href=""><img src="{{ url_for("home") }}" alt="Vitality Logo" width="200" height="100"></a>
-    <a href="">Trainees</a>
-    <a href="">Workouts</a>
-    <a href="">Schedule</a>
-    <a href="">Diets</a>
-</nav>
 
-<main style="display: block;">
-    <div class="trainees" style="display: block;">
-        {% if trainees|length < 1 %}
-        <div class="trainee">
-            <p style="color: red;">No trainees found!</p>
+{% if trainees|length < 1 %}
+<div class="trainee">
+    <p style="color: #47525E;">No trainees found!</p>
+</div>
+{% else %}
+<style>
+    .btn {
+        color: white;
+    }
+
+    .navbar,
+    .navbar-expand-lg,
+    .jumbotron {
+        background-color: #ffffff !important;
+    }
+
+    .card {
+        border: none; 
+        border-bottom: 1px solid #47525E;
+    }
+
+    #contentblock, .card{
+        background-color: #8492A6;
+        color: white;
+        
+    }
+    
+</style>
+<div class="row">
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
+        <div class="sidebar-sticky pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainer_overview") }}"><b>Overview</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainer_list_trainees") }}"><b>Trainees</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href=""><b>Workouts</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainer_schedule") }}"><b>Schedule</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href=""><b>Diets</b></a>
+                </li>
+            </ul>
         </div>
-        {% else %}
+    </nav>
+
+    <div class="col text-center " id="contentblock">
         {% for trainee in trainees %}
-        <div class="trainee" style="display: flex; align-items: center; text-align: center; padding: 10px 20px;">
-            <a href="{{ url_for("profile") }}">
-                <img src="{{ url_for("static", filename="images/profile.svg") }}" alt="Trainee {{ trainee.username }}"
-                    width="100" heigh="100">
-                <h3 class="trainee_name">{{ trainee.username }}</h3>
-            </a>
-            <button type="button" style="padding: 10px 20px; width: 200px; height:80px; text-align: center;">
-                Assigned Workouts
-            </button>
-            <button type="button" style="padding: 10px 20px; width: 200px; height:80px; text-align: center;">
-                Info
-            </button>
-            <button type="button" style="padding: 10px 20px; width: 200px; height:80px; text-align: center;">
-                Accept | Remove
-            </button>
+        {% if trainee %}
+        <div class="col-sm-12">
+            <div class="card mb-3 mx-auto" style="max-width: 540px;">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <img class="card-img" src="{{ url_for("static", filename="images/profile.svg") }}"
+                            alt="Trainee {{ trainee.username }}" width="100" heigh="100">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ trainee.username|e }}</h5>
+                            <a class="btn mb-1 col-sm-12">Assigned Workouts</a>
+                            <a class="btn mb-1 col-sm-12">Info</a>
+                            <a class="btn mb-1 col-sm-12">Accept | Remove</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        {% endif %}
         {% endfor %}
         {% endif %}
     </div>
-</main>
+</div>
 {% endblock %}
