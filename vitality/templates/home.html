@@ -1,14 +1,27 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="css/base.css") }}">
 {% endblock %}
 
 {% block content %}
-<p>Placeholder .... This is some content that will be injected into the content block of base.html.</p>
-<br />
-<a href="{{ url_for("login") }}">Log In</a>
-<br />
-<a href="{{ url_for("signup") }}">Create Account</a>
-<br />
+
+<main>
+    <div class="feature_block_right">
+        <img src="" alt="Feature Image Block Right">
+        <div>
+            <h3>Find trainers near you</h3>
+            <p>Find top notch trainers right around the corner from you just waiting for you, to provide the best
+                workout you have ever had.</p>
+        </div>
+    </div>
+
+    <div class="feature_block_left">
+        <div>
+            <h3>Create Unique Workouts</h3>
+            <p>Amazing workouts that are customized just for you, running, swimming, weights, aerobics, endurance,
+                whatever you want, it can be done.</p>
+        </div>
+        <img src="" alt="Feature Image Block Left">
+    </div>
+</main>
 {% endblock %}
