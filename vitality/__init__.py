@@ -209,25 +209,21 @@ def create_app():
     @app.errorhandler(403)
     def page_not_found(e):
         """Error handler for 403 page"""
-        logger.info('Rendering 403')
         return "403", 403
 
     @app.errorhandler(404)
     def page_not_found(e):
         """Error handler for 404 page"""
-        logger.info('Rendering 404')
         return "404", 404
 
     @app.errorhandler(410)
     def page_not_found(e):
         """Error handler for 410 page"""
-        logger.info('Rendering 410')
         return "410", 410
 
     @app.errorhandler(500)
     def page_not_found(e):
         """Error handler for 500 page"""
-        logger.info('Rendering 500')
         return "500", 500
 
     # Return created flask app
