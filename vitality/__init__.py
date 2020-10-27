@@ -10,7 +10,7 @@ from flask import (
 from flask_pymongo import PyMongo
 from markupsafe import escape
 from .user import User
-from .database import Database
+from .database import Database, UsernameTakenError
 from .configuration import Configuration
 from .workout import Workout
 
@@ -90,14 +90,18 @@ def create_app():
                     lastname=lastname,
                     location=location,
                     phone=phone)
-                database.add_user(new_user)
-                # If username and password successful
-                return render_template("account/signup.html", creation_successful=True, error_message=False)
+                try: 
+                    database.add_user(new_user)
+                    # If username and password successful
+                    return render_template("account/createuser.html", creation_successful=True)
+                except UsernameTakenError as err: 
+                    logger.debug("Username {} was taken.".format(new_user))
+                    return render_template("account/createuser.html", username_taken=True)
 
             # If username and password failed, render error messsage
             return render_template("account/signup.html", creation_successful=True, error_message=True)
 
-        return render_template("account/signup.html", creation_successful=False, error_message=False)
+        return render_template("account/signup.html")
 
     @app.route('/profile/<username>', methods=["GET"])
     def profile(username):
