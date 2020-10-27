@@ -36,10 +36,10 @@ def create_app():
                 g.user = None
 
     @app.route('/', methods=["GET"])
-    def index():
+    def home():
         """The home page of Vitality"""
-        logger.info('Rendering Index')
-        return render_template("index.html")
+        logger.info('Rendering home')
+        return render_template("home.html")
 
     @app.route('/login', methods=["GET", "POST"])
     def login():
@@ -66,8 +66,8 @@ def create_app():
 
         return render_template("account/login.html", login_error=False)
 
-    @app.route('/createuser', methods=["GET", "POST"])
-    def createuser():
+    @app.route('/signup', methods=["GET", "POST"])
+    def signup():
         """Sign up page for Vitality"""
         logger.info('Rendering Create User')
 
@@ -92,12 +92,12 @@ def create_app():
                     phone=phone)
                 database.add_user(new_user)
                 # If username and password successful
-                return render_template("account/createuser.html", creation_successful=True, error_message=False)
+                return render_template("account/signup.html", creation_successful=True, error_message=False)
 
             # If username and password failed, render error messsage
-            return render_template("account/createuser.html", creation_successful=True, error_message=True)
+            return render_template("account/signup.html", creation_successful=True, error_message=True)
 
-        return render_template("account/createuser.html", creation_successful=False, error_message=False)
+        return render_template("account/signup.html", creation_successful=False, error_message=False)
 
     @app.route('/profile/<username>', methods=["GET"])
     def profile(username):
@@ -156,7 +156,7 @@ def create_app():
         g.user = None
         if 'user_id' in session:
             session.pop('user_id', None)
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
 
     """ Trainer pages """

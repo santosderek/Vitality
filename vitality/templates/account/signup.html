@@ -5,7 +5,7 @@
 	<nav class="navd">
 		<ul>
 			<li><a href="{{ url_for("login") }}">Log In</a></li>
-			<li><a href="{{ url_for("createuser") }}">Create Account</a></li>
+			<li><a href="{{ url_for("signup") }}">Create Account</a></li>
 		</ul>
 	</nav>
 </header>
@@ -20,7 +20,7 @@
 
 	<h1 class="create">Create Account</h1>
 	<div class="container">
-		<form action="/createuser" method="POST">
+		<form action="/signup" method="POST">
 			<label for="username"><b>Name</b></label>
 			<input type="text" placeholder="Username" name="username" required>
 			<br />
