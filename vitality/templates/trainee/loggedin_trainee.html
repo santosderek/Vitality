@@ -20,8 +20,7 @@
 
         <nav class="navbar navbar-expand-lg">
             <a class="navbar-brand" href="{{ url_for("home") }}">
-                <img style="max-height: 50px;" src="{{ url_for("static", filename="images/heartlogo.png") }}"
-                    alt="Vitality Logo">
+                <img style="max-height: 50px;" src="{{ url_for("static", filename="images/heartlogo.png") }}" alt="Vitality Logo">
             </a>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -29,7 +28,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto">
-                    {% if g.user %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for("home") }}"><b>Overview</b></a>
                     </li>
@@ -42,20 +40,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for("logout") }}"><b>Signout</b></a>
                     </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for("home") }}"><b>Home</b></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href=""><b>Features</b></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for("login")}}"><b>Login</b></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for("signup") }}"><b>Sign up</b></a>
-                    </li>
-                    {% endif %}
                 </ul>
             </div>
         </nav>
