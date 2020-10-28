@@ -17,7 +17,12 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container" id="whileLoading">
+        <div class="d-flex justify-content-center align-items-center min-vh-100">
+            <div class="spinner-border text-success" style="width: 100px; height: 100px;"></div>
+        </div>
+    </div>
+    <div class="container" style="display: none;" id="loading">
 
         <nav class="navbar navbar-expand-lg">
             <a class="navbar-brand" href="{{ url_for("home") }}">
@@ -70,6 +75,15 @@
 
         {% block content %}{% endblock %}
     </div>
+
+    <script>
+        window.onload = function() {
+            
+            $("#whileLoading").hide();
+            $("#loading").show();
+
+        }
+    </script>
 </body>
 
 </html>
