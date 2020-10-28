@@ -1,7 +1,18 @@
 {%extends 'base.html'%}
 {% block content%}
-
-<div class="row">
+<style>
+      #contentblock {
+        background-color: #8492A6;
+        color: white;
+        font-size: large;
+    }
+.navbar,
+    .navbar-expand-lg,
+    .jumbotron {
+        background-color: #ffffff !important;
+    }
+</style>
+<div id="contentblock" class="row">
       <div class="col text-center">
             {% if user %}
             <p>Username: {{ user.username }}</p>
