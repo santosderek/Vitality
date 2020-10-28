@@ -37,6 +37,6 @@ jobs:
         mongodb-version: latest
     - name: Test with pytest
       run: |
-        pytest
+        pytest -v
         
     
