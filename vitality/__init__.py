@@ -241,6 +241,31 @@ def create_app():
                 Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0)]
                 )
 
+    @app.route('/trainee_list_trainers', methods=["GET"])
+    def trainee_list_trainers():
+        """Trainee list trainers page which will look for all trainees that the trainer has added."""
+        if not g.user:
+            logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        logger.debug('Trainer {} is loaded Trainer List Trainees.'.format(str(session['user_id'])))
+        return render_template("trainee/list_trainers.html", 
+            trainers=[
+                database.get_user_class_by_username("derek"),
+                database.get_user_class_by_username("bryson"),
+                database.get_user_class_by_username("elijah")])
+    
+    @app.route('/trainee_schedule', methods=["GET"])
+    def trainee_schedule():
+        """Trainee schedule page which gets populated by stored event list."""
+        if not g.user:
+            logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        logger.debug('Trainer {} is loaded Trainer Schedule.'.format(str(session['user_id'])))
+        return render_template("trainee/schedule.html", 
+            events=[])
+
     @app.errorhandler(403)
     def page_not_found(e):
         """Error handler for 403 page"""

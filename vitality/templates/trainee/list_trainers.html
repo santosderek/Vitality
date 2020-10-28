@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+{% if trainers|length < 1 %}
+<div class="trainee">
+    <p style="color: #47525E;">No trainers found!</p>
+</div>
+{% else %}
+<style>
+    .btn {
+        color: white;
+    }
+
+    .navbar,
+    .navbar-expand-lg,
+    .jumbotron {
+        background-color: #ffffff !important;
+    }
+
+    .card {
+        border: none;
+        border-bottom: 1px solid #47525E;
+    }
+
+    #contentblock,
+    .card {
+        background-color: #8492A6;
+        color: white;
+
+    }
+</style>
+<div class="row">
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
+        <div class="sidebar-sticky pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainee_overview") }}"><b>Overview</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href=""><b>Workouts</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainee_schedule") }}"><b>Schedule</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href=""><b>Diets</b></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="col text-center " id="contentblock">
+        {% for trainer in trainers %}
+        {% if trainer %}
+        <div class="col-sm-12">
+            <div class="card mb-3 mx-auto" style="max-width: 540px;">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <img class="card-img" src="{{ url_for("static", filename="images/profile.svg") }}"
+                            alt="Trainer {{ trainer.username }}" width="100" heigh="100">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ trainer.username|e }}</h5>
+                            <a class="btn mb-1 col-sm-12">Assigned Workouts</a>
+                            <a class="btn mb-1 col-sm-12">Info</a>
+                            <a class="btn mb-1 col-sm-12">Accept | Remove</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
