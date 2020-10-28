@@ -107,7 +107,7 @@ def create_app():
                     return render_template("account/signup.html", username_taken=True)
 
             # If username and password failed, render error messsage
-            return render_template("account/signup.html", creation_successful=True, error_message=True)
+            return render_template("account/signup.html", error_message=True)
 
         return render_template("account/signup.html")
 
