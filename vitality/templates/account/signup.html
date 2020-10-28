@@ -7,12 +7,20 @@
 		<div class="col-sm-12 mb-1 mt-2">
 			<h1>Sign up!</h1>
 		</div>
+		{% if creation_successful %}
 		<div class="col-sm-12 mb-1">
-			{% if creation_successful %}
 			<h1 style="color: green;">Account was created!</h1>
-			{% else %}
+		</div>
+		{% else %}
+
+		<div class="col-sm-12 mb-1">
+
 			{% if error_message %}
 			<p style="color: red;">Could not create account!</p>
+			{% endif %}
+
+			{% if username_taken %}
+			<p style="color: red;">Username was taken!</p>
 			{% endif %}
 		</div>
 		<div class="col-sm-12 mb-1">
