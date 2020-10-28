@@ -7,6 +7,8 @@
 
 _Connecting trainers with trainees around the world, one workout at a time._
 
+### Important! This is a senior project. We are not able to take outside help for this repo so pull requests from outside the group will not be accepted. Thank you for understanding. 
+
 ### Mission: 
 
 Vitality, an all in one platform allowing users to connect to nearby trainers, schedule meetings, share workouts, and encourage healthy dieting. 
