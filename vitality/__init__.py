@@ -305,23 +305,23 @@ def create_app():
 
     @app.errorhandler(403)
     def page_not_found(e):
-        """Error handler for 403 page"""
-        return "403 handled", 403
+        """HTTP Error 403: Forbidden."""
+        return render_template("error/403.html"), 403
 
     @app.errorhandler(404)
     def page_not_found(e):
-        """Error handler for 404 page"""
-        return "404 handled", 404
+        """HTTP Error 404: Not found."""
+        return render_template("error/404.html"), 404
 
     @app.errorhandler(410)
     def page_not_found(e):
-        """Error handler for 410 page"""
-        return "410 handled", 410
+        """HTTP Error 410: Page is gone."""
+        return render_template("error/410.html"), 410
 
     @app.errorhandler(500)
     def page_not_found(e):
-        """Error handler for 500 page"""
-        return "500 handled", 500
+        """HTTP Error 500: Internal Server Error."""
+        return render_template("error/500.html"), 500
 
     # Return created flask app
     return app
