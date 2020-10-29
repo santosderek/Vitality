@@ -1,11 +1,11 @@
 import unittest
-from vitality.user import User
+from vitality.trainee import Trainee
 
 class TestUser(unittest.TestCase):
 
     def test_as_dict(self):
 
-        new_user = User(0,"test", "password", "first", "last", "Earth", 1234567890)
+        new_user = Trainee(0,"test", "password", "first", "last", "Earth", 1234567890)
 
         new_dict = new_user.as_dict()
         comp_dict = {

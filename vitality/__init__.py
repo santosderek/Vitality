@@ -10,7 +10,7 @@ from flask import (
 )
 from flask_pymongo import PyMongo
 from markupsafe import escape
-from .user import User
+from .trainee import Trainee
 from .trainer import Trainer
 from .database import Database, UsernameTakenError
 from .configuration import Configuration
@@ -33,7 +33,7 @@ def create_app():
 
         g.user = None
         if 'user_id' in session:
-            suspected_user = g.database.get_user_class_by_id(session['user_id'])
+            suspected_user = g.database.get_trainee_class_by_id(session['user_id'])
             if suspected_user and suspected_user.id == session['user_id']:
                 g.user = suspected_user
             else:
@@ -59,7 +59,7 @@ def create_app():
             password = escape(request.form['password'])
 
             # This needs to be replaced once we get the database up and running
-            suspected_user = g.database.get_user_class_by_username(username)
+            suspected_user = g.database.get_trainee_class_by_username(username)
             found_user = suspected_user if suspected_user and suspected_user.password == password else None
 
             if found_user and type(found_user) == Trainer:
@@ -67,7 +67,7 @@ def create_app():
                 session['user_id'] = found_user.id
                 return redirect(url_for('trainer_overview'))
 
-            elif found_user and type(found_user) == User:
+            elif found_user and type(found_user) == Trainee:
                 app.logger.debug('Adding user_id to session')
                 session['user_id'] = found_user.id
                 return redirect(url_for('trainee_overview'))
@@ -93,7 +93,7 @@ def create_app():
             phone = escape(request.form['phone'])
 
             if username and password == re_password:
-                new_user = User(
+                new_user = Trainee(
                     id=None,
                     username=username,
                     password=password,
@@ -102,7 +102,7 @@ def create_app():
                     location=location,
                     phone=phone)
                 try:
-                    g.database.add_user(new_user)
+                    g.database.add_trainee(new_user)
                     # If username and password successful
                     return render_template("account/signup.html", creation_successful=True)
                 except UsernameTakenError as err:
@@ -122,7 +122,7 @@ def create_app():
 
         app.logger.info('Rendering Profile')
         username = escape(username)
-        user = g.database.get_user_class_by_username(username)
+        user = g.database.get_trainee_class_by_username(username)
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
@@ -142,25 +142,25 @@ def create_app():
             location = escape(request.form['location'])
             phone = escape(request.form['phone'])
 
-            if session['user_id'] == g.database.get_user_class_by_username(g.user.username).id:
+            if session['user_id'] == g.database.get_trainee_class_by_username(g.user.username).id:
 
                 if username:
-                    g.database.set_username(g.user.id, username)
+                    g.database.set_trainee_username(g.user.id, username)
 
                 if password and re_password and password == re_password:
-                    g.database.set_password(g.user.id, password)
+                    g.database.set_trainee_password(g.user.id, password)
 
                 if location:
-                    g.database.set_location(g.user.id, location)
+                    g.database.set_trainee_location(g.user.id, location)
 
                 if phone:
-                    g.database.set_phone(g.user.id, phone)
+                    g.database.set_trainee_phone(g.user.id, phone)
 
                 if firstname:
-                    g.database.set_firstname(g.user.id, firstname)
+                    g.database.set_trainee_firstname(g.user.id, firstname)
 
                 if lastname:
-                    g.database.set_lastname(g.user.id, lastname)
+                    g.database.set_trainee_lastname(g.user.id, lastname)
 
                 return redirect(url_for('usersettings'))
 
@@ -179,7 +179,7 @@ def create_app():
 
     @app.route('/trainer_overview', methods=["GET"])
     def trainer_overview():
-        """Trainer overview page populated by current logged in user's g.database settings"""
+        """Trainer overview page populated by current logged in trainee's g.database settings"""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'), 403)
@@ -191,11 +191,11 @@ def create_app():
             str(session['user_id'])))
         return render_template("trainer/overview.html",
                                trainees=[
-                                   g.database.get_user_class_by_username(
+                                   g.database.get_trainee_class_by_username(
                                        "derek"),
-                                   g.database.get_user_class_by_username(
+                                   g.database.get_trainee_class_by_username(
                                        "bryson"),
-                                   g.database.get_user_class_by_username("elijah")],
+                                   g.database.get_trainee_class_by_username("elijah")],
                                workouts=[
                                    Workout(id=None, creator_id="1", name="Workout 1",
                                            difficulty="easy", exp_rewards=0),
@@ -220,11 +220,11 @@ def create_app():
             str(session['user_id'])))
         return render_template("trainer/list_trainees.html",
                                trainees=[
-                                   g.database.get_user_class_by_username(
+                                   g.database.get_trainee_class_by_username(
                                        "derek"),
-                                   g.database.get_user_class_by_username(
+                                   g.database.get_trainee_class_by_username(
                                        "bryson"),
-                                   g.database.get_user_class_by_username("elijah")])
+                                   g.database.get_trainee_class_by_username("elijah")])
 
     @app.route('/trainer_schedule', methods=["GET"])
     def trainer_schedule():
@@ -256,11 +256,11 @@ def create_app():
             str(session['user_id'])))
         return render_template("trainee/overview.html",
                                trainers=[
-                                   g.database.get_user_class_by_username(
+                                   g.database.get_trainee_class_by_username(
                                        "derek"),
-                                   g.database.get_user_class_by_username(
+                                   g.database.get_trainee_class_by_username(
                                        "bryson"),
-                                   g.database.get_user_class_by_username("elijah")],
+                                   g.database.get_trainee_class_by_username("elijah")],
                                workouts=[
                                    Workout(id=None, creator_id="1", name="Workout 1",
                                            difficulty="easy", exp_rewards=0),
@@ -283,11 +283,11 @@ def create_app():
             str(session['user_id'])))
         return render_template("trainee/list_trainers.html",
                                trainers=[
-                                   g.database.get_user_class_by_username(
+                                   g.database.get_trainee_class_by_username(
                                        "derek"),
-                                   g.database.get_user_class_by_username(
+                                   g.database.get_trainee_class_by_username(
                                        "bryson"),
-                                   g.database.get_user_class_by_username("elijah")])
+                                   g.database.get_trainee_class_by_username("elijah")])
 
     @app.route('/trainee_schedule', methods=["GET"])
     def trainee_schedule():

@@ -3,7 +3,7 @@ import unittest
 from flask import g, session
 from vitality import create_app
 from vitality.database import Database
-from vitality.user import User
+from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 
 
@@ -16,9 +16,9 @@ def client():
     with app.test_client() as client:
         with app.app_context():
             # Adding test user
-            while database.get_by_username("test"):
-                database.remove_user(database.get_by_username("test")['_id'])
-            test_user = User(
+            while database.get_trainee_by_username("test"):
+                database.remove_trainee(database.get_trainee_by_username("test")['_id'])
+            test_user = Trainee(
                 None,
                 username="test",
                 password="password",
@@ -27,12 +27,12 @@ def client():
                 location="Earth",
                 phone=1234567890
             )
-            database.add_user(test_user)
+            database.add_trainee(test_user)
 
             # TODO: Create a trainer called test_trainer and add trainer to db
         yield client
-    if database.get_by_username("test"):
-        database.remove_user(database.get_by_username("test")['_id'])
+    if database.get_trainee_by_username("test"):
+        database.remove_trainee(database.get_trainee_by_username("test")['_id'])
 
 
 def test_home(client):
@@ -93,8 +93,8 @@ def test_signup(client):
     assert b'Username was taken' in returned_value.data
     assert b'<form action="/signup" method="POST">' in returned_value.data
 
-    if g.database.get_by_username("test"):
-        g.database.remove_user(g.database.get_by_username("test")['_id'])
+    if g.database.get_trainee_by_username("test"):
+        g.database.remove_trainee(g.database.get_trainee_by_username("test")['_id'])
 
     # POST with a username that was not taken, success
     returned_value = client.post('/signup', data=dict(
@@ -159,7 +159,7 @@ def test_usersettings(client):
     assert b'Schedule' in returned_value.data
 
     # Get id before change
-    database_user_id = g.database.get_user_class_by_username("test").id
+    database_user_id = g.database.get_trainee_class_by_username("test").id
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
@@ -174,7 +174,7 @@ def test_usersettings(client):
     assert returned_value.status_code == 200
 
     # Check database
-    database_user = g.database.get_user_class_by_username("test")
+    database_user = g.database.get_trainee_class_by_username("test")
 
     assert database_user.id == database_user_id
     assert database_user.username == 'test'
@@ -229,7 +229,7 @@ def test_trainer_overview(client):
     # Trainer Overview as Trainee
     returned_value = client.get('/trainer_overview', follow_redirects=True)
     assert returned_value.status_code == 403
-    assert type(g.user) == User
+    assert type(g.user) == Trainee
 
     # TODO: Once trainer logins are made, need to test if trainer can see page
 
@@ -259,7 +259,7 @@ def test_trainer_list_trainees(client):
     returned_value = client.get(
         '/trainer_list_trainees', follow_redirects=True)
     assert returned_value.status_code == 403
-    assert type(g.user) == User
+    assert type(g.user) == Trainee
 
     # TODO: Once trainer logins are made, need to test if trainer can see page
 
@@ -287,7 +287,7 @@ def test_trainer_schedule(client):
     # Trainer Overview as Trainee
     returned_value = client.get('/trainer_schedule', follow_redirects=True)
     assert returned_value.status_code == 403
-    assert type(g.user) == User
+    assert type(g.user) == Trainee
 
     # TODO: Once trainer logins are made, need to test if trainer can see page
 
@@ -314,7 +314,7 @@ def test_trainee_overview(client):
     # Trainer Overview as Trainee
     returned_value = client.get('/trainee_overview', follow_redirects=True)
     assert returned_value.status_code == 200
-    assert type(g.user) == User
+    assert type(g.user) == Trainee
     assert type(g.user) != Trainer
 
     # TODO: Try logging in as a trainer and check if you get redirected
@@ -344,7 +344,7 @@ def test_trainee_list_trainers(client):
     returned_value = client.get('/trainee_list_trainers',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
-    assert type(g.user) == User
+    assert type(g.user) == Trainee
     assert type(g.user) != Trainer
 
     # TODO: Try logging in as a trainer and check if you get redirected
@@ -374,7 +374,7 @@ def test_trainee_schedule(client):
     returned_value = client.get('/trainee_schedule',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
-    assert type(g.user) == User
+    assert type(g.user) == Trainee
     assert type(g.user) != Trainer
 
     # TODO: Try logging in as a trainer and check if you get redirected
