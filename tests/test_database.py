@@ -51,9 +51,8 @@ class TestDatabase(unittest.TestCase):
         # Add workout
         self.test_workout.creator_id = self.database.get_trainee_class_by_username(
                 self.test_trainee.username).id
+        print (self.test_workout.as_dict())
         self.database.add_workout(self.test_workout)
-        self.test_workout = self.get_workout_class_by_name(
-                self.test_workout.name)
 
     def tearDown(self):
         # Remove test Trainee if found
