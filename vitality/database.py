@@ -203,7 +203,7 @@ class Database:
     def add_trainer(self, trainer):
         """Adds a trainer to the database based on a provided trainer class."""
         if (self.get_trainer_by_username(trainer.username)):
-            raise usernameTakenError("username was taken.")
+            raise UsernameTakenError("username was taken.")
 
         self.mongo.db.trainer.insert_one({
             'username': trainer.username,
