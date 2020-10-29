@@ -278,6 +278,10 @@ class Database:
 
     def add_workout(self, workout):
         """Adds a workout to the database based on a provided Workout class."""
+
+        if self.get_trainee_class_by_id(workout.creator_id) is None or not self.get_trainer_class_by_id(workout.creator_id) is None:
+            raise WorkoutCreatorIdNotFound("Creator Id Not Found")
+
         self.mongo.db.workout.insert_one({
             "creator_id": workout.creator_id,
             'name': workout.name,
@@ -288,4 +292,8 @@ class Database:
 
 class UsernameTakenError(ValueError):
     """If a username was taken within the database class"""
+    pass
+
+class WorkoutCreatorIdNotFound(AttributeError):
+    """Error for when Workout creator id is missing"""
     pass

@@ -3,7 +3,7 @@ from copy import deepcopy
 from flask import Flask
 from flask_pymongo import PyMongo
 from vitality import create_app
-from vitality.database import Database
+from vitality.database import Database, WorkoutCreatorIdNotFound
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
@@ -47,6 +47,11 @@ class TestDatabase(unittest.TestCase):
         self.tearDown()
         self.database.add_trainee(self.test_trainee)
         self.database.add_trainer(self.test_trainer)
+        
+        # Add workout
+        self.test_workout.creator_id = self.database.get_trainee_class_by_username(
+                self.test_trainee.username).id
+        print (self.test_workout.as_dict())
         self.database.add_workout(self.test_workout)
 
     def tearDown(self):
@@ -594,3 +599,10 @@ class TestDatabase(unittest.TestCase):
         self.database.remove_trainee(new_trainee.id)
         self.assertTrue(self.database.get_trainee_by_id(
             new_trainee.id) is None)
+
+        
+        # Testing to see if an error occurs if adding a workout with no creator id
+        new_workout = deepcopy(self.test_workout)
+        new_workout.creator_id = None
+        with self.assertRaises(WorkoutCreatorIdNotFound):
+            self.database.add_workout(new_workout)
