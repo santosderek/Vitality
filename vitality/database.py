@@ -13,7 +13,7 @@ class Database:
     """ Trainee Functions """
 
     def trainee_dict_to_class(self, trainee_dict):
-        return Trainer(
+        return Trainee(
             id=str(trainee_dict['_id']),
             username=trainee_dict['username'],
             password=trainee_dict['password'],
