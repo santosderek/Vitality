@@ -329,6 +329,14 @@ def create_app():
 
         return render_template("workout/workout.html")
     
+    @app.route('/workout_overview', methods=["GET"])
+    def workout_overview(workout_id):
+        """Page that shows the workout details"""
+        if not g.user:
+            return redirect(url_for('login'), 403)
+
+        return render_template("workout/workout_overview.html")
+
     @app.route('/workout_list', methods=["GET"])
     def workout_list():
         """Page that shows the workout list"""
