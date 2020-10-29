@@ -3,7 +3,7 @@ from copy import deepcopy
 from flask import Flask
 from flask_pymongo import PyMongo
 from vitality import create_app
-from vitality.database import Database, 
+from vitality.database import Database, WorkoutCreatorIdNotFound
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
@@ -599,4 +599,5 @@ class TestDatabase(unittest.TestCase):
         # Testing to see if an error occurs if adding a workout with no creator id
         new_workout = deepcopy(self.test_workout)
         new_workout.creator_id = None
-        with self.assertRaises(WorkoutCreatorIdNotFound)
+        with self.assertRaises(WorkoutCreatorIdNotFound):
+            self.database.add_workout(new_workout)
