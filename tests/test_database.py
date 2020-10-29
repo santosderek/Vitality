@@ -342,7 +342,7 @@ class TestDatabase(unittest.TestCase):
         # Creating database object
         database = Database(app)
 
-        # Creating new User object
+        # Creating new Trainer object
         new_user = Trainer(
             None,
             username="test",
@@ -378,7 +378,7 @@ class TestDatabase(unittest.TestCase):
         # Creating database object
         database = Database(app)
 
-        # Creating new User object
+        # Creating new Trainer object
         new_user = Trainer(
             None,
             username="test",
@@ -423,7 +423,7 @@ class TestDatabase(unittest.TestCase):
         # Creating database object
         database = Database(app)
 
-        # Creating new User object
+        # Creating new Trainer object
         new_user = Trainer(
             None,
             username="test",
@@ -460,7 +460,7 @@ class TestDatabase(unittest.TestCase):
         # Creating database object
         database = Database(app)
 
-        # Creating new User object
+        # Creating new Trainer object
         new_user = Trainer(
             None,
             username="test",
@@ -497,7 +497,7 @@ class TestDatabase(unittest.TestCase):
             # Creating database object
             database = Database(app)
 
-            # Creating new User object
+            # Creating new Trainer object
             new_user = Trainer(
                 None,
                 username="test",
@@ -534,7 +534,7 @@ class TestDatabase(unittest.TestCase):
         # Creating database object
         database = Database(app)
 
-        # Creating new User object
+        # Creating new Trainer object
         new_user = Trainer(
             None,
             username="test",
@@ -571,7 +571,7 @@ class TestDatabase(unittest.TestCase):
         # Creating database object
         database = Database(app)
 
-        # Creating new User object
+        # Creating new Trainer object
         new_user = Trainer(
             None,
             username="test",
