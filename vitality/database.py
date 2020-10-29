@@ -279,7 +279,7 @@ class Database:
     def add_workout(self, workout):
         """Adds a workout to the database based on a provided Workout class."""
 
-        if self.get_trainee_class_by_id(workout.creator_id) or self.get_trainer_class_by_id(workout.creator_id):
+        if not self.get_trainee_class_by_id(workout.creator_id) or not self.get_trainer_class_by_id(workout.creator_id):
             raise WorkoutCreatorIdNotFound("Creator Id Not Found")
 
         self.mongo.db.workout.insert_one({

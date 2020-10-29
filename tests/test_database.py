@@ -37,7 +37,7 @@ class TestDatabase(unittest.TestCase):
     # Creating new Workout Object
     test_workout = Workout(
         id=None,
-        creator_id=test_trainer.id,
+        creator_id=None,
         name="testing",
         difficulty="easy",
         about="workout",
@@ -47,7 +47,13 @@ class TestDatabase(unittest.TestCase):
         self.tearDown()
         self.database.add_trainee(self.test_trainee)
         self.database.add_trainer(self.test_trainer)
+        
+        # Add workout
+        self.test_workout.creator_id = self.database.get_trainee_class_by_username(
+                self.test_trainee.username).id
         self.database.add_workout(self.test_workout)
+        self.test_workout = self.get_workout_class_by_name(
+                self.test_workout.name)
 
     def tearDown(self):
         # Remove test Trainee if found
