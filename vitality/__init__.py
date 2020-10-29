@@ -304,6 +304,39 @@ def create_app():
         return render_template("trainee/schedule.html",
                                events=[])
 
+    """Workout pages"""
+    @app.route('/new_workout', methods=["GET"])
+    def new_workout():
+        """Page to create a new workout"""
+        if not g.user:
+            return redirect(url_for('login'), 403)
+
+        return render_template("workout/new_workout.html")
+
+    @app.route('/search_workout', methods=["GET"])
+    def search_workout():
+        """Page to search for a workout"""
+        if not g.user:
+            return redirect(url_for('login'), 403)
+
+        return render_template("workout/search.html")
+    
+    @app.route('/workout/<workout_id>', methods=["GET"])
+    def workout(workout_id):
+        """Page that shows the workout details"""
+        if not g.user:
+            return redirect(url_for('login'), 403)
+
+        return render_template("workout/workout.html")
+    
+    @app.route('/workout_list', methods=["GET"])
+    def workout_list():
+        """Page that shows the workout list"""
+        if not g.user:
+            return redirect(url_for('login'), 403)
+
+        return render_template("workout/workoutlist.html")
+
     @app.errorhandler(400)
     def page_bad_request(e):
         """HTTP Error 400: Bad Request Error."""
