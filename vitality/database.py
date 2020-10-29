@@ -12,21 +12,24 @@ class Database:
 
     """ Trainee Functions """
 
+    def trainee_dict_to_class(self, trainee_dict):
+        return Trainer(
+            id=str(trainee_dict['_id']),
+            username=trainee_dict['username'],
+            password=trainee_dict['password'],
+            firstname=trainee_dict['firstname'],
+            lastname=trainee_dict['lastname'],
+            location=trainee_dict['location'],
+            phone=trainee_dict['phone']
+        )
+
     def get_trainee_class_by_id(self, id):
         """Returns the Trainee class of the User found by the trainee's id."""
         found_user = self.mongo.db.trainee.find_one({"_id": ObjectId(id)})
 
         if found_user:
-            user = Trainee(
-                id=str(found_user['_id']),
-                username=found_user['username'],
-                password=found_user['password'],
-                firstname=found_user['firstname'],
-                lastname=found_user['lastname'],
-                location=found_user['location'],
-                phone=found_user['phone']
-            )
-            return user
+            return self.trainee_dict_to_class(found_user)
+
         return None
 
     def get_trainee_class_by_username(self, username):
@@ -34,16 +37,8 @@ class Database:
         found_user = self.mongo.db.trainee.find_one({"username": username})
 
         if found_user:
-            user = Trainee(
-                id=str(found_user['_id']),
-                username=found_user['username'],
-                password=found_user['password'],
-                firstname=found_user['firstname'],
-                lastname=found_user['lastname'],
-                location=found_user['location'],
-                phone=found_user['phone']
-            )
-            return user
+            return self.trainee_dict_to_class(found_user)
+
         return None
 
     def get_trainee_by_id(self, id):
@@ -109,27 +104,30 @@ class Database:
             'location': user.location,
             'phone': user.phone})
 
-    def remove_trainee(self, id): 
+    def remove_trainee(self, id):
         """Deletes a trainee by trainee id."""
         self.mongo.db.trainee.delete_one({"_id": ObjectId(id)})
 
     """ Trainer Functions """
+
+    def trainer_dict_to_class(self, trainer_dict):
+        return Trainer(
+            id=str(trainer_dict['_id']),
+            username=trainer_dict['username'],
+            password=trainer_dict['password'],
+            firstname=trainer_dict['firstname'],
+            lastname=trainer_dict['lastname'],
+            location=trainer_dict['location'],
+            phone=trainer_dict['phone']
+        )
 
     def get_trainer_class_by_username(self, username):
         """Returns the trainer class of the trainer found by the trainer's username."""
         found_user = self.mongo.db.trainer.find_one({"username": username})
 
         if found_user:
-            user = Trainer(
-                id=str(found_user['_id']),
-                username=found_user['username'],
-                password=found_user['password'],
-                firstname=found_user['firstname'],
-                lastname=found_user['lastname'],
-                location=found_user['location'],
-                phone=found_user['phone']
-            )
-            return user
+            return self.trainer_dict_to_class(found_user)
+
         return None
 
     def get_trainer_class_by_id(self, id):
@@ -137,18 +135,9 @@ class Database:
         found_trainer = self.mongo.db.trainer.find_one({"_id": ObjectId(id)})
 
         if found_trainer:
-            trainer = Trainer(
-                id=str(found_trainer['_id']),
-                username=found_trainer['username'],
-                password=found_trainer['password'],
-                firstname=found_trainer['firstname'],
-                lastname=found_trainer['lastname'],
-                location=found_trainer['location'],
-                phone=found_trainer['phone']
-            )
-            return trainer
-        return None
+            return self.trainer_dict_to_class(found_trainer)
 
+        return None
 
     def get_trainer_by_id(self, id):
         """Returns the trainer class found by the trainer's id."""
@@ -212,27 +201,31 @@ class Database:
             'lastname': trainer.lastname,
             'location': trainer.location,
             'phone': trainer.phone})
-    
-    def remove_trainer(self, id): 
+
+    def remove_trainer(self, id):
         """Deletes a trainer by trainer id."""
         self.mongo.db.trainer.delete_one({"_id": ObjectId(id)})
 
     """Workout Functions"""
+
+    def workout_dict_to_class(self, workout_dict):
+        """Takes in a workout dictionary and returns a Workout class"""
+        return Workout(
+            id=str(workout_dict['_id']),
+            creator_id=workout_dict['creator_id'],
+            name=workout_dict['name'],
+            difficulty=workout_dict['difficulty'],
+            about=workout_dict['about'],
+            exp_rewards=workout_dict['exp_rewards']
+        )
 
     def get_workout_class_by_id(self, id):
         """Returns the Workout class found by the workout's id."""
         found_workout = self.mongo.db.workout.find_one({"_id": ObjectId(id)})
 
         if found_workout:
-            workout = Workout(
-                id=str(found_workout['_id']),
-                creator_id=found_workout['creator_id'],
-                name=found_workout['name'],
-                difficulty=found_workout['difficulty'],
-                about=found_workout['about'],
-                exp_rewards=found_workout['exp_rewards']
-            )
-            return workout
+            return self.workout_dict_to_class(found_workout)
+
         return None
 
     def get_workout_class_by_name(self, name):
@@ -240,15 +233,8 @@ class Database:
         found_workout = self.mongo.db.workout.find_one({"name": name})
 
         if found_workout:
-            workout = Workout(
-                id=str(found_workout['_id']),
-                creator_id=found_workout['creator_id'],
-                name=found_workout['name'],
-                difficulty=found_workout['difficulty'],
-                about=found_workout['about'],
-                exp_rewards=found_workout['exp_rewards']
-            )
-            return workout
+            return self.workout_dict_to_class(found_workout)
+
         return None
 
     def set_workout_creator_id(self, id, creator_id):
