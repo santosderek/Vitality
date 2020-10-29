@@ -198,11 +198,11 @@ def create_app():
                                    g.database.get_trainee_class_by_username("elijah")],
                                workouts=[
                                    Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp_rewards=0),
+                                           difficulty="easy", exp=0),
                                    Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp_rewards=0),
+                                           difficulty="easy", exp=0),
                                    Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp_rewards=0)
+                                           difficulty="easy", exp=0)
                                ],
                                events=[])
 
@@ -263,10 +263,10 @@ def create_app():
                                    g.database.get_trainee_class_by_username("elijah")],
                                workouts=[
                                    Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp_rewards=0),
+                                           difficulty="easy", exp=0),
                                    Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp_rewards=0),
-                                   Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp_rewards=0)]
+                                           difficulty="easy", exp=0),
+                                   Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp=0)]
                                )
 
     @app.route('/trainee_list_trainers', methods=["GET"])

@@ -211,12 +211,12 @@ class Database:
     def workout_dict_to_class(self, workout_dict):
         """Takes in a workout dictionary and returns a Workout class"""
         return Workout(
-            id=str(workout_dict['_id']),
+            id=workout_dict['_id'],
             creator_id=workout_dict['creator_id'],
             name=workout_dict['name'],
             difficulty=workout_dict['difficulty'],
             about=workout_dict['about'],
-            exp_rewards=workout_dict['exp_rewards']
+            exp=workout_dict['exp']
         )
 
     def get_workout_class_by_id(self, id):
@@ -258,13 +258,6 @@ class Database:
         }
         })
 
-    def set_workout_id(self, id, local_id):
-        """Updates a workout's id given a workout id."""
-        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
-            "id": local_id
-        }
-        })
-
     def set_workout_about(self, id, about):
         """Updates a workout's about information given a workout id."""
         self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
@@ -275,7 +268,7 @@ class Database:
     def set_workout_exp(self, id, exp):
         """Updates a workout's experience points given a workout id."""
         self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
-            "exp_rewards": exp
+            "exp": exp
         }
         })
 
@@ -290,7 +283,7 @@ class Database:
             'name': workout.name,
             "difficulty": workout.difficulty,
             "about": workout.about,
-            "exp_rewards": workout.exp_rewards})
+            "exp": workout.exp})
 
 
 class UsernameTakenError(ValueError):
