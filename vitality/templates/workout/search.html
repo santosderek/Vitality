@@ -1,4 +1,4 @@
-<!-- {% extends 'base.html' %} -->
+{% extends 'base.html' %}
 
 {% block header %}
 
@@ -9,15 +9,16 @@
 
 {% block content %}
 
-<!-- <header></header> -->
 
-<main>
-    <h2>Take control.</h2>
-    <h1>Your next workout is just a click away.</h1>
-    <form action="search.html">
-        <input type="text" placeholder="Search.." name="search">
-        <button type="submit"><i class="material-icons">search</i></button>
-    </form>
-</main>
+<div class="row">
+    <div class="col">
+        <h2>Take control.</h2>
+        <h1>Your next workout is just a click away.</h1>
+        <form action="search.html">
+            <input type="text" placeholder="Search.." name="search">
+            <button type="submit"><i class="material-icons">search</i></button>
+        </form>
+    </div>
+</div>
 
 {% endblock %}
