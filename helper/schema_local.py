@@ -17,7 +17,7 @@ workout = {
  "difficulty": "easy",
  "id": 0,
  "about": "biceps",
- "exp_rewards": 10
+ "exp": 10
 }
 
 trainer = {

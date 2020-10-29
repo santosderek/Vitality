@@ -202,7 +202,7 @@ def test_logout(client):
     # Logout
     returned_value = client.get('/logout', follow_redirects=True)
     assert returned_value.status_code == 403
-    assert g.user == None
+    assert g.user is None
     assert 'user_id' not in session
 
 
@@ -213,7 +213,7 @@ def test_trainer_overview(client):
     # Trainer Overview no user
     returned_value = client.get('/trainer_overview', follow_redirects=True)
     assert returned_value.status_code == 403
-    assert g.user == None
+    assert g.user is None
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -242,7 +242,7 @@ def test_trainer_list_trainees(client):
     returned_value = client.get(
         '/trainer_list_trainees', follow_redirects=True)
     assert returned_value.status_code == 403
-    assert g.user == None
+    assert g.user is None
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -271,7 +271,7 @@ def test_trainer_schedule(client):
     # Trainer Overview no user
     returned_value = client.get('/trainer_schedule', follow_redirects=True)
     assert returned_value.status_code == 403
-    assert g.user == None
+    assert g.user is None
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -298,7 +298,7 @@ def test_trainee_overview(client):
     # Trainer Overview no user
     returned_value = client.get('/trainee_overview', follow_redirects=True)
     assert returned_value.status_code == 403
-    assert g.user == None
+    assert g.user is None
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -327,7 +327,7 @@ def test_trainee_list_trainers(client):
     returned_value = client.get('/trainee_list_trainers',
                                 follow_redirects=True)
     assert returned_value.status_code == 403
-    assert g.user == None
+    assert g.user is None
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -357,7 +357,7 @@ def test_trainee_schedule(client):
     returned_value = client.get('/trainee_schedule',
                                 follow_redirects=True)
     assert returned_value.status_code == 403
-    assert g.user == None
+    assert g.user is None
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
