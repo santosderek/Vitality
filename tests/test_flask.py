@@ -17,7 +17,8 @@ def client():
         with app.app_context():
             # Adding test user
             while database.get_trainee_by_username("test"):
-                database.remove_trainee(database.get_trainee_by_username("test")['_id'])
+                database.remove_trainee(
+                    database.get_trainee_by_username("test")['_id'])
             test_user = Trainee(
                 None,
                 username="test",
@@ -32,7 +33,8 @@ def client():
             # TODO: Create a trainer called test_trainer and add trainer to db
         yield client
     if database.get_trainee_by_username("test"):
-        database.remove_trainee(database.get_trainee_by_username("test")['_id'])
+        database.remove_trainee(
+            database.get_trainee_by_username("test")['_id'])
 
 
 def test_home(client):
@@ -85,7 +87,8 @@ def test_signup(client):
         firstname="first",
         lastname="last",
         location="Earth",
-        phone=1234567890
+        phone=1234567890,
+        usertype="trainee"
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Account was created!' not in returned_value.data
@@ -94,7 +97,8 @@ def test_signup(client):
     assert b'<form action="/signup" method="POST">' in returned_value.data
 
     if g.database.get_trainee_by_username("test"):
-        g.database.remove_trainee(g.database.get_trainee_by_username("test")['_id'])
+        g.database.remove_trainee(
+            g.database.get_trainee_by_username("test")['_id'])
 
     # POST with a username that was not taken, success
     returned_value = client.post('/signup', data=dict(
@@ -104,13 +108,39 @@ def test_signup(client):
         firstname="first",
         lastname="last",
         location="Earth",
-        phone=1234567890
+        phone=1234567890,
+        usertype="trainee"
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Account was created!' in returned_value.data
     assert b'Could not create account' not in returned_value.data
     assert b'Username was taken' not in returned_value.data
     assert b'<form action="/signup" method="POST">' not in returned_value.data
+
+    if g.database.get_trainee_by_username("test"):
+        g.database.remove_trainee(
+            g.database.get_trainee_by_username("test")['_id'])
+
+    # POST with a username that was not taken, success
+    returned_value = client.post('/signup', data=dict(
+        username="test",
+        password="password",
+        repassword="password",
+        firstname="first",
+        lastname="last",
+        location="Earth",
+        phone=1234567890,
+        usertype="trainer"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'Account was created!' in returned_value.data
+    assert b'Could not create account' not in returned_value.data
+    assert b'Username was taken' not in returned_value.data
+    assert b'<form action="/signup" method="POST">' not in returned_value.data
+
+    if g.database.get_trainer_by_username("test"):
+        g.database.remove_trainer(
+            g.database.get_trainer_by_username("test")['_id'])
 
 
 def test_profile(client):
@@ -199,9 +229,26 @@ def test_logout(client):
     assert b'Workouts' in returned_value.data
     assert b'Schedule' in returned_value.data
 
-    # Logout
+    # Logout with redirects on
     returned_value = client.get('/logout', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert 'user_id' not in session
+
+    # Login
+    returned_value = client.post('/login', data=dict(
+        username="test",
+        password="password"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'Could not log you in!' not in returned_value.data
+    assert b'See Trainers' in returned_value.data
+    assert b'Workouts' in returned_value.data
+    assert b'Schedule' in returned_value.data
+
+    # Logout with redirects off
+    returned_value = client.get('/logout', follow_redirects=False)
+    assert returned_value.status_code == 302
     assert g.user is None
     assert 'user_id' not in session
 
@@ -491,6 +538,7 @@ def test_workout(client):
 
     # TODO: need to test post requests
 
+
 @pytest.mark.skip(reason="no way of currently testing if Trianer can login")
 def test_workout_overview(client):
     """Testing the search workout page"""
@@ -515,6 +563,7 @@ def test_workout_overview(client):
     assert returned_value.status_code == 200
 
     # TODO: need to test post requests
+
 
 def test_workout_list(client):
     """Testing the workout list page"""
