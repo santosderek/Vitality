@@ -229,9 +229,26 @@ def test_logout(client):
     assert b'Workouts' in returned_value.data
     assert b'Schedule' in returned_value.data
 
-    # Logout
+    # Logout with redirects on
     returned_value = client.get('/logout', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert 'user_id' not in session
+
+    # Login
+    returned_value = client.post('/login', data=dict(
+        username="test",
+        password="password"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'Could not log you in!' not in returned_value.data
+    assert b'See Trainers' in returned_value.data
+    assert b'Workouts' in returned_value.data
+    assert b'Schedule' in returned_value.data
+
+    # Logout with redirects off
+    returned_value = client.get('/logout', follow_redirects=False)
+    assert returned_value.status_code == 302
     assert g.user is None
     assert 'user_id' not in session
 
