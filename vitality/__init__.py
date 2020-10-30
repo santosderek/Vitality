@@ -28,16 +28,20 @@ def create_app():
     def before_request():
         """Actions to take before each request"""
 
-        if 'database' not in g: 
+        if 'database' not in g:
             g.database = Database(app)
 
         g.user = None
         if 'user_id' in session:
-            suspected_user = g.database.get_trainee_class_by_id(session['user_id'])
-            if suspected_user and suspected_user.id == session['user_id']:
+            suspected_user = g.database.get_trainee_class_by_id(
+                session['user_id'])
+            if suspected_user is not None and suspected_user.id == session['user_id']:
                 g.user = suspected_user
-            else:
-                g.user = None
+
+            suspected_user = g.database.get_trainer_class_by_id(
+                session['user_id'])
+            if suspected_user is not None and suspected_user.id == session['user_id']:
+                g.user = suspected_user
 
     @app.route('/', methods=["GET"])
     def home():
@@ -53,21 +57,30 @@ def create_app():
         app.logger.info('Rendering Login')
 
         if request.method == 'POST':
-            app.logger.debug("Poping out the the user id if found in the session.")
+            app.logger.debug(
+                "Poping out the the user id if found in the session.")
             session.pop('user_id', None)
             username = escape(request.form['username'])
             password = escape(request.form['password'])
 
-            # This needs to be replaced once we get the database up and running
-            suspected_user = g.database.get_trainee_class_by_username(username)
-            found_user = suspected_user if suspected_user and suspected_user.password == password else None
+            found_user = None
 
-            if found_user and type(found_user) == Trainer:
+            # Check if Trainee
+            suspected_user = g.database.get_trainee_class_by_username(username)
+            if suspected_user is not None and suspected_user.password == password:
+                found_user = suspected_user
+
+            # Check if Trainer
+            suspected_user = g.database.get_trainer_class_by_username(username)
+            if suspected_user is not None and suspected_user.password == password:
+                found_user = suspected_user
+
+            if found_user is not None and type(found_user) == Trainer:
                 app.logger.debug('Adding user_id to session')
                 session['user_id'] = found_user.id
                 return redirect(url_for('trainer_overview'))
 
-            elif found_user and type(found_user) == Trainee:
+            elif found_user is not None and type(found_user) == Trainee:
                 app.logger.debug('Adding user_id to session')
                 session['user_id'] = found_user.id
                 return redirect(url_for('trainee_overview'))
@@ -91,20 +104,41 @@ def create_app():
             re_password = escape(request.form['repassword'])
             location = escape(request.form['location'])
             phone = escape(request.form['phone'])
+            usertype = escape(request.form['usertype'])
 
             if username and password == re_password:
-                new_user = Trainee(
-                    id=None,
-                    username=username,
-                    password=password,
-                    firstname=firstname,
-                    lastname=lastname,
-                    location=location,
-                    phone=phone)
                 try:
-                    g.database.add_trainee(new_user)
+                    new_user = None
+                    if usertype == 'trainee':
+                        new_user = Trainee(
+                            id=None,
+                            username=username,
+                            password=password,
+                            firstname=firstname,
+                            lastname=lastname,
+                            location=location,
+                            phone=phone)
+
+                        g.database.add_trainee(new_user)
+
+                    elif usertype == 'trainer':
+                        new_user = Trainer(
+                            id=None,
+                            username=username,
+                            password=password,
+                            firstname=firstname,
+                            lastname=lastname,
+                            location=location,
+                            phone=phone)
+
+                        g.database.add_trainer(new_user)
+
+                    else:
+                        redirect(url_for('signup'), 403)
+
                     # If username and password successful
                     return render_template("account/signup.html", creation_successful=True)
+
                 except UsernameTakenError as err:
                     app.logger.debug("Username {} was taken.".format(new_user))
                     return render_template("account/signup.html", username_taken=True)
@@ -169,11 +203,12 @@ def create_app():
     @app.route('/logout', methods=["GET", "POST"])
     def logout():
         """Logout route"""
-        app.logger.debug('User {} has logged out.'.format(str(session['user_id'])))
+        app.logger.debug('User {} has logged out.'.format(
+            str(session['user_id'])))
         g.user = None
         if 'user_id' in session:
             session.pop('user_id', None)
-        return redirect(url_for('home'), 403)
+        return redirect(url_for('home'))
 
     """ Trainer pages """
 
@@ -184,7 +219,7 @@ def create_app():
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'), 403)
 
-        if type(g.user) != Trainer:
+        if type(g.user) is not Trainer:
             abort(403)
 
         app.logger.debug('Trainer {} is loaded Trainer Overview.'.format(
@@ -212,19 +247,16 @@ def create_app():
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'), 403)
-        
+
         if type(g.user) != Trainer:
+            app.logger.debug('Aborting becuase g.user is not a trainee.')
             abort(403)
 
         app.logger.debug('Trainer {} is loaded Trainer List Trainees.'.format(
             str(session['user_id'])))
         return render_template("trainer/list_trainees.html",
-                               trainees=[
-                                   g.database.get_trainee_class_by_username(
-                                       "derek"),
-                                   g.database.get_trainee_class_by_username(
-                                       "bryson"),
-                                   g.database.get_trainee_class_by_username("elijah")])
+                               trainees=[item for item in (
+                                   g.database.get_trainer_class_by_username("elijah"),) if item is not None])
 
     @app.route('/trainer_schedule', methods=["GET"])
     def trainer_schedule():
@@ -232,7 +264,7 @@ def create_app():
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'), 403)
-        
+
         if type(g.user) != Trainer:
             abort(403)
 
@@ -248,7 +280,7 @@ def create_app():
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'), 403)
-        
+
         if type(g.user) == Trainer:
             abort(403)
 
@@ -275,7 +307,7 @@ def create_app():
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'), 403)
-        
+
         if type(g.user) == Trainer:
             abort(403)
 
@@ -295,7 +327,7 @@ def create_app():
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'), 403)
-        
+
         if type(g.user) == Trainer:
             abort(403)
 
@@ -320,7 +352,7 @@ def create_app():
             return redirect(url_for('login'), 403)
 
         return render_template("workout/search.html")
-    
+
     @app.route('/workout/<workout_id>', methods=["GET"])
     def workout(workout_id):
         """Page that shows the workout details"""
@@ -328,7 +360,7 @@ def create_app():
             return redirect(url_for('login'), 403)
 
         return render_template("workout/workout.html")
-    
+
     @app.route('/workout_overview', methods=["GET"])
     def workout_overview(workout_id):
         """Page that shows the workout details"""
