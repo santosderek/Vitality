@@ -27,21 +27,17 @@ def create_app():
     @app.before_request
     def before_request():
         """Actions to take before each request"""
-
         if 'database' not in g:
             g.database = Database(app)
 
         g.user = None
         if 'user_id' in session:
-            suspected_user = g.database.get_trainee_class_by_id(
-                session['user_id'])
-            if suspected_user is not None and suspected_user.id == session['user_id']:
-                g.user = suspected_user
+            g.user = g.database.get_trainee_class_by_id(session['user_id'])
+            g.user_type = 'trainee' if g.user is not None else None 
 
-            suspected_user = g.database.get_trainer_class_by_id(
-                session['user_id'])
-            if suspected_user is not None and suspected_user.id == session['user_id']:
-                g.user = suspected_user
+            if g.user is None:
+                g.user = g.database.get_trainer_class_by_id(session['user_id'])
+                g.user_type = 'trainer' if g.user is not None else None 
 
     @app.route('/', methods=["GET"])
     def home():
@@ -63,27 +59,17 @@ def create_app():
             username = escape(request.form['username'])
             password = escape(request.form['password'])
 
-            found_user = None
-
             # Check if Trainee
-            suspected_user = g.database.get_trainee_class_by_username(username)
-            if suspected_user is not None and suspected_user.password == password:
-                found_user = suspected_user
+            session['user_id'] = g.database.get_trainee_id_by_login(
+                username, password)
+            if session['user_id']:
+                return redirect(url_for('trainee_overview'))
 
             # Check if Trainer
-            suspected_user = g.database.get_trainer_class_by_username(username)
-            if suspected_user is not None and suspected_user.password == password:
-                found_user = suspected_user
-
-            if found_user is not None and type(found_user) == Trainer:
-                app.logger.debug('Adding user_id to session')
-                session['user_id'] = found_user.id
+            session['user_id'] = g.database.get_trainer_id_by_login(
+                username, password)
+            if session['user_id']:
                 return redirect(url_for('trainer_overview'))
-
-            elif found_user is not None and type(found_user) == Trainee:
-                app.logger.debug('Adding user_id to session')
-                session['user_id'] = found_user.id
-                return redirect(url_for('trainee_overview'))
 
             # If no user found, alert user, and reload page
             return render_template("account/login.html", login_error=True)
