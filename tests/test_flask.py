@@ -147,7 +147,7 @@ def test_profile(client):
     """Testing the profile page"""
     # Get without a user
     returned_value = client.get('/profile/test', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
 
     # Login
     returned_value = client.post('/login', data=dict(
@@ -174,7 +174,7 @@ def test_usersettings(client):
     """Testing the user settings page"""
     # Get without a user
     returned_value = client.get('/usersettings', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert b'login' in returned_value.data
 
     # Login
@@ -259,7 +259,7 @@ def test_trainer_overview(client):
 
     # Trainer Overview no user
     returned_value = client.get('/trainer_overview', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert g.user is None
 
     # Login as Trainee
@@ -275,7 +275,7 @@ def test_trainer_overview(client):
 
     # Trainer Overview as Trainee
     returned_value = client.get('/trainer_overview', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert type(g.user) == Trainee
 
     # TODO: Once trainer logins are made, need to test if trainer can see page
@@ -288,7 +288,7 @@ def test_trainer_list_trainees(client):
     # Trainer Overview no user
     returned_value = client.get(
         '/trainer_list_trainees', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert g.user is None
 
     # Login as Trainee
@@ -305,7 +305,7 @@ def test_trainer_list_trainees(client):
     # Trainer Overview as Trainee
     returned_value = client.get(
         '/trainer_list_trainees', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert type(g.user) == Trainee
 
     # TODO: Once trainer logins are made, need to test if trainer can see page
@@ -317,7 +317,7 @@ def test_trainer_schedule(client):
 
     # Trainer Overview no user
     returned_value = client.get('/trainer_schedule', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert g.user is None
 
     # Login as Trainee
@@ -333,7 +333,7 @@ def test_trainer_schedule(client):
 
     # Trainer Overview as Trainee
     returned_value = client.get('/trainer_schedule', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert type(g.user) == Trainee
 
     # TODO: Once trainer logins are made, need to test if trainer can see page
@@ -344,7 +344,7 @@ def test_trainee_overview(client):
 
     # Trainer Overview no user
     returned_value = client.get('/trainee_overview', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert g.user is None
 
     # Login as Trainee
@@ -373,7 +373,7 @@ def test_trainee_list_trainers(client):
     # Trainer Overview no user
     returned_value = client.get('/trainee_list_trainers',
                                 follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert g.user is None
 
     # Login as Trainee
@@ -403,7 +403,7 @@ def test_trainee_schedule(client):
     # Trainer Overview no user
     returned_value = client.get('/trainee_schedule',
                                 follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert g.user is None
 
     # Login as Trainee
@@ -470,7 +470,7 @@ def test_new_workout(client):
 
     # Not logged in
     returned_value = client.get('/new_workout', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -494,7 +494,7 @@ def test_search_workout(client):
 
     # Not logged in
     returned_value = client.get('/search_workout', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -520,7 +520,7 @@ def test_workout(client):
     # TODO: Need to create a workout and add to database then check
     # Not logged in
     returned_value = client.get('/workout/', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -546,7 +546,7 @@ def test_workout_overview(client):
     # TODO: Need to create a workout and add to database then check
     # Not logged in
     returned_value = client.get('/workout_overview', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
@@ -570,7 +570,7 @@ def test_workout_list(client):
 
     # Not logged in
     returned_value = client.get('/workout_list', follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
 
     # Login as Trainee
     returned_value = client.post('/login', data=dict(

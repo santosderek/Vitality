@@ -138,7 +138,7 @@ def create_app():
     def profile(username):
         """Profile page for a given username"""
         if not g.user:
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         app.logger.info('Rendering Profile')
         username = escape(username)
@@ -151,7 +151,7 @@ def create_app():
         app.logger.info('Rendering User Settings')
 
         if not g.user:
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         if request.method == 'POST':
             username = escape(request.form['username'])
@@ -203,7 +203,7 @@ def create_app():
         """Trainer overview page populated by current logged in trainee's g.database settings"""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         if type(g.user) is not Trainer:
             abort(403)
@@ -232,7 +232,7 @@ def create_app():
         """Trainer list trainees page which will look for all trainees that the trainer has added."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         if type(g.user) != Trainer:
             app.logger.debug('Aborting becuase g.user is not a trainee.')
@@ -249,7 +249,7 @@ def create_app():
         """Trainer schedule page which gets populated by stored event list."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         if type(g.user) != Trainer:
             abort(403)
@@ -265,7 +265,7 @@ def create_app():
         """Trainee overview page which gets populated by stored event list."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         if type(g.user) == Trainer:
             abort(403)
@@ -292,7 +292,7 @@ def create_app():
         """Trainee list trainers page which will look for all trainees that the trainer has added."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         if type(g.user) == Trainer:
             abort(403)
@@ -312,7 +312,7 @@ def create_app():
         """Trainee schedule page which gets populated by stored event list."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         if type(g.user) == Trainer:
             abort(403)
@@ -327,7 +327,7 @@ def create_app():
     def new_workout():
         """Page to create a new workout"""
         if not g.user:
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         return render_template("workout/new_workout.html")
 
@@ -335,7 +335,7 @@ def create_app():
     def search_workout():
         """Page to search for a workout"""
         if not g.user:
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         return render_template("workout/search.html")
 
@@ -343,7 +343,7 @@ def create_app():
     def workout(workout_id):
         """Page that shows the workout details"""
         if not g.user:
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         return render_template("workout/workout.html")
 
@@ -351,7 +351,7 @@ def create_app():
     def workout_overview(workout_id):
         """Page that shows the workout details"""
         if not g.user:
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         return render_template("workout/workout_overview.html")
 
@@ -359,7 +359,7 @@ def create_app():
     def workout_list():
         """Page that shows the workout list"""
         if not g.user:
-            return redirect(url_for('login'), 403)
+            return redirect(url_for('login'))
 
         return render_template("workout/workoutlist.html")
 
