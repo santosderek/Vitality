@@ -33,11 +33,11 @@ def create_app():
         g.user = None
         if 'user_id' in session:
             g.user = g.database.get_trainee_class_by_id(session['user_id'])
-            g.user_type = 'trainee' if g.user is not None else None 
+            g.user_type = 'trainee' if g.user is not None else None
 
             if g.user is None:
                 g.user = g.database.get_trainer_class_by_id(session['user_id'])
-                g.user_type = 'trainer' if g.user is not None else None 
+                g.user_type = 'trainer' if g.user is not None else None
 
     @app.route('/', methods=["GET"])
     def home():
