@@ -60,45 +60,63 @@ class Database:
 
     def set_trainee_username(self, id, username):
         """Updates a trainee's username given a user id."""
-        self.mongo.db.trainee.update_one({"_id": ObjectId(id)}, {"$set": {
-            "username": username
-        }
-        })
+        self.mongo.db.trainee.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "username": username
+                }
+            })
 
     def set_trainee_password(self, id, password):
         """Updates a trainee's password given a user id."""
-        self.mongo.db.trainee.update_one({"_id": ObjectId(id)}, {"$set": {
-            "password": password
-        }
-        })
+        self.mongo.db.trainee.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "password": password
+                }
+            })
 
     def set_trainee_location(self, id, location):
         """Updates a trainee's location given a user id."""
-        self.mongo.db.trainee.update_one({"_id": ObjectId(id)}, {"$set": {
-            "location": location
-        }
-        })
+        self.mongo.db.trainee.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "location": location
+                }
+            })
 
     def set_trainee_phone(self, id, phone):
         """Updates a trainee's phone number given a user id."""
-        self.mongo.db.trainee.update_one({"_id": ObjectId(id)}, {"$set": {
-            "phone": phone
-        }
-        })
+        self.mongo.db.trainee.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "phone": phone
+                }
+            })
 
     def set_trainee_firstname(self, id, firstname):
         """Updates a trainee's firstname given a user id."""
-        self.mongo.db.trainee.update_one({"_id": ObjectId(id)}, {"$set": {
-            "firstname": firstname
-        }
-        })
+        self.mongo.db.trainee.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "firstname": firstname
+                }
+            })
 
     def set_trainee_lastname(self, id, lastname):
         """Updates a trainee's lastname given a user id."""
-        self.mongo.db.trainee.update_one({"_id": ObjectId(id)}, {"$set": {
-            "lastname": lastname
-        }
-        })
+        self.mongo.db.trainee.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "lastname": lastname
+                }
+            })
 
     def add_trainee(self, user):
         """Adds a user to the database based on a provided Trainee class."""
@@ -167,45 +185,63 @@ class Database:
 
     def set_trainer_username(self, id, username):
         """Updates a trainer's username given a trainer id."""
-        self.mongo.db.trainer.update_one({"_id": ObjectId(id)}, {"$set": {
-            "username": username
-        }
-        })
+        self.mongo.db.trainer.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "username": username
+                }
+            })
 
     def set_trainer_password(self, id, password):
         """Updates a trainer's password given a trainer id."""
-        self.mongo.db.trainer.update_one({"_id": ObjectId(id)}, {"$set": {
-            "password": password
-        }
-        })
+        self.mongo.db.trainer.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "password": password
+                }
+            })
 
     def set_trainer_location(self, id, location):
         """Updates a trainer's location given a trainer id."""
-        self.mongo.db.trainer.update_one({"_id": ObjectId(id)}, {"$set": {
-            "location": location
-        }
-        })
+        self.mongo.db.trainer.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "location": location
+                }
+            })
 
     def set_trainer_phone(self, id, phone):
         """Updates a trainer's phone number given a trainer id."""
-        self.mongo.db.trainer.update_one({"_id": ObjectId(id)}, {"$set": {
-            "phone": phone
-        }
-        })
+        self.mongo.db.trainer.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "phone": phone
+                }
+            })
 
     def set_trainer_firstname(self, id, firstname):
         """Updates a trainer's firstname given a trainer id."""
-        self.mongo.db.trainer.update_one({"_id": ObjectId(id)}, {"$set": {
-            "firstname": firstname
-        }
-        })
+        self.mongo.db.trainer.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "firstname": firstname
+                }
+            })
 
     def set_trainer_lastname(self, id, lastname):
         """Updates a trainer's lastname given a trainer id."""
-        self.mongo.db.trainer.update_one({"_id": ObjectId(id)}, {"$set": {
-            "lastname": lastname
-        }
-        })
+        self.mongo.db.trainer.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "lastname": lastname
+                }
+            })
 
     def add_trainer(self, trainer):
         """Adds a trainer to the database based on a provided trainer class."""
@@ -257,38 +293,53 @@ class Database:
 
     def set_workout_creator_id(self, id, creator_id):
         """Updates a workout's creator id given a workout id."""
-        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
-            "creator_id": creator_id
-        }
-        })
+        self.mongo.db.workout.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "creator_id": creator_id
+                }
+            })
 
     def set_workout_name(self, id, name):
         """Updates a workout's name given a workout id."""
-        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
-            "name": name
-        }
-        })
+        self.mongo.db.workout.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "name": name
+                }
+            })
 
     def set_workout_difficulty(self, id, difficulty):
         """Updates a workout's difficulty given a workout id."""
-        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
-            "difficulty": difficulty
-        }
-        })
+        self.mongo.db.workout.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "difficulty": difficulty
+                }
+            })
 
     def set_workout_about(self, id, about):
         """Updates a workout's about information given a workout id."""
-        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
-            "about": about
-        }
-        })
+        self.mongo.db.workout.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "about": about
+                }
+            })
 
     def set_workout_exp(self, id, exp):
         """Updates a workout's experience points given a workout id."""
-        self.mongo.db.workout.update_one({"_id": ObjectId(id)}, {"$set": {
-            "exp": exp
-        }
-        })
+        self.mongo.db.workout.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "exp": exp
+                }
+            })
 
     def remove_workout(self, id):
         """Deletes a workout by workout id."""

@@ -162,7 +162,7 @@ def create_app():
             location = escape(request.form['location'])
             phone = escape(request.form['phone'])
 
-            if session['user_id'] == g.database.get_trainee_class_by_username(g.user.username).id:
+            if g.database.get_trainee_class_by_id(g.user.id) is not None:
 
                 if username:
                     g.database.set_trainee_username(g.user.id, username)
@@ -181,6 +181,27 @@ def create_app():
 
                 if lastname:
                     g.database.set_trainee_lastname(g.user.id, lastname)
+
+                return redirect(url_for('usersettings'))
+                
+            elif g.database.get_trainer_class_by_id(g.user.id) is not None: 
+                if username:
+                    g.database.set_trainer_username(g.user.id, username)
+
+                if password and re_password and password == re_password:
+                    g.database.set_trainer_password(g.user.id, password)
+
+                if location:
+                    g.database.set_trainer_location(g.user.id, location)
+
+                if phone:
+                    g.database.set_trainer_phone(g.user.id, phone)
+
+                if firstname:
+                    g.database.set_trainer_firstname(g.user.id, firstname)
+
+                if lastname:
+                    g.database.set_trainer_lastname(g.user.id, lastname)
 
                 return redirect(url_for('usersettings'))
 
