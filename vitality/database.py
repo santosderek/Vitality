@@ -13,6 +13,7 @@ class Database:
     """ Trainee Functions """
 
     def trainee_dict_to_class(self, trainee_dict):
+        """Return a Trainee class from a dictionary"""
         return Trainee(
             id=str(trainee_dict['_id']),
             username=trainee_dict['username'],
@@ -22,6 +23,14 @@ class Database:
             location=trainee_dict['location'],
             phone=trainee_dict['phone']
         )
+
+    def get_trainee_id_by_login(self, username, password):
+        """Return the trainer id if login matches"""
+        trainee = self.mongo.db.trainee.find_one({
+            'username': username, 
+            'password':password})
+
+        return str(trainee['_id']) if trainee is not None else None 
 
     def get_trainee_class_by_id(self, id):
         """Returns the Trainee class of the User found by the trainee's id."""
@@ -111,6 +120,7 @@ class Database:
     """ Trainer Functions """
 
     def trainer_dict_to_class(self, trainer_dict):
+        """Return a Trainer class from a dictionary"""
         return Trainer(
             id=str(trainer_dict['_id']),
             username=trainer_dict['username'],
@@ -120,6 +130,14 @@ class Database:
             location=trainer_dict['location'],
             phone=trainer_dict['phone']
         )
+
+    def get_trainer_id_by_login(self, username, password):
+        """Return the trainer id if login matches"""
+        trainer = self.mongo.db.trainer.find_one({
+            'username': username, 
+            'password':password})
+
+        return str(trainer['_id']) if trainer is not None else None 
 
     def get_trainer_class_by_username(self, username):
         """Returns the trainer class of the trainer found by the trainer's username."""
@@ -293,6 +311,7 @@ class Database:
 class UsernameTakenError(ValueError):
     """If a username was taken within the database class"""
     pass
+
 
 class WorkoutCreatorIdNotFound(AttributeError):
     """Error for when Workout creator id is missing"""
