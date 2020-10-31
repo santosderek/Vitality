@@ -452,14 +452,20 @@ def test_trainee_schedule(client):
     # Login as Trainee
     login_as_testTrainee(client)
 
-    # Trainer Overview as Trainee
+    # Trainee Overview as Trainee
     returned_value = client.get('/trainee_schedule',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
-    assert type(g.user) != Trainer
 
-    # TODO: Try logging in as a trainer and check if you get redirected
+    login_as_testTrainer(client)
+
+    # Trainee Overview as Trainee
+    returned_value = client.get('/trainee_schedule',
+                                follow_redirects=True)
+    assert returned_value.status_code == 403
+    assert type(g.user) == Trainer
+    assert b'Page Forbidden' in returned_value.data
 
 
 def test_page_forbidden(client):
