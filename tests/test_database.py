@@ -3,7 +3,7 @@ from copy import deepcopy
 from flask import Flask
 from flask_pymongo import PyMongo
 from vitality import create_app
-from vitality.database import Database, WorkoutCreatorIdNotFound
+from vitality.database import Database, WorkoutCreatorIdNotFound, UsernameTakenError
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
@@ -87,6 +87,16 @@ class TestDatabase(unittest.TestCase):
         # Removing temp user from database
         self.database.remove_trainee(db_user.id)
         self.assertTrue(self.database.get_trainee_by_id(db_user.id) is None)
+
+        # Reseting database
+        self.setUp()
+
+        # Adding a Trainee called testTrainer to see if raise
+        with self.assertRaises(UsernameTakenError):
+            new_trainee = deepcopy(self.test_trainee)
+            new_trainee.username = "testTrainer"
+            self.database.add_trainee(new_trainee)
+
 
     def test_set_trainee_username(self):
         new_trainee = deepcopy(self.test_trainee)
@@ -225,6 +235,11 @@ class TestDatabase(unittest.TestCase):
         # Removing temp user from database
         self.database.remove_trainer(db_user.id)
         self.assertTrue(self.database.get_trainer_by_id(db_user.id) is None)
+
+        with self.assertRaises(UsernameTakenError):
+            new_trainer = deepcopy(self.test_trainer)
+            new_trainer.username = "testTrainee"
+            self.database.add_trainer(new_trainer)
 
     def test_set_trainer_username(self):
 
