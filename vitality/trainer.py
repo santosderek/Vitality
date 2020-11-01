@@ -2,7 +2,7 @@ from .trainee import Trainee
 
 
 class Trainer(Trainee):
-    def __init__(self, id, username, password, trainees=None, name=None,  location=None, phone=None):
+    def __init__(self, id: str, username: str, password: str, trainees: list = None, name: str = None,  location: str = None, phone: int = None):
         """Constructor for Trainer."""
         super().__init__(id, username, password, name,  location, phone)
         self.trainees = trainees

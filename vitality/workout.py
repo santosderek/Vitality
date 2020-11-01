@@ -1,5 +1,5 @@
 class Workout:
-    def __init__(self, id, creator_id, name, difficulty="easy", about=None, exp=None):
+    def __init__(self, id: str, creator_id: str, name: str, difficulty: str = "easy", about: str = None, exp: int = None):
         """Constructor for Workout class."""
         self.id = id
         self.creator_id = creator_id
@@ -7,7 +7,6 @@ class Workout:
         self.difficulty = difficulty
         self.about = about
         self.exp = exp
-
 
     def as_dict(self):
         """Returns all attributes of the Workout class as a dictionary."""

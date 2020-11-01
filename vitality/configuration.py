@@ -1,13 +1,14 @@
 import json
 
-class Configuration (): 
 
-    def __init__(self, path = 'configuration.json'):
-        """Constructor for Configuration class. Grabs configuration.json file.""" 
+class Configuration ():
+
+    def __init__(self, path: str = 'configuration.json'):
+        """Constructor for Configuration class. Grabs configuration.json file."""
         self.__data = {}
 
         with open(path, 'r') as current_file:
-            self.__data = json.loads( current_file.read() )
+            self.__data = json.loads(current_file.read())
 
     def get_local_uri(self):
         """Returns the URI for the local mongo database."""
