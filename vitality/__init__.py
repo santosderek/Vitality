@@ -219,7 +219,7 @@ def create_app():
         if type(g.user) is not Trainer:
             abort(403)
 
-        app.logger.debug('Trainer {} is loaded Trainer Overview.'.format(
+        app.logger.debug('Trainer {} loaded Trainer Overview.'.format(
             str(session['user_id'])))
         return render_template("trainer/overview.html",
                                trainees=[],
@@ -237,7 +237,7 @@ def create_app():
             app.logger.debug('Aborting becuase g.user is not a trainee.')
             abort(403)
 
-        app.logger.debug('Trainer {} is loaded Trainer List Trainees.'.format(
+        app.logger.debug('Trainer {} loaded Trainer List Trainees.'.format(
             str(session['user_id'])))
         return render_template("trainer/list_trainees.html",
                                trainees=[item for item in (
@@ -253,7 +253,7 @@ def create_app():
         if type(g.user) is not Trainer:
             abort(403)
 
-        app.logger.debug('Trainer {} is loaded Trainer Schedule.'.format(
+        app.logger.debug('Trainer {} loaded Trainer Schedule.'.format(
             str(session['user_id'])))
         return render_template("trainer/schedule.html",
                                events=[])
@@ -286,7 +286,7 @@ def create_app():
         if type(g.user) == Trainer:
             abort(403)
 
-        app.logger.debug('Trainer {} is loaded Trainer List Trainees.'.format(
+        app.logger.debug('Trainer {} loaded Trainer List Trainees.'.format(
             str(session['user_id'])))
         return render_template("trainee/list_trainers.html",
                                trainers=[])
@@ -301,7 +301,7 @@ def create_app():
         if type(g.user) == Trainer:
             abort(403)
 
-        app.logger.debug('Trainer {} is loaded Trainer Schedule.'.format(
+        app.logger.debug('Trainer {} loaded Trainer Schedule.'.format(
             str(session['user_id'])))
         return render_template("trainee/schedule.html",
                                events=[])
@@ -316,7 +316,7 @@ def create_app():
         if type(g.user) is not Trainee:
             abort(403)
 
-        app.logger.debug('Trainee {} is loaded add trainer page.'.format(
+        app.logger.debug('Trainee {} loaded add trainer page.'.format(
             str(session['user_id'])))
 
         if (request.method == "POST"):

@@ -6,6 +6,24 @@ from vitality.database import Database
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 
+test_trainee = Trainee(
+    None,
+    username="testTrainee",
+    password="password",
+    name="first last",
+    location="Earth",
+    phone=1234567890
+)
+
+test_trainer = Trainer(
+    None,
+    username="testTrainer",
+    password="password",
+    name="first last",
+    location="Earth",
+    phone=1234567890
+)
+
 
 def login_as_testTrainee(client):
     """Login as testTrainee"""
@@ -42,25 +60,9 @@ def client():
     def setup():
         """ Code run after client has been used """
         teardown()
-        test_trainee_user = Trainee(
-            None,
-            username="testTrainee",
-            password="password",
-            name="first last",
-            location="Earth",
-            phone=1234567890
-        )
-        database.add_trainee(test_trainee_user)
 
-        test_trainer_user = Trainer(
-            None,
-            username="testTrainer",
-            password="password",
-            name="first last",
-            location="Earth",
-            phone=1234567890
-        )
-        database.add_trainer(test_trainer_user)
+        database.add_trainer(test_trainer)
+        database.add_trainee(test_trainee)
 
     def teardown():
         """ Code run after client has been used """
@@ -444,6 +446,18 @@ def test_trainee_add_trainer(client):
     assert type(g.user) == Trainee
     assert b'Overview' in returned_value.data
     assert b'Workouts' in returned_value.data
+    assert b'Schedule' in returned_value.data
+    assert b'Diets' in returned_value.data
+
+    # Search for trainer with only first 3 letters 
+    login_as_testTrainee(client)
+    returned_value = client.post('/trainee_add_trainer', data=dict(
+        trainer_name=test_trainer.username[0:3]
+    ), follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert type(g.user) == Trainee
+    assert bytes(test_trainer.username, 'utf-8') in returned_value.data
+    assert bytes('/profile/%s' % test_trainer.username, 'utf-8') in returned_value.data
     assert b'Schedule' in returned_value.data
     assert b'Diets' in returned_value.data
 

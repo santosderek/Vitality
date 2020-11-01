@@ -1,30 +1,11 @@
 {% extends 'base.html' %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css') }}" />
+{% endblock %}
 
 {% block content %}
 
-<style>
-    .btn {
-        color: white;
-    }
 
-    .navbar,
-    .navbar-expand-lg,
-    .jumbotron {
-        background-color: #ffffff !important;
-    }
-
-    .card {
-        border: none;
-        border-bottom: 1px solid #47525E;
-    }
-
-    #contentblock,
-    .card {
-        background-color: #8492A6;
-        color: white;
-
-    }
-</style>
 <div class="row">
     <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
         <div class="sidebar-sticky pt-3">
@@ -58,9 +39,28 @@
                 </div>
 
                 {% for trainer in trainers%}
-                
-                                {{ trainer.name }}
-                            
+
+                <div class="col-sm-12">
+                    <div class="card mb-3 mt-3 mx-auto" style="max-width: 540px;">
+                        <div class="row no-gutters">
+                            <div class="col-md-4">
+                                <img class="card-img" src="{{ url_for("static", filename="images/profile.svg") }}"
+                                    alt="Trainer {{ trainer.username }}" width="100" heigh="100">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ trainer.username|e }}</h5>
+                                    <a class="btn mb-1 col-sm-12">Assigned Workouts</a>
+                                    <a class="btn mb-1 col-sm-12"
+                                        href="{{ url_for('profile', username=trainer.username) }}">Info</a>
+                                    <a class="btn mb-1 col-sm-12">Accept | Remove</a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {% endfor%}
             </form>
         </div>

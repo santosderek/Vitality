@@ -2,26 +2,40 @@ body {
     font-family: 'Raleway', sans-serif;
 }
 
-button {
+button, .card .btn {
     background-color: #47525E;
     border: 0px;
-    color: white; 
+    color: white;
     border-radius: 5px;
+}
+
+.btn:hover {
+    background-color: #2f455e;
+}
+
+.card {
+    background-color: #8492A6;
+    border: none;
+}
+
+.darkbg {
+    background-color: #8492A6;
+    color: white;
+}
+
+.jumbotron h1 {
+    color: #F95F62;
 }
 
 .navbar-toggler, .btn {
     background-color: #47525E;
 }
 
-.btn:hover{
-    background-color: #2f455e;
-}
-
-.navbar, .navbar-expand-lg, .jumbotron{
+.navbar, .navbar-expand-lg, .jumbotron {
     background-color: #E5E9F2 !important;
 }
 
-.navbar li a{
+.navbar li a {
     color: #47525E;
 }
 
@@ -29,15 +43,7 @@ button {
     color: #F95F62;
 }
 
-.jumbotron h1 {
-    color: #F95F62;
-}
-
-.darkbg {
+#contentblock {
     background-color: #8492A6;
     color: white;
 }
-/* .additionalContent {
-    background-color: #8492A6;
-    color: white; 
-} */
