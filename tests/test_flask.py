@@ -46,8 +46,7 @@ def client():
             None,
             username="testTrainee",
             password="password",
-            firstname="first",
-            lastname="last",
+            name="first last",
             location="Earth",
             phone=1234567890
         )
@@ -57,8 +56,7 @@ def client():
             None,
             username="testTrainer",
             password="password",
-            firstname="first",
-            lastname="last",
+            name="first last",
             location="Earth",
             phone=1234567890
         )
@@ -121,8 +119,7 @@ def test_signup(client):
         username="testTrainee",
         password="password",
         repassword="password",
-        firstname="first",
-        lastname="last",
+        name="first last",
         location="Earth",
         phone=1234567890,
         usertype="trainee"
@@ -142,8 +139,7 @@ def test_signup(client):
         username="testTrainee",
         password="password",
         repassword="password",
-        firstname="first",
-        lastname="last",
+        name="first last",
         location="Earth",
         phone=1234567890,
         usertype="trainee"
@@ -163,8 +159,7 @@ def test_signup(client):
         username="testTrainee",
         password="password",
         repassword="password",
-        firstname="first",
-        lastname="last",
+        name = "first last",
         location="Earth",
         phone=1234567890,
         usertype="trainer"
@@ -218,8 +213,7 @@ def test_usersettings(client):
         username="testTrainee",
         password="newpassword",
         repassword="newpassword",
-        firstname="another",
-        lastname="other",
+        name="another",
         location="Venus",
         phone="0987654321"
     ), follow_redirects=True)
@@ -231,8 +225,7 @@ def test_usersettings(client):
     assert database_user.id == database_user_id
     assert database_user.username == 'testTrainee'
     assert database_user.password == 'newpassword'
-    assert database_user.firstname == 'another'
-    assert database_user.lastname == 'other'
+    assert database_user.name == 'another'
     assert database_user.location == 'Venus'
     assert database_user.phone == '0987654321'
 
@@ -390,7 +383,7 @@ def test_trainee_list_trainers(client):
     assert type(g.user) != Trainer
 
     # Login as Trainer
-    login_as_testTrainer(client) 
+    login_as_testTrainer(client)
 
     # Trainee Overview as Trainer
     returned_value = client.get('/trainee_list_trainers',

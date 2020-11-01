@@ -85,8 +85,7 @@ def create_app():
             session.pop('user_id', None)
             username = escape(request.form['username'])
             password = escape(request.form['password'])
-            firstname = escape(request.form['firstname'])
-            lastname = escape(request.form['lastname'])
+            name = escape(request.form['name'])
             re_password = escape(request.form['repassword'])
             location = escape(request.form['location'])
             phone = escape(request.form['phone'])
@@ -100,8 +99,7 @@ def create_app():
                             id=None,
                             username=username,
                             password=password,
-                            firstname=firstname,
-                            lastname=lastname,
+                            name=name,
                             location=location,
                             phone=phone)
 
@@ -112,8 +110,7 @@ def create_app():
                             id=None,
                             username=username,
                             password=password,
-                            firstname=firstname,
-                            lastname=lastname,
+                            name=name,
                             location=location,
                             phone=phone)
 
@@ -156,8 +153,7 @@ def create_app():
         if request.method == 'POST':
             username = escape(request.form['username'])
             password = escape(request.form['password'])
-            firstname = escape(request.form['firstname'])
-            lastname = escape(request.form['lastname'])
+            name = escape(request.form['name'])
             re_password = escape(request.form['repassword'])
             location = escape(request.form['location'])
             phone = escape(request.form['phone'])
@@ -176,15 +172,12 @@ def create_app():
                 if phone:
                     g.database.set_trainee_phone(g.user.id, phone)
 
-                if firstname:
-                    g.database.set_trainee_firstname(g.user.id, firstname)
-
-                if lastname:
-                    g.database.set_trainee_lastname(g.user.id, lastname)
+                if name:
+                    g.database.set_trainee_name(g.user.id, name)
 
                 return redirect(url_for('usersettings'))
-                
-            elif g.database.get_trainer_class_by_id(g.user.id) is not None: 
+
+            elif g.database.get_trainer_class_by_id(g.user.id) is not None:
                 if username:
                     g.database.set_trainer_username(g.user.id, username)
 
@@ -197,11 +190,8 @@ def create_app():
                 if phone:
                     g.database.set_trainer_phone(g.user.id, phone)
 
-                if firstname:
-                    g.database.set_trainer_firstname(g.user.id, firstname)
-
-                if lastname:
-                    g.database.set_trainer_lastname(g.user.id, lastname)
+                if name:
+                    g.database.set_trainer_name(g.user.id, name)
 
                 return redirect(url_for('usersettings'))
 
@@ -232,20 +222,8 @@ def create_app():
         app.logger.debug('Trainer {} is loaded Trainer Overview.'.format(
             str(session['user_id'])))
         return render_template("trainer/overview.html",
-                               trainees=[
-                                   g.database.get_trainee_class_by_username(
-                                       "derek"),
-                                   g.database.get_trainee_class_by_username(
-                                       "bryson"),
-                                   g.database.get_trainee_class_by_username("elijah")],
-                               workouts=[
-                                   Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp=0),
-                                   Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp=0),
-                                   Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp=0)
-                               ],
+                               trainees=[],
+                               workouts=[],
                                events=[])
 
     @app.route('/trainer_list_trainees', methods=["GET"])
@@ -255,7 +233,7 @@ def create_app():
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
 
-        if type(g.user) != Trainer:
+        if type(g.user) is not Trainer:
             app.logger.debug('Aborting becuase g.user is not a trainee.')
             abort(403)
 
@@ -272,7 +250,7 @@ def create_app():
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
 
-        if type(g.user) != Trainer:
+        if type(g.user) is not Trainer:
             abort(403)
 
         app.logger.debug('Trainer {} is loaded Trainer Schedule.'.format(
@@ -294,18 +272,8 @@ def create_app():
         app.logger.debug('Trainee {} has loaded Trainee Overview.'.format(
             str(session['user_id'])))
         return render_template("trainee/overview.html",
-                               trainers=[
-                                   g.database.get_trainee_class_by_username(
-                                       "derek"),
-                                   g.database.get_trainee_class_by_username(
-                                       "bryson"),
-                                   g.database.get_trainee_class_by_username("elijah")],
-                               workouts=[
-                                   Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp=0),
-                                   Workout(id=None, creator_id="1", name="Workout 1",
-                                           difficulty="easy", exp=0),
-                                   Workout(id=None, creator_id="1", name="Workout 1", difficulty="easy", exp=0)]
+                               trainers=[],
+                               workouts=[]
                                )
 
     @app.route('/trainee_list_trainers', methods=["GET"])
@@ -321,12 +289,7 @@ def create_app():
         app.logger.debug('Trainer {} is loaded Trainer List Trainees.'.format(
             str(session['user_id'])))
         return render_template("trainee/list_trainers.html",
-                               trainers=[
-                                   g.database.get_trainee_class_by_username(
-                                       "derek"),
-                                   g.database.get_trainee_class_by_username(
-                                       "bryson"),
-                                   g.database.get_trainee_class_by_username("elijah")])
+                               trainers=[])
 
     @app.route('/trainee_schedule', methods=["GET"])
     def trainee_schedule():
@@ -341,6 +304,27 @@ def create_app():
         app.logger.debug('Trainer {} is loaded Trainer Schedule.'.format(
             str(session['user_id'])))
         return render_template("trainee/schedule.html",
+                               events=[])
+
+    @app.route('/trainee_add_trainer', methods=["GET", "POST"])
+    def trainee_add_trainer():
+        """Page for a trainer to add a trainer."""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        if type(g.user) is not Trainee:
+            abort(403)
+
+        app.logger.debug('Trainee {} is loaded add trainer page.'.format(
+            str(session['user_id'])))
+
+        if (request.method == "POST"):
+
+            trainer_name = escape(request.form['trainer_name'])
+            found_trainers = g.database.list_trainers_by_search(trainer_name)
+
+        return render_template("trainee/add_trainer.html",
                                events=[])
 
     """Workout pages"""

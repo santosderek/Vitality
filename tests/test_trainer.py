@@ -5,7 +5,7 @@ class TestTrainer(unittest.TestCase):
 
     def test_as_dict(self):
 
-        new_trainer = Trainer(0,"test", "password", "None", "first", "last", "Earth", 1234567890)
+        new_trainer = Trainer(0,"test", "password", "None", "first last", "Earth", 1234567890)
 
         new_dict = new_trainer.as_dict()
         comp_dict = {
@@ -13,8 +13,7 @@ class TestTrainer(unittest.TestCase):
             "username" : "test",
             "password" : "password",
             "trainees" : "None",
-            "firstname" : "first",
-            "lastname" : "last",
+            "name" : "first last",
             "location" : "Earth",
             "phone" : 1234567890
             }

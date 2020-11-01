@@ -5,15 +5,14 @@ class TestUser(unittest.TestCase):
 
     def test_as_dict(self):
 
-        new_user = Trainee(0,"test", "password", "first", "last", "Earth", 1234567890)
+        new_user = Trainee(0,"test", "password", "first last", "Earth", 1234567890)
 
         new_dict = new_user.as_dict()
         comp_dict = {
             "id" : 0,
             "username" : "test",
             "password" : "password",
-            "firstname" : "first",
-            "lastname" : "last",
+            "name": "first last",
             "location" : "Earth",
             "phone" : 1234567890
             }

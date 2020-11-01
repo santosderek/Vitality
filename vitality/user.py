@@ -1,11 +1,10 @@
 class User:
-    def __init__(self, id, username, password, firstname=None, lastname=None, location=None, phone=None):
+    def __init__(self, id, username, password, name=None, location=None, phone=None):
         """Constructor for Trainee class."""
         self.id = id
         self.username = username
         self.password = password
-        self.firstname = firstname
-        self.lastname = lastname
+        self.name = name
         self.location = location
         self.phone = phone
     
@@ -15,8 +14,7 @@ class User:
             "_id" : self.id,
             "username" : self.username,
             "password" : self.password,
-            "firstname" : self.firstname,
-            "lastname" : self.lastname,
+            "name": self.name, 
             "location" : self.location,
             "phone" : self.phone
         }

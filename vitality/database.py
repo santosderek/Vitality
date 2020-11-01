@@ -1,8 +1,9 @@
-from flask_pymongo import PyMongo
 from .trainee import Trainee
 from .trainer import Trainer
 from .workout import Workout
 from bson.objectid import ObjectId
+from flask_pymongo import PyMongo
+from markupsafe import escape
 
 
 class Database:
@@ -18,8 +19,7 @@ class Database:
             id=str(trainee_dict['_id']),
             username=trainee_dict['username'],
             password=trainee_dict['password'],
-            firstname=trainee_dict['firstname'],
-            lastname=trainee_dict['lastname'],
+            name=trainee_dict['name'],
             location=trainee_dict['location'],
             phone=trainee_dict['phone']
         )
@@ -98,23 +98,13 @@ class Database:
                 }
             })
 
-    def set_trainee_firstname(self, id, firstname):
-        """Updates a trainee's firstname given a user id."""
+    def set_trainee_name(self, id, name):
+        """Updates a trainee's name given a user id."""
         self.mongo.db.trainee.update_one(
             {"_id": ObjectId(id)},
             {
                 "$set": {
-                    "firstname": firstname
-                }
-            })
-
-    def set_trainee_lastname(self, id, lastname):
-        """Updates a trainee's lastname given a user id."""
-        self.mongo.db.trainee.update_one(
-            {"_id": ObjectId(id)},
-            {
-                "$set": {
-                    "lastname": lastname
+                    "name": name
                 }
             })
 
@@ -126,8 +116,7 @@ class Database:
         self.mongo.db.trainee.insert_one({
             'username': user.username,
             'password': user.password,
-            'firstname': user.firstname,
-            'lastname': user.lastname,
+            'name': user.name,
             'location': user.location,
             'phone': user.phone})
 
@@ -143,8 +132,7 @@ class Database:
             id=str(trainer_dict['_id']),
             username=trainer_dict['username'],
             password=trainer_dict['password'],
-            firstname=trainer_dict['firstname'],
-            lastname=trainer_dict['lastname'],
+            name=trainer_dict['name'],
             location=trainer_dict['location'],
             phone=trainer_dict['phone']
         )
@@ -159,7 +147,7 @@ class Database:
 
     def get_trainer_class_by_username(self, username):
         """Returns the trainer class of the trainer found by the trainer's username."""
-        found_user = self.mongo.db.trainer.find_one({"username": username})
+        found_user = self.mongo.db.trainer.find_one({"username": escape(username)})
 
         if found_user:
             return self.trainer_dict_to_class(found_user)
@@ -181,7 +169,26 @@ class Database:
 
     def get_trainer_by_username(self, username):
         """Returns the trainer class found by the trainer's username."""
-        return self.mongo.db.trainer.find_one({"username": username})
+        return self.mongo.db.trainer.find_one({"username": escape(username)})
+
+    def list_trainers_by_search(self, username):
+        found_trainers = []
+
+        usernames_found = self.mongo.db.trainer.find({
+            "username": {"$regex": r".*{}.*".format(escape(username))}
+        })
+
+        if usernames_found is not None:
+            found_trainers.extend(usernames_found)
+
+        names_found = self.mongo.db.trainer.find({
+            "name": {"$regex": r".*{}.*".format(escape(username))}
+        })
+
+        if names_found is not None:
+            found_trainers.extend(names_found)
+
+        return found_trainers
 
     def set_trainer_username(self, id, username):
         """Updates a trainer's username given a trainer id."""
@@ -223,23 +230,13 @@ class Database:
                 }
             })
 
-    def set_trainer_firstname(self, id, firstname):
-        """Updates a trainer's firstname given a trainer id."""
+    def set_trainer_name(self, id, name):
+        """Updates a trainer's name given a trainer id."""
         self.mongo.db.trainer.update_one(
             {"_id": ObjectId(id)},
             {
                 "$set": {
-                    "firstname": firstname
-                }
-            })
-
-    def set_trainer_lastname(self, id, lastname):
-        """Updates a trainer's lastname given a trainer id."""
-        self.mongo.db.trainer.update_one(
-            {"_id": ObjectId(id)},
-            {
-                "$set": {
-                    "lastname": lastname
+                    "name": name
                 }
             })
 
@@ -251,8 +248,7 @@ class Database:
         self.mongo.db.trainer.insert_one({
             'username': trainer.username,
             'password': trainer.password,
-            'firstname': trainer.firstname,
-            'lastname': trainer.lastname,
+            'name': trainer.name,
             'location': trainer.location,
             'phone': trainer.phone})
 

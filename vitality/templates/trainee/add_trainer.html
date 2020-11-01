@@ -2,13 +2,6 @@
 
 {% block content %}
 
-{% if trainers|length < 1 %}
-<div class="row">
-    <div class="col">
-        <p style="color: #47525E;">No trainers found!</p>
-    </div>
-</div>
-{% else %}
 <style>
     .btn {
         color: white;
@@ -52,37 +45,32 @@
         </div>
     </nav>
 
-    <div class="col text-center " id="contentblock">
-        <div class="col-sm-12 pt-3">
-            <a href="{{ url_for('trainee_add_trainer') }}" class="btn" style="background-color: green;">
-                Add Trainer
-            </a>
-        </div>
+    <div class="col-md-3 col-lg-10" id="contentblock">
+        <div class="col pt-4 text-center">
+            
+            <form action="/add_trainer" method="POST">
+                <div class="col-sm-12">
+                    <input class="col-sm-3 text-center" name="trainer_name" style="height: 30px;" placeholder="Trainer Name" />
+                    <button class="col-sm-2" style="width: 19%; height: 30px;" type="submit">
+                        Search
+                    </button>
+                </div>
 
-        {% for trainer in trainers %}
-        {% if trainer %}
-        <div class="col-sm-12">
-            <div class="card mb-3 mx-auto" style="max-width: 540px;">
-                <div class="row no-gutters">
-                    <div class="col-md-4">
-                        <img class="card-img" src="{{ url_for("static", filename="images/profile.svg") }}"
-                            alt="Trainer {{ trainer.username }}" width="100" heigh="100">
-                    </div>
-                    <div class="col-md-8">
+                {% for trainer in trainers%}
+                <div class="col">
+                    <div class="card">
+                        <img class="card-img-left" src="" alt="Trainer image">
                         <div class="card-body">
-                            <h5 class="card-title">{{ trainer.username|e }}</h5>
-                            <a class="btn mb-1 col-sm-12">Assigned Workouts</a>
-                            <a class="btn mb-1 col-sm-12">Info</a>
-                            <a class="btn mb-1 col-sm-12">Accept | Remove</a>
-
+                            <p class="card-text">
+                                Trainer information 
+                            </p>
+                            <a class="btn" />
                         </div>
                     </div>
                 </div>
-            </div>
+                {% endfor%}
+            </form>
         </div>
-        {% endif %}
-        {% endfor %}
-        {% endif %}
     </div>
 </div>
 {% endblock %}
