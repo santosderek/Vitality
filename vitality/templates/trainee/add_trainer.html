@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .btn {
+        color: white;
+    }
+
+    .navbar,
+    .navbar-expand-lg,
+    .jumbotron {
+        background-color: #ffffff !important;
+    }
+
+    .card {
+        border: none;
+        border-bottom: 1px solid #47525E;
+    }
+
+    #contentblock,
+    .card {
+        background-color: #8492A6;
+        color: white;
+
+    }
+</style>
+<div class="row">
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
+        <div class="sidebar-sticky pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainee_overview") }}"><b>Overview</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href=""><b>Workouts</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href="{{ url_for("trainee_schedule") }}"><b>Schedule</b></a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="nav-link" href=""><b>Diets</b></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="col-md-3 col-lg-10" id="contentblock">
+        <div class="col pt-4 text-center">
+
+            <form action="/trainee_add_trainer" method="POST">
+                <div class="col-sm-12">
+                    <input class="col-sm-3 text-center" name="trainer_name" style="height: 30px;"
+                        placeholder="Trainer Name" />
+                    <button class="col-sm-2" style="width: 19%; height: 30px;" type="submit">
+                        Search
+                    </button>
+                </div>
+
+                {% for trainer in trainers%}
+                
+                                {{ trainer.name }}
+                            
+                {% endfor%}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

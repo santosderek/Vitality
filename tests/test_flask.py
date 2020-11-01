@@ -46,8 +46,7 @@ def client():
             None,
             username="testTrainee",
             password="password",
-            firstname="first",
-            lastname="last",
+            name="first last",
             location="Earth",
             phone=1234567890
         )
@@ -57,8 +56,7 @@ def client():
             None,
             username="testTrainer",
             password="password",
-            firstname="first",
-            lastname="last",
+            name="first last",
             location="Earth",
             phone=1234567890
         )
@@ -68,11 +66,11 @@ def client():
         """ Code run after client has been used """
         while database.get_trainee_by_username("testTrainee"):
             database.remove_trainee(
-                database.get_trainee_by_username("testTrainee")['_id'])
+                database.get_trainee_by_username("testTrainee").id)
 
         while database.get_trainer_by_username("testTrainer"):
             database.remove_trainer(
-                database.get_trainer_by_username("testTrainer")['_id'])
+                database.get_trainer_by_username("testTrainer").id)
 
     with app.test_client() as client:
         with app.app_context():
@@ -116,13 +114,44 @@ def test_signup(client):
     returned_value = client.get('/signup', follow_redirects=True)
     assert returned_value.status_code == 200
 
+    # POST with a wrong password combination
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password",
+        repassword="repassword",
+        name="first last",
+        location="Earth",
+        phone=1234567890,
+        usertype="trainee"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'Account was created!' not in returned_value.data
+    assert b'Could not create account' in returned_value.data
+    assert b'Username was taken' not in returned_value.data
+    assert b'<form action="/signup" method="POST">' in returned_value.data
+
+    # POST with a wrong usertype
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password",
+        repassword="password",
+        name="first last",
+        location="Earth",
+        phone=1234567890,
+        usertype="notausertype"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'Account was created!' not in returned_value.data
+    assert b'Could not create account' in returned_value.data
+    assert b'Username was taken' not in returned_value.data
+    assert b'<form action="/signup" method="POST">' in returned_value.data
+
     # POST with a username that was taken
     returned_value = client.post('/signup', data=dict(
         username="testTrainee",
         password="password",
         repassword="password",
-        firstname="first",
-        lastname="last",
+        name="first last",
         location="Earth",
         phone=1234567890,
         usertype="trainee"
@@ -135,15 +164,14 @@ def test_signup(client):
 
     if g.database.get_trainee_by_username("testTrainee"):
         g.database.remove_trainee(
-            g.database.get_trainee_by_username("testTrainee")['_id'])
+            g.database.get_trainee_by_username("testTrainee").id)
 
     # POST with a username that was not taken, success
     returned_value = client.post('/signup', data=dict(
         username="testTrainee",
         password="password",
         repassword="password",
-        firstname="first",
-        lastname="last",
+        name="first last",
         location="Earth",
         phone=1234567890,
         usertype="trainee"
@@ -156,15 +184,14 @@ def test_signup(client):
 
     if g.database.get_trainee_by_username("testTrainee"):
         g.database.remove_trainee(
-            g.database.get_trainee_by_username("testTrainee")['_id'])
+            g.database.get_trainee_by_username("testTrainee").id)
 
     # POST with a username that was not taken, success
     returned_value = client.post('/signup', data=dict(
         username="testTrainee",
         password="password",
         repassword="password",
-        firstname="first",
-        lastname="last",
+        name="first last",
         location="Earth",
         phone=1234567890,
         usertype="trainer"
@@ -177,7 +204,7 @@ def test_signup(client):
 
     if g.database.get_trainer_by_username("testTrainee"):
         g.database.remove_trainer(
-            g.database.get_trainer_by_username("testTrainee")['_id'])
+            g.database.get_trainer_by_username("testTrainee").id)
 
 
 def test_profile(client):
@@ -185,6 +212,7 @@ def test_profile(client):
     # Get without a user
     returned_value = client.get('/profile/test', follow_redirects=True)
     assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
 
     # Login
     login_as_testTrainee(client)
@@ -210,29 +238,53 @@ def test_usersettings(client):
     login_as_testTrainee(client)
 
     # Get id before change
-    database_user_id = g.database.get_trainee_class_by_username(
-        "testTrainee").id
+    database_user_id = g.database.get_trainee_by_username("testTrainee").id
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
         username="testTrainee",
         password="newpassword",
         repassword="newpassword",
-        firstname="another",
-        lastname="other",
+        name="another",
         location="Venus",
         phone="0987654321"
     ), follow_redirects=True)
     assert returned_value.status_code == 200
 
     # Check database
-    database_user = g.database.get_trainee_class_by_username("testTrainee")
+    database_user = g.database.get_trainee_by_username("testTrainee")
 
     assert database_user.id == database_user_id
     assert database_user.username == 'testTrainee'
     assert database_user.password == 'newpassword'
-    assert database_user.firstname == 'another'
-    assert database_user.lastname == 'other'
+    assert database_user.name == 'another'
+    assert database_user.location == 'Venus'
+    assert database_user.phone == '0987654321'
+
+    # Login as trainer
+    login_as_testTrainer(client)
+
+    # Get id before change
+    database_user_id = g.database.get_trainer_by_username("testTrainer").id
+
+    # Check profile page.
+    returned_value = client.post('/usersettings', data=dict(
+        username="testTrainer",
+        password="newpassword",
+        repassword="newpassword",
+        name="another",
+        location="Venus",
+        phone="0987654321"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 200
+
+    # Check database
+    database_user = g.database.get_trainer_by_username("testTrainer")
+
+    assert database_user.id == database_user_id
+    assert database_user.username == 'testTrainer'
+    assert database_user.password == 'newpassword'
+    assert database_user.name == 'another'
     assert database_user.location == 'Venus'
     assert database_user.phone == '0987654321'
 
@@ -266,6 +318,7 @@ def test_trainer_overview(client):
     returned_value = client.get('/trainer_overview', follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
+    assert b'login' in returned_value.data
 
     # Login as Trainee
     login_as_testTrainee(client)
@@ -323,6 +376,7 @@ def test_trainer_schedule(client):
     returned_value = client.get('/trainer_schedule', follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
+    assert b'login' in returned_value.data
 
     # Login as Trainee
     login_as_testTrainee(client)
@@ -350,6 +404,7 @@ def test_trainee_overview(client):
     returned_value = client.get('/trainee_overview', follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
+    assert b'login' in returned_value.data
 
     # Login as Trainee
     login_as_testTrainee(client)
@@ -368,6 +423,31 @@ def test_trainee_overview(client):
     assert returned_value.status_code == 403
     assert type(g.user) == Trainer
     assert b'Page Forbidden' in returned_value.data
+
+
+def test_trainee_add_trainer(client):
+    """Test the /trainee_add_trianer page to add a trainer to a trainee"""
+    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert b'login' in returned_value.data
+
+    login_as_testTrainer(client)
+    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+    assert returned_value.status_code == 403
+    assert type(g.user) == Trainer
+    assert b'Page Forbidden' in returned_value.data
+
+    login_as_testTrainee(client)
+    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert type(g.user) == Trainee
+    assert b'Overview' in returned_value.data
+    assert b'Workouts' in returned_value.data
+    assert b'Schedule' in returned_value.data
+    assert b'Diets' in returned_value.data
+
+    # TODO: need to add checks to see if trainer gets added to trainee list
 
 
 def test_trainee_list_trainers(client):
@@ -390,7 +470,7 @@ def test_trainee_list_trainers(client):
     assert type(g.user) != Trainer
 
     # Login as Trainer
-    login_as_testTrainer(client) 
+    login_as_testTrainer(client)
 
     # Trainee Overview as Trainer
     returned_value = client.get('/trainee_list_trainers',

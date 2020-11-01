@@ -9,8 +9,7 @@ class Trainee(User):
             "id": self.id,
             "username": self.username,
             "password": self.password,
-            "firstname": self.firstname,
-            "lastname": self.lastname,
+            "name": self.name,
             "location": self.location,
             "phone": self.phone
         }

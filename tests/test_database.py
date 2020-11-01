@@ -3,7 +3,7 @@ from copy import deepcopy
 from flask import Flask
 from flask_pymongo import PyMongo
 from vitality import create_app
-from vitality.database import Database, WorkoutCreatorIdNotFound
+from vitality.database import Database, WorkoutCreatorIdNotFound, UsernameTakenError
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
@@ -19,8 +19,7 @@ class TestDatabase(unittest.TestCase):
         id=None,
         username="testTrainee",
         password="password",
-        firstname="first",
-        lastname="last",
+        name="first last",
         location="Earth",
         phone=1234567890)
 
@@ -29,8 +28,7 @@ class TestDatabase(unittest.TestCase):
         id=None,
         username="testTrainer",
         password="password",
-        firstname="first",
-        lastname="last",
+        name="first last",
         location="mars",
         phone=1234567890)
 
@@ -47,28 +45,27 @@ class TestDatabase(unittest.TestCase):
         self.tearDown()
         self.database.add_trainee(self.test_trainee)
         self.database.add_trainer(self.test_trainer)
-        
+
         # Add workout
-        self.test_workout.creator_id = self.database.get_trainee_class_by_username(
-                self.test_trainee.username).id
-        print (self.test_workout.as_dict())
+        self.test_workout.creator_id = self.database.get_trainee_by_username(
+            self.test_trainee.username).id
         self.database.add_workout(self.test_workout)
 
     def tearDown(self):
         # Remove test Trainee if found
-        while self.database.get_trainee_class_by_username(self.test_trainee.username):
-            db_user = self.database.get_trainee_class_by_username(
+        while self.database.get_trainee_by_username(self.test_trainee.username) is not None:
+            db_user = self.database.get_trainee_by_username(
                 self.test_trainee.username)
             self.database.remove_trainee(db_user.id)
 
         # Remove test Trainer if found
-        while self.database.get_trainer_class_by_username(self.test_trainer.username):
-            db_user = self.database.get_trainer_class_by_username(
+        while self.database.get_trainer_by_username(self.test_trainer.username) is not None:
+            db_user = self.database.get_trainer_by_username(
                 self.test_trainer.username)
             self.database.remove_trainer(db_user.id)
 
         # Remove test Workout if found
-        while self.database.get_workout_class_by_name(self.test_workout.name):
+        while self.database.get_workout_class_by_name(self.test_workout.name) is not None:
             db_user = self.database.get_workout_class_by_name(
                 self.test_workout.name)
             self.database.remove_workout(db_user.id)
@@ -77,25 +74,52 @@ class TestDatabase(unittest.TestCase):
 
     def test_add_trainee(self):
 
-        # Geting the new user by their username
-        db_user = self.database.get_trainee_class_by_username(
-            self.test_trainee.username)
+        # Raise exception if 'testTrainee' username found
+        with self.assertRaises(UsernameTakenError):
+            new_trainer = deepcopy(self.test_trainer)
+            new_trainer.username = "testTrainee"
+            self.database.add_trainee(new_trainer)
 
-        # Setting our current user object's id as mongodb id
+        # Raise exception if 'testTrainer' username found
+        with self.assertRaises(UsernameTakenError):
+            new_trainer = deepcopy(self.test_trainer)
+            new_trainer.username = "testTrainer"
+            self.database.add_trainee(new_trainer)
+
+        # Copy test_trainer and change to unused trainer name
         new_trainee = deepcopy(self.test_trainee)
-        new_trainee.id = db_user.id
+        new_trainee.username = "testUsername"
 
-        self.assertTrue(db_user.as_dict() == new_trainee.as_dict())
+        # Remove testUsername
+        while self.database.get_trainee_by_username(new_trainee.username) is not None:
+            db_user = self.database.get_trainee_by_username(
+                new_trainee.username)
+            self.database.remove_trainee(db_user.id)
 
-        # Removing temp user from database
-        self.database.remove_trainee(db_user.id)
-        self.assertTrue(self.database.get_trainee_by_id(db_user.id) is None)
+        # Get database testUsername trainer
+        database_trainee = self.database.get_trainee_by_username(
+            new_trainee.username)
+        self.assertTrue(database_trainee is None)
+
+        # Add a new trainer
+        self.database.add_trainee(new_trainee)
+
+        # Get database testUsername trainer
+        database_trainee = self.database.get_trainee_by_username(
+            new_trainee.username)
+        self.assertTrue(database_trainee is not None)
+
+        # Remove newly added trainer
+        self.database.remove_trainee(database_trainee.id)
+        database_trainee = self.database.get_trainee_by_username(
+            new_trainee.username)
+        self.assertTrue(database_trainee is None)
 
     def test_set_trainee_username(self):
         new_trainee = deepcopy(self.test_trainee)
 
         # Geting the new user by their username
-        db_user_1 = self.database.get_trainee_class_by_username(
+        db_user_1 = self.database.get_trainee_by_username(
             new_trainee.username)
 
         # Setting our current user object's id as mongodb id
@@ -110,7 +134,7 @@ class TestDatabase(unittest.TestCase):
             new_trainee.id, new_trainee.username)
 
         # Checking if database updated
-        db_user_2 = self.database.get_trainee_class_by_id(new_trainee.id)
+        db_user_2 = self.database.get_trainee_by_id(new_trainee.id)
 
         self.assertTrue(db_user_2.as_dict() == new_trainee.as_dict())
 
@@ -123,7 +147,7 @@ class TestDatabase(unittest.TestCase):
         new_trainee = deepcopy(self.test_trainee)
 
         # Updating user object to database user
-        new_trainee = self.database.get_trainee_class_by_username(
+        new_trainee = self.database.get_trainee_by_username(
             new_trainee.username)
 
         # Changing password
@@ -132,19 +156,19 @@ class TestDatabase(unittest.TestCase):
             new_trainee.id, new_trainee.password)
 
         # Checking password
-        db_user = self.database.get_trainee_class_by_username(
+        db_user = self.database.get_trainee_by_username(
             new_trainee.username)
         self.assertTrue(db_user.password == new_trainee.password)
 
         self.database.remove_trainee(db_user.id)
         self.assertTrue(
-            self.database.get_trainee_class_by_id(db_user.id) is None)
+            self.database.get_trainee_by_id(db_user.id) is None)
 
     def test_set_trainee_location(self):
         new_trainee = deepcopy(self.test_trainee)
 
         # Updating user object to database user
-        new_trainee = self.database.get_trainee_class_by_username(
+        new_trainee = self.database.get_trainee_by_username(
             new_trainee.username)
 
         # Changing location
@@ -153,19 +177,19 @@ class TestDatabase(unittest.TestCase):
             new_trainee.id, new_trainee.location)
 
         # Checking location
-        db_user = self.database.get_trainee_class_by_username(
+        db_user = self.database.get_trainee_by_username(
             new_trainee.username)
         self.assertTrue(db_user.location == new_trainee.location)
 
         self.database.remove_trainee(db_user.id)
         self.assertTrue(
-            self.database.get_trainee_class_by_id(db_user.id) is None)
+            self.database.get_trainee_by_id(db_user.id) is None)
 
     def test_set_trainee_phone(self):
         new_trainee = deepcopy(self.test_trainee)
 
         # Updating user object to database user
-        new_trainee = self.database.get_trainee_class_by_username(
+        new_trainee = self.database.get_trainee_by_username(
             new_trainee.username)
 
         # Changing phone
@@ -173,81 +197,94 @@ class TestDatabase(unittest.TestCase):
         self.database.set_trainee_phone(new_trainee.id, new_trainee.phone)
 
         # Checking phone
-        db_user = self.database.get_trainee_class_by_username(
+        db_user = self.database.get_trainee_by_username(
             new_trainee.username)
         self.assertTrue(db_user.phone == new_trainee.phone)
 
         self.database.remove_trainee(db_user.id)
         self.assertTrue(
-            self.database.get_trainee_class_by_id(db_user.id) is None)
+            self.database.get_trainee_by_id(db_user.id) is None)
 
-    def test_set_trainee_firstname(self):
+    def test_set_trainee_name(self):
         new_trainee = deepcopy(self.test_trainee)
 
         # Updating user object to database user
-        new_trainee = self.database.get_trainee_class_by_username(
+        new_trainee = self.database.get_trainee_by_username(
             new_trainee.username)
 
-        # Changing firstname
-        new_trainee.firstname = "newfirstname"
-        self.database.set_trainee_firstname(
-            new_trainee.id, new_trainee.firstname)
+        # Changing name
+        new_trainee.name = "newname"
+        self.database.set_trainee_name(
+            new_trainee.id, new_trainee.name)
 
-        # Checking firstname
-        db_user = self.database.get_trainee_class_by_username(
+        # Checking name
+        db_user = self.database.get_trainee_by_username(
             new_trainee.username)
-        self.assertTrue(db_user.firstname == new_trainee.firstname)
+        self.assertTrue(db_user.name == new_trainee.name)
 
         self.database.remove_trainee(db_user.id)
         self.assertTrue(
-            self.database.get_trainee_class_by_username(db_user.id) is None)
+            self.database.get_trainee_by_username(db_user.id) is None)
 
-    def test_set_trainee_lastname(self):
-        new_trainee = deepcopy(self.test_trainee)
+    def test_list_trainers_by_search(self):
+        # Searching for testTrainer with input "testTrain"
+        found_trainers = self.database.list_trainers_by_search("testTrain")
+        self.assertEqual(len(found_trainers), 1)
 
-        # Updating user object to database user
-        new_trainee = self.database.get_trainee_class_by_username(
-            new_trainee.username)
-
-        # Changing lastname
-        new_trainee.lastname = "newlastname"
-        self.database.set_trainee_lastname(
-            new_trainee.id, new_trainee.lastname)
-
-        # Checking lastname
-        db_user = self.database.get_trainee_class_by_username(
-            new_trainee.username)
-        self.assertTrue(db_user.lastname == new_trainee.lastname)
-
-        self.database.remove_trainee(db_user.id)
-        self.assertTrue(
-            self.database.get_trainee_class_by_id(db_user.id) is None)
+        trainer = self.database.get_trainer_by_username("testTrainer")
+        self.assertEqual(found_trainers[0].as_dict(), trainer.as_dict())
 
     """ Test trainer """
 
     def test_add_trainer(self):
 
+        # Raise exception if 'testTrainee' username found
+        with self.assertRaises(UsernameTakenError):
+            new_trainer = deepcopy(self.test_trainer)
+            new_trainer.username = "testTrainee"
+            self.database.add_trainer(new_trainer)
+
+        # Raise exception if 'testTrainer' username found
+        with self.assertRaises(UsernameTakenError):
+            new_trainer = deepcopy(self.test_trainer)
+            new_trainer.username = "testTrainer"
+            self.database.add_trainer(new_trainer)
+
+        # Copy test_trainer and change to unused trainer name
         new_trainer = deepcopy(self.test_trainer)
+        new_trainer.username = "testUsername"
 
-        # Geting the new user by their username
-        db_user = self.database.get_trainer_class_by_username(
+        # Remove testUsername
+        while self.database.get_trainer_by_username(new_trainer.username) is not None:
+            db_user = self.database.get_trainer_by_username(
+                new_trainer.username)
+            self.database.remove_trainer(db_user.id)
+
+        # Get database testUsername trainer
+        database_trainer = self.database.get_trainer_by_username(
             new_trainer.username)
+        self.assertTrue(database_trainer is None)
 
-        # Setting our current user object's id as mongodb id
-        new_trainer.id = db_user.id
+        # Add a new trainer
+        self.database.add_trainer(new_trainer)
 
-        self.assertTrue(db_user.as_dict() == new_trainer.as_dict())
+        # Get database testUsername trainer
+        database_trainer = self.database.get_trainer_by_username(
+            new_trainer.username)
+        self.assertTrue(database_trainer is not None)
 
-        # Removing temp user from database
-        self.database.remove_trainer(db_user.id)
-        self.assertTrue(self.database.get_trainer_by_id(db_user.id) is None)
+        # Remove newly added trainer
+        self.database.remove_trainer(database_trainer.id)
+        database_trainer = self.database.get_trainer_by_username(
+            new_trainer.username)
+        self.assertTrue(database_trainer is None)
 
     def test_set_trainer_username(self):
 
         new_trainer = deepcopy(self.test_trainer)
 
         # Geting the new user by their username
-        db_user_1 = self.database.get_trainer_class_by_username(
+        db_user_1 = self.database.get_trainer_by_username(
             new_trainer.username)
 
         # Setting our current user object's id as mongodb id
@@ -262,7 +299,7 @@ class TestDatabase(unittest.TestCase):
             new_trainer.id, new_trainer.username)
 
         # Checking if database updated
-        db_user_2 = self.database.get_trainer_class_by_id(new_trainer.id)
+        db_user_2 = self.database.get_trainer_by_id(new_trainer.id)
 
         self.assertTrue(db_user_2.as_dict() == new_trainer.as_dict())
 
@@ -275,7 +312,7 @@ class TestDatabase(unittest.TestCase):
         new_trainer = deepcopy(self.test_trainer)
 
         # Updating user object to database user
-        new_trainer = self.database.get_trainer_class_by_username(
+        new_trainer = self.database.get_trainer_by_username(
             new_trainer.username)
 
         # Changing password
@@ -284,20 +321,20 @@ class TestDatabase(unittest.TestCase):
             new_trainer.id, new_trainer.password)
 
         # Checking password
-        db_user = self.database.get_trainer_class_by_username(
+        db_user = self.database.get_trainer_by_username(
             new_trainer.username)
         self.assertTrue(db_user.password == new_trainer.password)
 
         self.database.remove_trainer(db_user.id)
         self.assertTrue(
-            self.database.get_trainer_class_by_id(db_user.id) is None)
+            self.database.get_trainer_by_id(db_user.id) is None)
 
     def test_set_trainer_location(self):
 
         new_trainer = deepcopy(self.test_trainer)
 
         # Updating user object to database user
-        new_trainer = self.database.get_trainer_class_by_username(
+        new_trainer = self.database.get_trainer_by_username(
             new_trainer.username)
 
         # Changing location
@@ -306,20 +343,20 @@ class TestDatabase(unittest.TestCase):
             new_trainer.id, new_trainer.location)
 
         # Checking location
-        db_user = self.database.get_trainer_class_by_username(
+        db_user = self.database.get_trainer_by_username(
             new_trainer.username)
         self.assertTrue(db_user.location == new_trainer.location)
 
         self.database.remove_trainer(db_user.id)
         self.assertTrue(
-            self.database.get_trainer_class_by_id(db_user.id) is None)
+            self.database.get_trainer_by_id(db_user.id) is None)
 
     def test_set_trainer_phone(self):
 
         new_trainer = deepcopy(self.test_trainer)
 
         # Updating user object to database user
-        new_trainer = self.database.get_trainer_class_by_username(
+        new_trainer = self.database.get_trainer_by_username(
             new_trainer.username)
 
         # Changing phone
@@ -327,57 +364,35 @@ class TestDatabase(unittest.TestCase):
         self.database.set_trainer_phone(new_trainer.id, new_trainer.phone)
 
         # Checking phone
-        db_user = self.database.get_trainer_class_by_username(
+        db_user = self.database.get_trainer_by_username(
             new_trainer.username)
         self.assertTrue(db_user.phone == new_trainer.phone)
 
         self.database.remove_trainer(db_user.id)
         self.assertTrue(
-            self.database.get_trainer_class_by_id(db_user.id) is None)
+            self.database.get_trainer_by_id(db_user.id) is None)
 
-    def test_set_trainer_firstname(self):
-
-        new_trainer = deepcopy(self.test_trainer)
-
-        # Updating user object to database user
-        new_trainer = self.database.get_trainer_class_by_username(
-            new_trainer.username)
-
-        # Changing firstname
-        new_trainer.firstname = "newfirstname"
-        self.database.set_trainer_firstname(
-            new_trainer.id, new_trainer.firstname)
-
-        # Checking firstname
-        db_user = self.database.get_trainer_class_by_username(
-            new_trainer.username)
-        self.assertTrue(db_user.firstname == new_trainer.firstname)
-
-        self.database.remove_trainer(db_user.id)
-        self.assertTrue(
-            self.database.get_trainer_class_by_username(db_user.id) is None)
-
-    def test_set_trainer_lastname(self):
+    def test_set_trainer_name(self):
 
         new_trainer = deepcopy(self.test_trainer)
 
         # Updating user object to database user
-        new_trainer = self.database.get_trainer_class_by_username(
+        new_trainer = self.database.get_trainer_by_username(
             new_trainer.username)
 
-        # Changing lastname
-        new_trainer.lastname = "newlastname"
-        self.database.set_trainer_lastname(
-            new_trainer.id, new_trainer.lastname)
+        # Changing name
+        new_trainer.name = "newname"
+        self.database.set_trainer_name(
+            new_trainer.id, new_trainer.name)
 
-        # Checking lastname
-        db_user = self.database.get_trainer_class_by_username(
+        # Checking name
+        db_user = self.database.get_trainer_by_username(
             new_trainer.username)
-        self.assertTrue(db_user.lastname == new_trainer.lastname)
+        self.assertTrue(db_user.name == new_trainer.name)
 
         self.database.remove_trainer(db_user.id)
         self.assertTrue(
-            self.database.get_trainer_class_by_id(db_user.id) is None)
+            self.database.get_trainer_by_username(db_user.id) is None)
 
     """Workout tests"""
 
@@ -435,11 +450,11 @@ class TestDatabase(unittest.TestCase):
             new_workout.name)
 
         # Get trainee from database
-        database_trainee = self.database.get_trainee_class_by_username(
+        database_trainee = self.database.get_trainee_by_username(
             self.test_trainee.username)
 
         # Get trainer from database
-        database_trainer = self.database.get_trainer_class_by_username(
+        database_trainer = self.database.get_trainer_by_username(
             self.test_trainer.username)
 
         # Need to pass in the mongo id
@@ -505,7 +520,8 @@ class TestDatabase(unittest.TestCase):
         new_workout.difficulty = "newdifficulty"
 
         # Set it in database
-        self.database.set_workout_difficulty(new_workout.id, new_workout.difficulty)
+        self.database.set_workout_difficulty(
+            new_workout.id, new_workout.difficulty)
 
         # Get workout from database
         database_workout = self.database.get_workout_class_by_name(
@@ -568,13 +584,14 @@ class TestDatabase(unittest.TestCase):
         new_workout.id = database_workout.id
 
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
-        
+
         self.database.remove_workout(new_workout.id)
-        
-        self.assertTrue(self.database.get_workout_class_by_name(new_workout.name) is None)
+
+        self.assertTrue(self.database.get_workout_class_by_name(
+            new_workout.name) is None)
 
     def test_add_workout(self):
-        new_trainee = self.database.get_trainee_class_by_username(
+        new_trainee = self.database.get_trainee_by_username(
             self.test_trainee.username)
 
         new_workout = deepcopy(self.test_workout)
@@ -600,7 +617,6 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(self.database.get_trainee_by_id(
             new_trainee.id) is None)
 
-        
         # Testing to see if an error occurs if adding a workout with no creator id
         new_workout = deepcopy(self.test_workout)
         new_workout.creator_id = None
