@@ -117,7 +117,7 @@ def create_app():
                         g.database.add_trainer(new_user)
 
                     else:
-                        redirect(url_for('signup'), 403)
+                        return render_template("account/signup.html", error_message=True)
 
                     # If username and password successful
                     return render_template("account/signup.html", creation_successful=True)
