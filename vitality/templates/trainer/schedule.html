@@ -1,43 +1,9 @@
 {% extends 'base.html' %}
-
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css') }}" />
+{% endblock %}
 
 {% block content %}
-
-<style>
-    #contentblock {
-        background-color: #8492A6;
-        color: white;
-    }
-
-    a {
-        color: white;
-    }
-
-    a:hover {
-        color: white;
-        text-decoration: none;
-    }
-
-    .sidebar a {
-        color: #47525E;
-    }
-
-    .btn {
-        background-color: #8492A6;
-        border-color: white;
-    }
-
-    .navbar,
-    .navbar-expand-lg,
-    .jumbotron {
-        background-color: #ffffff !important;
-    }
-
-    .flex-column .nav-item {
-        border-bottom: 1px solid #D3DCE6;
-    }
-    
-</style>
 <div class="row">
     <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
         <div class="sidebar-sticky pt-3">

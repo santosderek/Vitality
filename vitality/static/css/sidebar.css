@@ -1,0 +1,27 @@
+a {
+    color: white;
+}
+
+a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.sidebar a {
+    color: #47525E;
+}
+
+.btn {
+    background-color: #8492A6;
+    border-color: white;
+}
+
+.navbar,
+.navbar-expand-lg,
+.jumbotron {
+    background-color: #ffffff !important;
+}
+
+.flex-column .nav-item {
+    border-bottom: 1px solid #D3DCE6;
+}

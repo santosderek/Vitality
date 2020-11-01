@@ -1,36 +1,11 @@
 {% extends 'base.html' %}
 
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css') }}" />
+{% endblock %}
 
 {% block content %}
 
-{% if trainees|length < 1 %}
-<div class="col">
-    <p style="color: #47525E;">No trainees found!</p>
-</div>
-{% else %}
-<style>
-    .btn {
-        color: white;
-    }
-
-    .navbar,
-    .navbar-expand-lg,
-    .jumbotron {
-        background-color: #ffffff !important;
-    }
-
-    .card {
-        border: none; 
-        border-bottom: 1px solid #47525E;
-    }
-
-    #contentblock, .card{
-        background-color: #8492A6;
-        color: white;
-        
-    }
-    
-</style>
 <div class="row">
     <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
         <div class="sidebar-sticky pt-3">
@@ -53,6 +28,12 @@
             </ul>
         </div>
     </nav>
+
+    {% if trainees|length < 1 %}
+    <div class="col text-center" id="contentblock">
+        <p>No trainees found!</p>
+    </div>
+    {% else %}
 
     <div class="col text-center " id="contentblock">
         {% for trainee in trainees %}
