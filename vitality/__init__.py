@@ -32,11 +32,11 @@ def create_app():
 
         g.user = None
         if 'user_id' in session:
-            g.user = g.database.get_trainee_class_by_id(session['user_id'])
+            g.user = g.database.get_trainee_by_id(session['user_id'])
             g.user_type = 'trainee' if g.user is not None else None
 
             if g.user is None:
-                g.user = g.database.get_trainer_class_by_id(session['user_id'])
+                g.user = g.database.get_trainer_by_id(session['user_id'])
                 g.user_type = 'trainer' if g.user is not None else None
 
     @app.route('/', methods=["GET"])
@@ -139,7 +139,7 @@ def create_app():
 
         app.logger.info('Rendering Profile')
         username = escape(username)
-        user = g.database.get_trainee_class_by_username(username)
+        user = g.database.get_trainee_by_username(username)
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
@@ -158,7 +158,7 @@ def create_app():
             location = escape(request.form['location'])
             phone = escape(request.form['phone'])
 
-            if g.database.get_trainee_class_by_id(g.user.id) is not None:
+            if g.database.get_trainee_by_id(g.user.id) is not None:
 
                 if username:
                     g.database.set_trainee_username(g.user.id, username)
@@ -177,7 +177,7 @@ def create_app():
 
                 return redirect(url_for('usersettings'))
 
-            elif g.database.get_trainer_class_by_id(g.user.id) is not None:
+            elif g.database.get_trainer_by_id(g.user.id) is not None:
                 if username:
                     g.database.set_trainer_username(g.user.id, username)
 
@@ -241,7 +241,7 @@ def create_app():
             str(session['user_id'])))
         return render_template("trainer/list_trainees.html",
                                trainees=[item for item in (
-                                   g.database.get_trainer_class_by_username("elijah"),) if item is not None])
+                                   g.database.get_trainer_by_username("elijah"),) if item is not None])
 
     @app.route('/trainer_schedule', methods=["GET"])
     def trainer_schedule():

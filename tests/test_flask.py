@@ -66,11 +66,11 @@ def client():
         """ Code run after client has been used """
         while database.get_trainee_by_username("testTrainee"):
             database.remove_trainee(
-                database.get_trainee_by_username("testTrainee")['_id'])
+                database.get_trainee_by_username("testTrainee").id)
 
         while database.get_trainer_by_username("testTrainer"):
             database.remove_trainer(
-                database.get_trainer_by_username("testTrainer")['_id'])
+                database.get_trainer_by_username("testTrainer").id)
 
     with app.test_client() as client:
         with app.app_context():
@@ -132,7 +132,7 @@ def test_signup(client):
 
     if g.database.get_trainee_by_username("testTrainee"):
         g.database.remove_trainee(
-            g.database.get_trainee_by_username("testTrainee")['_id'])
+            g.database.get_trainee_by_username("testTrainee").id)
 
     # POST with a username that was not taken, success
     returned_value = client.post('/signup', data=dict(
@@ -152,14 +152,14 @@ def test_signup(client):
 
     if g.database.get_trainee_by_username("testTrainee"):
         g.database.remove_trainee(
-            g.database.get_trainee_by_username("testTrainee")['_id'])
+            g.database.get_trainee_by_username("testTrainee").id)
 
     # POST with a username that was not taken, success
     returned_value = client.post('/signup', data=dict(
         username="testTrainee",
         password="password",
         repassword="password",
-        name = "first last",
+        name="first last",
         location="Earth",
         phone=1234567890,
         usertype="trainer"
@@ -172,7 +172,7 @@ def test_signup(client):
 
     if g.database.get_trainer_by_username("testTrainee"):
         g.database.remove_trainer(
-            g.database.get_trainer_by_username("testTrainee")['_id'])
+            g.database.get_trainer_by_username("testTrainee").id)
 
 
 def test_profile(client):
@@ -205,8 +205,7 @@ def test_usersettings(client):
     login_as_testTrainee(client)
 
     # Get id before change
-    database_user_id = g.database.get_trainee_class_by_username(
-        "testTrainee").id
+    database_user_id = g.database.get_trainee_by_username("testTrainee").id
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
@@ -220,7 +219,7 @@ def test_usersettings(client):
     assert returned_value.status_code == 200
 
     # Check database
-    database_user = g.database.get_trainee_class_by_username("testTrainee")
+    database_user = g.database.get_trainee_by_username("testTrainee")
 
     assert database_user.id == database_user_id
     assert database_user.username == 'testTrainee'

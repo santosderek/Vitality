@@ -14,7 +14,7 @@ class Database:
 
     """ Trainee Functions """
 
-    def trainee_dict_to_class(self, trainee_dict):
+    def trainee_dict_to_class(self, trainee_dict: dict):
         """Return a Trainee class from a dictionary"""
         return Trainee(
             id=str(trainee_dict['_id']),
@@ -25,7 +25,7 @@ class Database:
             phone=trainee_dict['phone']
         )
 
-    def get_trainee_id_by_login(self, username, password):
+    def get_trainee_id_by_login(self, username: str, password: str):
         """Return the trainer id if login matches"""
         trainee = self.mongo.db.trainee.find_one({
             'username': username,
@@ -33,7 +33,7 @@ class Database:
 
         return str(trainee['_id']) if trainee is not None else None
 
-    def get_trainee_class_by_id(self, id):
+    def get_trainee_by_id(self, id: str):
         """Returns the Trainee class of the User found by the trainee's id."""
         found_user = self.mongo.db.trainee.find_one({"_id": ObjectId(id)})
 
@@ -42,7 +42,7 @@ class Database:
 
         return None
 
-    def get_trainee_class_by_username(self, username):
+    def get_trainee_by_username(self, username: str):
         """Returns the Trainee class of the User found by the trainee's username."""
         found_user = self.mongo.db.trainee.find_one({"username": username})
 
@@ -51,15 +51,7 @@ class Database:
 
         return None
 
-    def get_trainee_by_id(self, id):
-        """Returns the Trainee class found by the trainee's id."""
-        return self.mongo.db.trainee.find_one({"_id": ObjectId(id)})
-
-    def get_trainee_by_username(self, username):
-        """Returns the Trainee class found by the trainee's username."""
-        return self.mongo.db.trainee.find_one({"username": username})
-
-    def set_trainee_username(self, id, username):
+    def set_trainee_username(self, id: str, username: str):
         """Updates a trainee's username given a user id."""
         self.mongo.db.trainee.update_one(
             {"_id": ObjectId(id)},
@@ -69,7 +61,7 @@ class Database:
                 }
             })
 
-    def set_trainee_password(self, id, password):
+    def set_trainee_password(self, id: str, password: str):
         """Updates a trainee's password given a user id."""
         self.mongo.db.trainee.update_one(
             {"_id": ObjectId(id)},
@@ -79,7 +71,7 @@ class Database:
                 }
             })
 
-    def set_trainee_location(self, id, location):
+    def set_trainee_location(self, id: str, location: str):
         """Updates a trainee's location given a user id."""
         self.mongo.db.trainee.update_one(
             {"_id": ObjectId(id)},
@@ -89,7 +81,7 @@ class Database:
                 }
             })
 
-    def set_trainee_phone(self, id, phone):
+    def set_trainee_phone(self, id: str, phone: int):
         """Updates a trainee's phone number given a user id."""
         self.mongo.db.trainee.update_one(
             {"_id": ObjectId(id)},
@@ -99,7 +91,7 @@ class Database:
                 }
             })
 
-    def set_trainee_name(self, id, name):
+    def set_trainee_name(self, id: str, name: str):
         """Updates a trainee's name given a user id."""
         self.mongo.db.trainee.update_one(
             {"_id": ObjectId(id)},
@@ -109,12 +101,12 @@ class Database:
                 }
             })
 
-    def add_trainee(self, user):
+    def add_trainee(self, user: Trainee):
         """Adds a user to the database based on a provided Trainee class."""
-        if (self.get_trainee_by_username(user.username)):
+        if (self.get_trainee_by_username(user.username) is not None):
             raise UsernameTakenError("Username was taken.")
 
-        if (self.get_trainer_by_username(user.username)):
+        if (self.get_trainer_by_username(user.username) is not None):
             raise UsernameTakenError("Username was taken.")
 
         self.mongo.db.trainee.insert_one({
@@ -124,13 +116,13 @@ class Database:
             'location': user.location,
             'phone': user.phone})
 
-    def remove_trainee(self, id):
+    def remove_trainee(self, id: str):
         """Deletes a trainee by trainee id."""
         self.mongo.db.trainee.delete_one({"_id": ObjectId(id)})
 
     """ Trainer Functions """
 
-    def trainer_dict_to_class(self, trainer_dict):
+    def trainer_dict_to_class(self, trainer_dict: str):
         """Return a Trainer class from a dictionary"""
         return Trainer(
             id=str(trainer_dict['_id']),
@@ -141,7 +133,7 @@ class Database:
             phone=trainer_dict['phone']
         )
 
-    def get_trainer_id_by_login(self, username, password):
+    def get_trainer_id_by_login(self, username: str, password: str):
         """Return the trainer id if login matches"""
         trainer = self.mongo.db.trainer.find_one({
             'username': username,
@@ -149,8 +141,9 @@ class Database:
 
         return str(trainer['_id']) if trainer is not None else None
 
-    def get_trainer_class_by_username(self, username):
+    def get_trainer_by_username(self, username: str):
         """Returns the trainer class of the trainer found by the trainer's username."""
+
         found_user = self.mongo.db.trainer.find_one(
             {"username": escape(username)})
 
@@ -159,7 +152,7 @@ class Database:
 
         return None
 
-    def get_trainer_class_by_id(self, id):
+    def get_trainer_by_id(self, id: str):
         """Returns the trainer class of the trainer found by the trainer's id."""
         found_trainer = self.mongo.db.trainer.find_one({"_id": ObjectId(id)})
 
@@ -168,17 +161,9 @@ class Database:
 
         return None
 
-    def get_trainer_by_id(self, id):
-        """Returns the trainer class found by the trainer's id."""
-        return self.mongo.db.trainer.find_one({"_id": ObjectId(id)})
-
-    def get_trainer_by_username(self, username):
-        """Returns the trainer class found by the trainer's username."""
-        return self.mongo.db.trainer.find_one({"username": escape(username)})
-
-    def list_trainers_by_search(self, name):
+    def list_trainers_by_search(self, name: str):
         """Return a list of trainers by using regex against the 'name' and 'username' fields"""
-        def escape_regex(word):
+        def escape_regex(word: str):
             """Escaping the user input being passed into regex"""
             word = escape(word)
             word = re.escape(word)
@@ -203,7 +188,7 @@ class Database:
 
         return trainers
 
-    def set_trainer_username(self, id, username):
+    def set_trainer_username(self, id: str, username: str):
         """Updates a trainer's username given a trainer id."""
         self.mongo.db.trainer.update_one(
             {"_id": ObjectId(id)},
@@ -213,7 +198,7 @@ class Database:
                 }
             })
 
-    def set_trainer_password(self, id, password):
+    def set_trainer_password(self, id: str, password: str):
         """Updates a trainer's password given a trainer id."""
         self.mongo.db.trainer.update_one(
             {"_id": ObjectId(id)},
@@ -223,7 +208,7 @@ class Database:
                 }
             })
 
-    def set_trainer_location(self, id, location):
+    def set_trainer_location(self, id: str, location: str):
         """Updates a trainer's location given a trainer id."""
         self.mongo.db.trainer.update_one(
             {"_id": ObjectId(id)},
@@ -233,7 +218,7 @@ class Database:
                 }
             })
 
-    def set_trainer_phone(self, id, phone):
+    def set_trainer_phone(self, id: str, phone: str):
         """Updates a trainer's phone number given a trainer id."""
         self.mongo.db.trainer.update_one(
             {"_id": ObjectId(id)},
@@ -243,7 +228,7 @@ class Database:
                 }
             })
 
-    def set_trainer_name(self, id, name):
+    def set_trainer_name(self, id: str, name: str):
         """Updates a trainer's name given a trainer id."""
         self.mongo.db.trainer.update_one(
             {"_id": ObjectId(id)},
@@ -253,12 +238,12 @@ class Database:
                 }
             })
 
-    def add_trainer(self, trainer):
+    def add_trainer(self, trainer: Trainer):
         """Adds a trainer to the database based on a provided trainer class."""
-        if (self.get_trainer_by_username(trainer.username)):
-            raise UsernameTakenError("username was taken.")
+        if (self.get_trainer_by_username(trainer.username) is not None):
+            raise UsernameTakenError("Username was taken.")
 
-        if (self.get_trainee_by_username(trainer.username)):
+        if (self.get_trainee_by_username(trainer.username) is not None):
             raise UsernameTakenError("Username was taken.")
 
         self.mongo.db.trainer.insert_one({
@@ -268,13 +253,13 @@ class Database:
             'location': trainer.location,
             'phone': trainer.phone})
 
-    def remove_trainer(self, id):
+    def remove_trainer(self, id: str):
         """Deletes a trainer by trainer id."""
         self.mongo.db.trainer.delete_one({"_id": ObjectId(id)})
 
     """Workout Functions"""
 
-    def workout_dict_to_class(self, workout_dict):
+    def workout_dict_to_class(self, workout_dict: str):
         """Takes in a workout dictionary and returns a Workout class"""
         return Workout(
             id=workout_dict['_id'],
@@ -285,7 +270,7 @@ class Database:
             exp=workout_dict['exp']
         )
 
-    def get_workout_class_by_id(self, id):
+    def get_workout_class_by_id(self, id: str):
         """Returns the Workout class found by the workout's id."""
         found_workout = self.mongo.db.workout.find_one({"_id": ObjectId(id)})
 
@@ -294,7 +279,7 @@ class Database:
 
         return None
 
-    def get_workout_class_by_name(self, name):
+    def get_workout_class_by_name(self, name: str):
         """Returns the Workout class found by the workout's name."""
         found_workout = self.mongo.db.workout.find_one({"name": name})
 
@@ -303,7 +288,7 @@ class Database:
 
         return None
 
-    def set_workout_creator_id(self, id, creator_id):
+    def set_workout_creator_id(self, id: str, creator_id: str):
         """Updates a workout's creator id given a workout id."""
         self.mongo.db.workout.update_one(
             {"_id": ObjectId(id)},
@@ -313,7 +298,7 @@ class Database:
                 }
             })
 
-    def set_workout_name(self, id, name):
+    def set_workout_name(self, id: str, name: str):
         """Updates a workout's name given a workout id."""
         self.mongo.db.workout.update_one(
             {"_id": ObjectId(id)},
@@ -323,7 +308,7 @@ class Database:
                 }
             })
 
-    def set_workout_difficulty(self, id, difficulty):
+    def set_workout_difficulty(self, id: str, difficulty: str):
         """Updates a workout's difficulty given a workout id."""
         self.mongo.db.workout.update_one(
             {"_id": ObjectId(id)},
@@ -333,7 +318,7 @@ class Database:
                 }
             })
 
-    def set_workout_about(self, id, about):
+    def set_workout_about(self, id: str, about: str):
         """Updates a workout's about information given a workout id."""
         self.mongo.db.workout.update_one(
             {"_id": ObjectId(id)},
@@ -343,7 +328,7 @@ class Database:
                 }
             })
 
-    def set_workout_exp(self, id, exp):
+    def set_workout_exp(self, id: str, exp: str):
         """Updates a workout's experience points given a workout id."""
         self.mongo.db.workout.update_one(
             {"_id": ObjectId(id)},
@@ -353,14 +338,14 @@ class Database:
                 }
             })
 
-    def remove_workout(self, id):
+    def remove_workout(self, id: str):
         """Deletes a workout by workout id."""
         self.mongo.db.workout.delete_one({"_id": ObjectId(id)})
 
-    def add_workout(self, workout):
+    def add_workout(self, workout: Workout):
         """Adds a workout to the database based on a provided Workout class."""
 
-        if self.get_trainee_class_by_id(workout.creator_id) is None or not self.get_trainer_class_by_id(workout.creator_id) is None:
+        if self.get_trainee_by_id(workout.creator_id) is None or not self.get_trainer_by_id(workout.creator_id) is None:
             raise WorkoutCreatorIdNotFound("Creator Id Not Found")
 
         self.mongo.db.workout.insert_one({
