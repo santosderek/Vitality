@@ -320,12 +320,11 @@ def create_app():
             str(session['user_id'])))
 
         if (request.method == "POST"):
-
             trainer_name = escape(request.form['trainer_name'])
             found_trainers = g.database.list_trainers_by_search(trainer_name)
+            return render_template("trainee/add_trainer.html", trainers=found_trainers)
 
-        return render_template("trainee/add_trainer.html",
-                               events=[])
+        return render_template("trainee/add_trainer.html")
 
     """Workout pages"""
     @app.route('/new_workout', methods=["GET"])

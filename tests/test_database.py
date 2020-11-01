@@ -49,7 +49,6 @@ class TestDatabase(unittest.TestCase):
         # Add workout
         self.test_workout.creator_id = self.database.get_trainee_class_by_username(
             self.test_trainee.username).id
-        print(self.test_workout.as_dict())
         self.database.add_workout(self.test_workout)
 
     def tearDown(self):
@@ -199,6 +198,14 @@ class TestDatabase(unittest.TestCase):
         self.database.remove_trainee(db_user.id)
         self.assertTrue(
             self.database.get_trainee_class_by_username(db_user.id) is None)
+
+    def test_list_trainers_by_search(self): 
+        # Searching for testTrainer with input "testTrain"
+        found_trainers = self.database.list_trainers_by_search("testTrain")
+        self.assertEqual(len(found_trainers), 1)
+
+        trainer = self.database.get_trainer_class_by_username("testTrainer")
+        self.assertEqual(found_trainers[0].as_dict(), trainer.as_dict())
 
     """ Test trainer """
 

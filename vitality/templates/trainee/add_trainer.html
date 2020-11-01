@@ -47,27 +47,20 @@
 
     <div class="col-md-3 col-lg-10" id="contentblock">
         <div class="col pt-4 text-center">
-            
-            <form action="/add_trainer" method="POST">
+
+            <form action="/trainee_add_trainer" method="POST">
                 <div class="col-sm-12">
-                    <input class="col-sm-3 text-center" name="trainer_name" style="height: 30px;" placeholder="Trainer Name" />
+                    <input class="col-sm-3 text-center" name="trainer_name" style="height: 30px;"
+                        placeholder="Trainer Name" />
                     <button class="col-sm-2" style="width: 19%; height: 30px;" type="submit">
                         Search
                     </button>
                 </div>
 
                 {% for trainer in trainers%}
-                <div class="col">
-                    <div class="card">
-                        <img class="card-img-left" src="" alt="Trainer image">
-                        <div class="card-body">
-                            <p class="card-text">
-                                Trainer information 
-                            </p>
-                            <a class="btn" />
-                        </div>
-                    </div>
-                </div>
+                
+                                {{ trainer.name }}
+                            
                 {% endfor%}
             </form>
         </div>

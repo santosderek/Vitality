@@ -4,6 +4,7 @@ from .workout import Workout
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 from markupsafe import escape
+import re
 
 
 class Database:
@@ -147,7 +148,8 @@ class Database:
 
     def get_trainer_class_by_username(self, username):
         """Returns the trainer class of the trainer found by the trainer's username."""
-        found_user = self.mongo.db.trainer.find_one({"username": escape(username)})
+        found_user = self.mongo.db.trainer.find_one(
+            {"username": escape(username)})
 
         if found_user:
             return self.trainer_dict_to_class(found_user)
@@ -171,22 +173,30 @@ class Database:
         """Returns the trainer class found by the trainer's username."""
         return self.mongo.db.trainer.find_one({"username": escape(username)})
 
-    def list_trainers_by_search(self, username):
-        found_trainers = []
+    def list_trainers_by_search(self, name):
+        """Return a list of trainers by using regex against the 'name' and 'username' fields"""
+        def escape_regex(word):
+            """Escaping the user input being passed into regex"""
+            word = escape(word)
+            word = re.escape(word)
+            return word
 
-        usernames_found = self.mongo.db.trainer.find({
-            "username": {"$regex": r".*{}.*".format(escape(username))}
-        })
+        trainers = []
 
-        if usernames_found is not None:
-            found_trainers.extend(usernames_found)
+        found_trainers = self.mongo.db.trainer.find(
+            {"$or": [
+                {
+                    "username": {"$regex": r".*{}.*".format(escape_regex(name))}
+                },
+                {
+                    "name": {"$regex": r".*{}.*".format(escape_regex(name))}
+                }
+            ]}
+        )
 
-        names_found = self.mongo.db.trainer.find({
-            "name": {"$regex": r".*{}.*".format(escape(username))}
-        })
-
-        if names_found is not None:
-            found_trainers.extend(names_found)
+        if found_trainers is not None:
+            for trainer in found_trainers:
+                trainers.append(self.trainer_dict_to_class(trainer))
 
         return found_trainers
 
