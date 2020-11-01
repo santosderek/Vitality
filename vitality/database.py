@@ -114,6 +114,9 @@ class Database:
         if (self.get_trainee_by_username(user.username)):
             raise UsernameTakenError("Username was taken.")
 
+        if (self.get_trainer_by_username(user.username)):
+            raise UsernameTakenError("Username was taken.")
+
         self.mongo.db.trainee.insert_one({
             'username': user.username,
             'password': user.password,
@@ -198,7 +201,7 @@ class Database:
             for trainer in found_trainers:
                 trainers.append(self.trainer_dict_to_class(trainer))
 
-        return found_trainers
+        return trainers
 
     def set_trainer_username(self, id, username):
         """Updates a trainer's username given a trainer id."""
@@ -254,6 +257,9 @@ class Database:
         """Adds a trainer to the database based on a provided trainer class."""
         if (self.get_trainer_by_username(trainer.username)):
             raise UsernameTakenError("username was taken.")
+
+        if (self.get_trainee_by_username(trainer.username)):
+            raise UsernameTakenError("Username was taken.")
 
         self.mongo.db.trainer.insert_one({
             'username': trainer.username,
