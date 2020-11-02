@@ -6,23 +6,23 @@ from vitality.database import Database
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 
-test_trainee = Trainee(
-    None,
+test_trainee = Trainee(dict(
+    id=None,
     username="testTrainee",
     password="password",
     name="first last",
     location="Earth",
     phone=1234567890
-)
+))
 
-test_trainer = Trainer(
-    None,
+test_trainer = Trainer(dict(
+    id=None,
     username="testTrainer",
     password="password",
     name="first last",
     location="Earth",
     phone=1234567890
-)
+))
 
 
 def login_as_testTrainee(client):
