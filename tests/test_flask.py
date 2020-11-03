@@ -7,7 +7,7 @@ from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 
 test_trainee = Trainee(
-    None,
+    id=None,
     username="testTrainee",
     password="password",
     name="first last",
@@ -16,7 +16,7 @@ test_trainee = Trainee(
 )
 
 test_trainer = Trainer(
-    None,
+    id=None,
     username="testTrainer",
     password="password",
     name="first last",
@@ -449,7 +449,7 @@ def test_trainee_add_trainer(client):
     assert b'Schedule' in returned_value.data
     assert b'Diets' in returned_value.data
 
-    # Search for trainer with only first 3 letters 
+    # Search for trainer with only first 3 letters
     login_as_testTrainee(client)
     returned_value = client.post('/trainee_add_trainer', data=dict(
         trainer_name=test_trainer.username[0:3]
@@ -457,7 +457,8 @@ def test_trainee_add_trainer(client):
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
     assert bytes(test_trainer.username, 'utf-8') in returned_value.data
-    assert bytes('/profile/%s' % test_trainer.username, 'utf-8') in returned_value.data
+    assert bytes('/profile/%s' % test_trainer.username,
+                 'utf-8') in returned_value.data
     assert b'Schedule' in returned_value.data
     assert b'Diets' in returned_value.data
 
