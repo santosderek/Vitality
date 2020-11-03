@@ -23,18 +23,15 @@
         </div>
     </div>
     <div class="container" style="display: none;" id="loading">
-
         {% include "navbar.html" ignore missing %}
 
         {% block content %}{% endblock %}
     </div>
 
     <script>
-        window.onload = function() {
-            
+        window.onload = function () {
             $("#whileLoading").hide();
             $("#loading").show();
-
         }
     </script>
 </body>
