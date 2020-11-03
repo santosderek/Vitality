@@ -4,24 +4,7 @@
 {% endblock %}
 {% block content %}
 <div class="row">
-    <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse pt">
-        <div class="sidebar-sticky pt-3">
-            <ul class="nav flex-column">
-                <li class="nav-item pb-2">
-                    <a class="nav-link" href="{{ url_for("trainee_overview") }}"><b>Overview</b></a>
-                </li>
-                <li class="nav-item pb-2">
-                    <a class="nav-link" href=""><b>Workouts</b></a>
-                </li>
-                <li class="nav-item pb-2">
-                    <a class="nav-link" href="{{ url_for("trainee_schedule") }}"><b>Schedule</b></a>
-                </li>
-                <li class="nav-item pb-2">
-                    <a class="nav-link" href=""><b>Diets</b></a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    {%include "sidebar.html" ignore missing %}
 
     <div id="contentblock" class="col-md-9 pt-3">
         <div class="row trainees">
