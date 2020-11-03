@@ -140,6 +140,8 @@ def create_app():
         app.logger.info('Rendering Profile')
         username = escape(username)
         user = g.database.get_trainee_by_username(username)
+        if user is None: 
+            user = g.database.get_trainer_by_username(username)
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
