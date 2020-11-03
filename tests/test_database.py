@@ -15,22 +15,22 @@ class TestDatabase(unittest.TestCase):
     database = Database(create_app())
 
     # Creating new Trainee object
-    test_trainee = Trainee(dict(
+    test_trainee = Trainee(
         id=None,
         username="testTrainee",
         password="password",
         name="first last",
         location="Earth",
-        phone=1234567890))
+        phone=1234567890)
 
     # Creating new Trainer object
-    test_trainer = Trainer(dict(
+    test_trainer = Trainer(
         id=None,
         username="testTrainer",
         password="password",
         name="first last",
         location="mars",
-        phone=1234567890))
+        phone=1234567890)
 
     # Creating new Workout Object
     test_workout = Workout(
