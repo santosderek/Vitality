@@ -17,7 +17,7 @@ class TestTrainer(unittest.TestCase):
 
         new_dict = new_trainer.as_dict()
         comp_dict = {
-            "id": 0,
+            "_id": 0,
             "username": "test",
             "password": "password",
             "trainees": "None",
