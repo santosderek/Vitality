@@ -29,6 +29,11 @@ button, .card .btn {
 
 .navbar-toggler, .btn {
     background-color: #47525E;
+    
+}
+.navbar-toggler-icon {
+    background-image: url("/static/images/bars.svg");
+    fill: white;
 }
 
 .navbar, .navbar-expand-lg, .jumbotron {
