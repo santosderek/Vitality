@@ -17,7 +17,7 @@ class Database:
     def trainee_dict_to_class(self, trainee_dict: dict):
         """Return a Trainee class from a dictionary"""
         return Trainee(
-            id=str(trainee_dict['_id']),
+            _id=str(trainee_dict['_id']),
             username=trainee_dict['username'],
             password=trainee_dict['password'],
             name=trainee_dict['name'],
@@ -125,7 +125,7 @@ class Database:
     def trainer_dict_to_class(self, trainer_dict: str):
         """Return a Trainer class from a dictionary"""
         return Trainer(
-            id=str(trainer_dict['_id']),
+            _id=str(trainer_dict['_id']),
             username=trainer_dict['username'],
             password=trainer_dict['password'],
             name=trainer_dict['name'],
@@ -259,10 +259,10 @@ class Database:
 
     """Workout Functions"""
 
-    def workout_dict_to_class(self, workout_dict: str):
+    def workout_dict_to_class(self, workout_dict: Workout):
         """Takes in a workout dictionary and returns a Workout class"""
         return Workout(
-            id=workout_dict['_id'],
+            _id=workout_dict['_id'],
             creator_id=workout_dict['creator_id'],
             name=workout_dict['name'],
             difficulty=workout_dict['difficulty'],

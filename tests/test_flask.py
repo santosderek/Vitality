@@ -7,7 +7,7 @@ from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 
 test_trainee = Trainee(
-    id=None,
+    _id=None,
     username="testTrainee",
     password="password",
     name="first last",
@@ -16,7 +16,7 @@ test_trainee = Trainee(
 )
 
 test_trainer = Trainer(
-    id=None,
+    _id=None,
     username="testTrainer",
     password="password",
     name="first last",
@@ -68,11 +68,11 @@ def client():
         """ Code run after client has been used """
         while database.get_trainee_by_username("testTrainee"):
             database.remove_trainee(
-                database.get_trainee_by_username("testTrainee").id)
+                database.get_trainee_by_username("testTrainee")._id)
 
         while database.get_trainer_by_username("testTrainer"):
             database.remove_trainer(
-                database.get_trainer_by_username("testTrainer").id)
+                database.get_trainer_by_username("testTrainer")._id)
 
     with app.test_client() as client:
         with app.app_context():
@@ -166,7 +166,7 @@ def test_signup(client):
 
     if g.database.get_trainee_by_username("testTrainee"):
         g.database.remove_trainee(
-            g.database.get_trainee_by_username("testTrainee").id)
+            g.database.get_trainee_by_username("testTrainee")._id)
 
     # POST with a username that was not taken, success
     returned_value = client.post('/signup', data=dict(
@@ -186,7 +186,7 @@ def test_signup(client):
 
     if g.database.get_trainee_by_username("testTrainee"):
         g.database.remove_trainee(
-            g.database.get_trainee_by_username("testTrainee").id)
+            g.database.get_trainee_by_username("testTrainee")._id)
 
     # POST with a username that was not taken, success
     returned_value = client.post('/signup', data=dict(
@@ -206,7 +206,7 @@ def test_signup(client):
 
     if g.database.get_trainer_by_username("testTrainee"):
         g.database.remove_trainer(
-            g.database.get_trainer_by_username("testTrainee").id)
+            g.database.get_trainer_by_username("testTrainee")._id)
 
 
 def test_profile(client):
@@ -240,7 +240,7 @@ def test_usersettings(client):
     login_as_testTrainee(client)
 
     # Get id before change
-    database_user_id = g.database.get_trainee_by_username("testTrainee").id
+    database_user_id = g.database.get_trainee_by_username("testTrainee")._id
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
@@ -256,7 +256,7 @@ def test_usersettings(client):
     # Check database
     database_user = g.database.get_trainee_by_username("testTrainee")
 
-    assert database_user.id == database_user_id
+    assert database_user._id == database_user_id
     assert database_user.username == 'testTrainee'
     assert database_user.password == 'newpassword'
     assert database_user.name == 'another'
@@ -267,7 +267,7 @@ def test_usersettings(client):
     login_as_testTrainer(client)
 
     # Get id before change
-    database_user_id = g.database.get_trainer_by_username("testTrainer").id
+    database_user_id = g.database.get_trainer_by_username("testTrainer")._id
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
@@ -283,7 +283,7 @@ def test_usersettings(client):
     # Check database
     database_user = g.database.get_trainer_by_username("testTrainer")
 
-    assert database_user.id == database_user_id
+    assert database_user._id == database_user_id
     assert database_user.username == 'testTrainer'
     assert database_user.password == 'newpassword'
     assert database_user.name == 'another'
@@ -368,6 +368,7 @@ def test_trainer_list_trainees(client):
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainer
+    print (returned_value.data)
     assert b'No trainees found' in returned_value.data
 
 

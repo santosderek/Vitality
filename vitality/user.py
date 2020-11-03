@@ -1,8 +1,8 @@
 class User:
-    def __init__(self, id: str, username: str, password: str, name: str = None, location: str = None, phone: int = None):
+    def __init__(self, _id: str, username: str, password: str, name: str = None, location: str = None, phone: int = None):
         """Constructor for Trainee class."""
         self.__dict__.update(dict(
-            id=id,
+            _id=_id,
             username=username,
             password=password,
             name=name,

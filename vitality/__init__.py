@@ -96,7 +96,7 @@ def create_app():
                     new_user = None
                     if usertype == 'trainee':
                         new_user = Trainee(
-                            id=None,
+                            _id=None,
                             username=username,
                             password=password,
                             name=name,
@@ -107,7 +107,7 @@ def create_app():
 
                     elif usertype == 'trainer':
                         new_user = Trainer(
-                            id=None,
+                            _id=None,
                             username=username,
                             password=password,
                             name=name,
@@ -158,40 +158,40 @@ def create_app():
             location = escape(request.form['location'])
             phone = escape(request.form['phone'])
 
-            if g.database.get_trainee_by_id(g.user.id) is not None:
+            if g.database.get_trainee_by_id(g.user._id) is not None:
 
                 if username:
-                    g.database.set_trainee_username(g.user.id, username)
+                    g.database.set_trainee_username(g.user._id, username)
 
                 if password and re_password and password == re_password:
-                    g.database.set_trainee_password(g.user.id, password)
+                    g.database.set_trainee_password(g.user._id, password)
 
                 if location:
-                    g.database.set_trainee_location(g.user.id, location)
+                    g.database.set_trainee_location(g.user._id, location)
 
                 if phone:
-                    g.database.set_trainee_phone(g.user.id, phone)
+                    g.database.set_trainee_phone(g.user._id, phone)
 
                 if name:
-                    g.database.set_trainee_name(g.user.id, name)
+                    g.database.set_trainee_name(g.user._id, name)
 
                 return redirect(url_for('usersettings'))
 
-            elif g.database.get_trainer_by_id(g.user.id) is not None:
+            elif g.database.get_trainer_by_id(g.user._id) is not None:
                 if username:
-                    g.database.set_trainer_username(g.user.id, username)
+                    g.database.set_trainer_username(g.user._id, username)
 
                 if password and re_password and password == re_password:
-                    g.database.set_trainer_password(g.user.id, password)
+                    g.database.set_trainer_password(g.user._id, password)
 
                 if location:
-                    g.database.set_trainer_location(g.user.id, location)
+                    g.database.set_trainer_location(g.user._id, location)
 
                 if phone:
-                    g.database.set_trainer_phone(g.user.id, phone)
+                    g.database.set_trainer_phone(g.user._id, phone)
 
                 if name:
-                    g.database.set_trainer_name(g.user.id, name)
+                    g.database.set_trainer_name(g.user._id, name)
 
                 return redirect(url_for('usersettings'))
 
@@ -240,8 +240,7 @@ def create_app():
         app.logger.debug('Trainer {} loaded Trainer List Trainees.'.format(
             str(session['user_id'])))
         return render_template("trainer/list_trainees.html",
-                               trainees=[item for item in (
-                                   g.database.get_trainer_by_username("elijah"),) if item is not None])
+                               trainees=[])
 
     @app.route('/trainer_schedule', methods=["GET"])
     def trainer_schedule():
