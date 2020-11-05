@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+
+<title>New Routine</title>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+
+        <h1>Create Workout</h1>
+        <form>
+            <input type="text" placeholder="Workout Name" name="workout" required><br>
+            <select id="difficulty" name="difficulty" placeholder="workout Difficulty">
+                <option value="novice">Noive</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="experienced">Experienced</option>
+                <option value="superstar">Superstar</option>
+            </select><br>
+            <textarea id="description" type="text" placeholder="Type your workout description here" name="description"
+                required></textarea><br>
+            <button type="submit">Create Routine</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="darkbg">
+
+	<div class="row text-center">
+		<div class="col-sm-12 mb-1 mt-2">
+			<h1>Sign up!</h1>
+		</div>
+		{% if creation_successful %}
+		<div class="col-sm-12 mb-1">
+			<h1 style="color: green;">Account was created!</h1>
+		</div>
+		{% else %}
+
+		<div class="col-sm-12 mb-1">
+
+			{% if error_message %}
+			<p style="color: red;">Could not create account!</p>
+			{% endif %}
+
+			{% if username_taken %}
+			<p style="color: red;">Username was taken!</p>
+			{% endif %}
+		</div>
+		<div class="col-sm-12 mb-1">
+			<form action="/signup" method="POST">
+				<input type="text" placeholder="Username" name="username" required>
+				<br />
+
+				<input type="text" placeholder="Name" name="name" required>
+				<br />
+
+				<input type="password" placeholder="Enter Password" name="password" required>
+				<br />
+
+				<input type="password" placeholder="Re-enter Password" name="repassword" required>
+				<br />
+
+				<input type="text" placeholder="City and State" name="location" required>
+				<br />
+
+				<input type="tel" placeholder="Phone Number" name="phone" required>
+				<br />
+				<br />
+
+				<input type="radio" id="trainer" name="usertype" value="trainer">
+				<label for="trainer">Trainer</label><br>
+				<input type="radio" id="trainee" name="usertype" value="trainee">
+				<label for="trainee">Trainee</label><br>
+
+				<button style="width: 19%; height: 50px;" type="submit">Create</button>
+			</form>
+		</div>
+	</div>
+
+	{% endif %}
+
+	{% endblock %}

@@ -1,15 +1,32 @@
 {%extends 'base.html'%}
 {% block content%}
-<header>
-      <nav class="navd">
-            <ul>
-                  <li><a href="{{ url_for("profile") }}">Profile</a></li>
-                  <li><a href="{{ url_for("usersettings") }}">Settings</a></li>
-                  <li><a href="{{ url_for("logout") }}">logout</a></li>
-            </ul>
-      </nav>
-</header>
-<p>Welcome back {{g.user.username}}</p>
-<p>User number is {{g.user.id}}</p>
-
+<style>
+      #contentblock {
+        background-color: #8492A6;
+        color: white;
+        font-size: large;
+    }
+.navbar,
+    .navbar-expand-lg,
+    .jumbotron {
+        background-color: #ffffff !important;
+    }
+</style>
+<div id="contentblock" class="row">
+      <div class="col text-center">
+            {% if user %}
+            <p>Username: {{ user.username }}</p>
+            <p>Name: {{ user.name }}</p>
+            <p>Location: {{ user.location }}</p>
+            <p>Phone: {{ user.phone }}</p>
+            <p>Height:</p>
+            <p>Weight:</p>
+            <p>Experience Points:</p>
+            <p>Goal Weight:</p>
+            <p>Body Fat:</p>
+            {% else %}
+            <p style="color: red;">No User Found!</p>
+            {% endif %}
+      </div>
+</div>
 {% endblock %}

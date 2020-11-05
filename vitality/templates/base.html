@@ -2,16 +2,38 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="{{ url_for("static", filename="css/bootstrap.min.css") }}">
+    <script src="{{ url_for("static", filename="js/jquery-3.5.1.min.js") }}"></script>
+    <script src="{{ url_for("static", filename="js/bootstrap.bundle.min.js") }}"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for("static", filename="css/base.css") }}">
+
     <title>Vitality</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/heart.ico') }}">
 
     {% block header %}{% endblock %}
 
 </head>
 
 <body>
+    <div class="container" id="whileLoading">
+        <div class="d-flex justify-content-center align-items-center min-vh-100">
+            <div class="spinner-border text-success" style="width: 100px; height: 100px;"></div>
+        </div>
+    </div>
+    <div class="container" style="display: none;" id="loading">
+        {% include "navbar.html" ignore missing %}
 
-    {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
+    </div>
 
+    <script>
+        window.onload = function () {
+            $("#whileLoading").hide();
+            $("#loading").show();
+        }
+    </script>
 </body>
 
 </html>

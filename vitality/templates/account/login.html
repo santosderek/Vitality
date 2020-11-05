@@ -1,34 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<header>
-  <nav class="navd">
-    <ul>
-      <li><a href="{{ url_for("login") }}">Log In</a></li>
-      <li><a href="{{ url_for("createuser") }}">Create Account</a></li>
-    </ul>
-  </nav>
-</header>
-<main>
-  <h2>Login Form</h2>
+<main class="darkbg">
   <form action="/login" method="post">
-    <div class="image">
-      <img src="{{ url_for("static", filename="images/heartlogo.png" )}}" alt="Avatar-img" class="avatar">
-    </div>
-    {% if login_error %}
-    <p style="color: red;">Could not log you in!</p>
-    {% endif %}
-    <div class="container">
-      <label for="username"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="username" required>
-      <br />
-      <label for="password"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="password" required>
-      <br />
-      <button type="submit">Login</button>
-      <br />
-      <label for="remember">Remember me</label>
-      <input type="checkbox" checked="checked" name="remember">
+    <div class="row text-center">
+      <div class="col-sm-12">
+        <h2>Login</h2>
+        <p>Let's get this workout started!</p>
+      </div>
+      {% if login_error %}
+      <div class="col-sm-12">
+        <p style="color: red;">Could not log you in!</p>
+      </div>
+      {% endif %}
+      <div class="col-sm-12 mb-2">
+        <input type="text" placeholder="Enter Username" name="username" required>
+      </div>
+      <div class="col-sm-12 mb-2">
+        <input type="password" placeholder="Enter Password" name="password" required>
+      </div>
+      <div class="col-sm-12 mb-2">
+        <label for="remember">Remember me</label>
+        <input type="checkbox" checked="checked" name="remember">
+        <br />
+        <button style="width: 19%; height: 50px;" type="submit">Login</button>
+      </div>
     </div>
   </form>
 </main>
