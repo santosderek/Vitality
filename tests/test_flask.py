@@ -2,7 +2,7 @@ import pytest
 import unittest
 from flask import g, session
 from vitality import create_app
-from vitality.database import Database
+from vitality.database import Database, password_sha256
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 
@@ -258,7 +258,7 @@ def test_usersettings(client):
 
     assert database_user._id == database_user_id
     assert database_user.username == 'testTrainee'
-    assert database_user.password == 'newpassword'
+    assert database_user.password == password_sha256('newpassword')
     assert database_user.name == 'another'
     assert database_user.location == 'Venus'
     assert database_user.phone == '0987654321'
@@ -285,7 +285,7 @@ def test_usersettings(client):
 
     assert database_user._id == database_user_id
     assert database_user.username == 'testTrainer'
-    assert database_user.password == 'newpassword'
+    assert database_user.password == password_sha256('newpassword')
     assert database_user.name == 'another'
     assert database_user.location == 'Venus'
     assert database_user.phone == '0987654321'
@@ -368,7 +368,7 @@ def test_trainer_list_trainees(client):
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainer
-    print (returned_value.data)
+    print(returned_value.data)
     assert b'No trainees found' in returned_value.data
 
 
