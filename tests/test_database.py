@@ -3,7 +3,12 @@ from copy import deepcopy
 from flask import Flask
 from flask_pymongo import PyMongo
 from vitality import create_app
-from vitality.database import Database, WorkoutCreatorIdNotFound, UsernameTakenError
+from vitality.database import (
+    Database, 
+    WorkoutCreatorIdNotFound, 
+    UsernameTakenError, 
+    password_sha256
+)
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
@@ -21,7 +26,7 @@ class TestDatabase(unittest.TestCase):
         password="password",
         name="first last",
         location="Earth",
-        phone=1234567890, 
+        phone=1234567890,
         trainers=[])
 
     # Creating new Trainer object
@@ -31,7 +36,7 @@ class TestDatabase(unittest.TestCase):
         password="password",
         name="first last",
         location="mars",
-        phone=1234567890, 
+        phone=1234567890,
         trainees=[])
 
     # Creating new Workout Object
@@ -127,6 +132,9 @@ class TestDatabase(unittest.TestCase):
         # Setting our current user object's id as mongodb id
         new_trainee._id = db_user_1._id
 
+        # Need to hash new_trainee's password
+        new_trainee.password = password_sha256(new_trainee.password)
+
         # Checking if user objects are the same through their dicts
         self.assertTrue(db_user_1.as_dict() == new_trainee.as_dict())
 
@@ -160,6 +168,7 @@ class TestDatabase(unittest.TestCase):
         # Checking password
         db_user = self.database.get_trainee_by_username(
             new_trainee.username)
+        new_trainee.password = password_sha256(new_trainee.password)
         self.assertTrue(db_user.password == new_trainee.password)
 
         self.database.remove_trainee(db_user._id)
@@ -292,6 +301,9 @@ class TestDatabase(unittest.TestCase):
         # Setting our current user object's id as mongodb id
         new_trainer._id = db_user_1._id
 
+        # Need to hash new_trainer's password
+        new_trainer.password = password_sha256(new_trainer.password)
+
         # Checking if user objects are the same through their dicts
         self.assertTrue(db_user_1.as_dict() == new_trainer.as_dict())
 
@@ -325,7 +337,8 @@ class TestDatabase(unittest.TestCase):
         # Checking password
         db_user = self.database.get_trainer_by_username(
             new_trainer.username)
-        self.assertTrue(db_user.password == new_trainer.password)
+        self.assertTrue(db_user.password ==
+                        password_sha256(new_trainer.password))
 
         self.database.remove_trainer(db_user._id)
         self.assertTrue(
