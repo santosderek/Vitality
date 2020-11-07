@@ -15,7 +15,7 @@ from .trainer import Trainer
 from .database import Database, UsernameTakenError
 from .configuration import Configuration
 from .workout import Workout
-
+import hashlib
 
 def create_app():
     """Application factory for our flask web server"""
@@ -57,7 +57,10 @@ def create_app():
                 "Poping out the the user id if found in the session.")
             session.pop('user_id', None)
             username = escape(request.form['username'])
-            password = escape(request.form['password'])
+            h = hashlib.sha256(escape(request.form['password']).encode())
+            password = h.hexdigest()
+            print(password)
+            #password = escape(request.form['password'])
 
             # Check if Trainee
             session['user_id'] = g.database.get_trainee_id_by_login(
@@ -84,9 +87,13 @@ def create_app():
         if request.method == 'POST':
             session.pop('user_id', None)
             username = escape(request.form['username'])
-            password = escape(request.form['password'])
+            h = hashlib.sha256(escape(request.form['password']).encode())
+            password = h.hexdigest()
+            #password = escape(request.form['password'])
             name = escape(request.form['name'])
-            re_password = escape(request.form['repassword'])
+            r = hashlib.sha256(escape(request.form['repassword']).encode())
+            re_password = r.hexdigest()
+           # re_password = escape(request.form['repassword'])
             location = escape(request.form['location'])
             phone = escape(request.form['phone'])
             usertype = escape(request.form['usertype'])
