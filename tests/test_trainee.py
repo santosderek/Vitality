@@ -15,7 +15,14 @@ class TestUser(unittest.TestCase):
             "name": "first last",
             "location" : "Earth",
             "phone" : 1234567890, 
-            'trainers' : [] 
+            'trainers' : [],
+            "body_type": None,
+            "body_fat": None,
+            "height": None,
+            "weight": None,
+            "exp": None,
+            "goal_weight": None,
+            "goal_body_fat": None
             }
 
         self.assertTrue(new_dict == comp_dict)
