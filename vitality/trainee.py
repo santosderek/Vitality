@@ -12,10 +12,3 @@ class Trainee(User):
             phone=phone
         )
         self.trainers = trainers
-        
-    def as_dict(self):
-        """Returns all attributes of the Trainer class and the inherited Trainee class as a dictionary."""
-        return {
-            **super().as_dict(),
-            "trainers": self.trainers
-        }
