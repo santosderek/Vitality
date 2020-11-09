@@ -15,7 +15,7 @@ from .trainer import Trainer
 from .database import Database, UsernameTakenError, password_sha256
 from .configuration import Configuration
 from .workout import Workout
-import hashlib
+import re
 
 def create_app():
     """Application factory for our flask web server"""
@@ -23,6 +23,10 @@ def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.secret_key = 'somethingverysecret'
     app.config["MONGO_URI"] = config.get_local_uri()
+
+    alphaPattern = re.compile("[a-zA-Z0-9*]+")
+    numberPattern = re.compile(r"[0-9]+")
+    stringPattern = re.compile("[a-zA-Z]+")
 
     @app.before_request
     def before_request():
@@ -57,7 +61,15 @@ def create_app():
                 "Poping out the the user id if found in the session.")
             session.pop('user_id', None)
             username = escape(request.form['username'])
+            if alphaPattern.search(username):
+                print("valid")
+            else:
+                raise Exception("Invalid characters")
             password = escape(request.form['password'])
+            if alphaPattern.search(password):
+                print("valid")
+            else:
+                raise Exception("Invalid characters")
             password = password_sha256(password)
 
             # Check if Trainee
@@ -85,12 +97,32 @@ def create_app():
         if request.method == 'POST':
             session.pop('user_id', None)
             username = escape(request.form['username'])
+            if alphaPattern.search(username):
+                print("valid")
+            else:
+                raise Exception("Invalid characters")
             password = escape(request.form['password'])
             name = escape(request.form['name'])
+            if alphaPattern.search(password):
+                print("valid")
+            else:
+                raise Exception("Invalid characters")
             re_password = escape(request.form['repassword'])
             location = escape(request.form['location'])
+            if alphaPattern.search(re_password):
+                print("valid")
+            else:
+                raise Exception("Invalid characters")
             phone = escape(request.form['phone'])
+            if numberPattern.search(phone):
+                print("valid")
+            else:
+                raise Exception("Invalid characters")
             usertype = escape(request.form['usertype'])
+            if stringPattern.search(usertype):
+                print("valid")
+            else:
+                raise Exception("Invalid characters")
 
             if username and password == re_password:
                 try:
