@@ -11,4 +11,4 @@ class Trainee(User):
             location=location,
             phone=phone
         )
-        setattr(self, 'trainers', trainers)
+        self.trainers = trainers

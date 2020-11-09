@@ -7,23 +7,32 @@ class TestTrainer(unittest.TestCase):
     def test_as_dict(self):
 
         new_trainer = Trainer(
-            0,
-            "test",
-            "password",
-            "None",
-            "first last",
-            "Earth",
-            1234567890)
+            _id="0",
+            username="test",
+            password="password",
+            trainees=[],
+            name="first last",
+            location="Earth",
+            phone=1234567890
+        )
 
         new_dict = new_trainer.as_dict()
+        print(new_trainer.as_dict())
         comp_dict = {
-            "_id": 0,
+            "_id": "0",
             "username": "test",
             "password": "password",
-            "trainees": "None",
+            "trainees": [],
             "name": "first last",
             "location": "Earth",
-            "phone": 1234567890
+            "phone": 1234567890,
+            "body_type": None,
+            "body_fat": None,
+            "height": None,
+            "weight": None,
+            "exp": None,
+            "goal_weight": None,
+            "goal_body_fat": None
         }
 
         self.assertTrue(new_dict == comp_dict)
