@@ -5,6 +5,10 @@ from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 from markupsafe import escape
 import re
+import hashlib
+
+def password_sha256(password: str): 
+    return hashlib.sha256(escape(password).encode()).hexdigest()
 
 
 class Database:
@@ -67,7 +71,7 @@ class Database:
             {"_id": ObjectId(id)},
             {
                 "$set": {
-                    "password": password
+                    "password": password_sha256(password)
                 }
             })
 
@@ -111,7 +115,7 @@ class Database:
 
         self.mongo.db.trainee.insert_one({
             'username': user.username,
-            'password': user.password,
+            'password': password_sha256(user.password),
             'name': user.name,
             'location': user.location,
             'phone': user.phone})
@@ -204,7 +208,7 @@ class Database:
             {"_id": ObjectId(id)},
             {
                 "$set": {
-                    "password": password
+                    "password": password_sha256(password)
                 }
             })
 
@@ -248,7 +252,7 @@ class Database:
 
         self.mongo.db.trainer.insert_one({
             'username': trainer.username,
-            'password': trainer.password,
+            'password': password_sha256(trainer.password),
             'name': trainer.name,
             'location': trainer.location,
             'phone': trainer.phone})
@@ -364,3 +368,9 @@ class UsernameTakenError(ValueError):
 class WorkoutCreatorIdNotFound(AttributeError):
     """Error for when Workout creator id is missing"""
     pass
+
+
+class InvalidCharactersException(Exception):
+    """Error for invalid user input"""
+    pass
+
