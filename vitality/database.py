@@ -368,3 +368,9 @@ class UsernameTakenError(ValueError):
 class WorkoutCreatorIdNotFound(AttributeError):
     """Error for when Workout creator id is missing"""
     pass
+
+
+class InvalidCharactersException(Exception):
+    """Error for invalid user input"""
+    pass
+

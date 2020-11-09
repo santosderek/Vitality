@@ -12,7 +12,7 @@ from flask_pymongo import PyMongo
 from markupsafe import escape
 from .trainee import Trainee
 from .trainer import Trainer
-from .database import Database, UsernameTakenError, password_sha256
+from .database import Database, UsernameTakenError, password_sha256, InvalidCharactersException
 from .configuration import Configuration
 from .workout import Workout
 import re
@@ -64,12 +64,12 @@ def create_app():
             if alphaPattern.search(username):
                 print("valid")
             else:
-                raise Exception("Invalid characters")
+                raise InvalidCharactersException("Invalid characters")
             password = escape(request.form['password'])
             if alphaPattern.search(password):
                 print("valid")
             else:
-                raise Exception("Invalid characters")
+                raise InvalidCharactersException("Invalid characters")
             password = password_sha256(password)
 
             # Check if Trainee
@@ -100,29 +100,29 @@ def create_app():
             if alphaPattern.search(username):
                 print("valid")
             else:
-                raise Exception("Invalid characters")
+                raise InvalidCharactersException("Invalid characters")
             password = escape(request.form['password'])
             name = escape(request.form['name'])
             if alphaPattern.search(password):
                 print("valid")
             else:
-                raise Exception("Invalid characters")
+                raise InvalidCharactersException("Invalid characters")
             re_password = escape(request.form['repassword'])
             location = escape(request.form['location'])
             if alphaPattern.search(re_password):
                 print("valid")
             else:
-                raise Exception("Invalid characters")
+                raise InvalidCharactersException("Invalid characters")
             phone = escape(request.form['phone'])
             if numberPattern.search(phone):
                 print("valid")
             else:
-                raise Exception("Invalid characters")
+                raise InvalidCharactersException("Invalid characters")
             usertype = escape(request.form['usertype'])
             if stringPattern.search(usertype):
                 print("valid")
             else:
-                raise Exception("Invalid characters")
+                raise InvalidCharactersException("Invalid characters")
 
             if username and password == re_password:
                 try:
