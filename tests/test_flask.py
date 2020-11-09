@@ -368,7 +368,6 @@ def test_trainer_list_trainees(client):
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainer
-    print(returned_value.data)
     assert b'No trainees found' in returned_value.data
 
 
