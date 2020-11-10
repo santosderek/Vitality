@@ -254,12 +254,10 @@ class Database:
         if (self.get_trainee_by_username(trainer.username) is not None):
             raise UsernameTakenError("Username was taken.")
 
-        self.mongo.db.trainer.insert_one({
-            'username': trainer.username,
-            'password': password_sha256(trainer.password),
-            'name': trainer.name,
-            'location': trainer.location,
-            'phone': trainer.phone})
+        trainer_dict = trainer.as_dict()
+        trainer_dict.pop('_id', None)
+        trainer_dict['password'] = password_sha256(trainer.password)
+        self.mongo.db.trainer.insert_one(trainer_dict)
 
     def remove_trainer(self, id: str):
         """Deletes a trainer by trainer id."""
