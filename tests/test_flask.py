@@ -1,6 +1,6 @@
 import pytest
 import unittest
-from flask import g, session
+from flask import g, session, url_for
 from vitality import create_app
 from vitality.database import Database, password_sha256
 from vitality.trainee import Trainee
@@ -60,7 +60,6 @@ def client():
     def setup():
         """ Code run after client has been used """
         teardown()
-
         database.add_trainer(test_trainer)
         database.add_trainee(test_trainee)
 
@@ -427,21 +426,21 @@ def test_trainee_overview(client):
     assert b'Page Forbidden' in returned_value.data
 
 
-def test_trainee_add_trainer(client):
-    """Test the /trainee_add_trianer page to add a trainer to a trainee"""
-    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+def test_trainer_search(client):
+    """Test the /trainer_search page to add a trainer to a trainee"""
+    returned_value = client.get('/trainer_search', follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
     assert b'login' in returned_value.data
 
     login_as_testTrainer(client)
-    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+    returned_value = client.get('/trainer_search', follow_redirects=True)
     assert returned_value.status_code == 403
     assert type(g.user) == Trainer
     assert b'Page Forbidden' in returned_value.data
 
     login_as_testTrainee(client)
-    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+    returned_value = client.get('/trainer_search', follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
     assert b'Overview' in returned_value.data
@@ -451,9 +450,10 @@ def test_trainee_add_trainer(client):
 
     # Search for trainer with only first 3 letters
     login_as_testTrainee(client)
-    returned_value = client.post('/trainee_add_trainer', data=dict(
-        trainer_name=test_trainer.username[0:3]
-    ), follow_redirects=True)
+    returned_value = client.post('/trainer_search',
+                                 data=dict(
+                                     trainer_name=test_trainer.username[0:3]
+                                 ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
     assert bytes(test_trainer.username, 'utf-8') in returned_value.data

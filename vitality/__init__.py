@@ -1,3 +1,14 @@
+from .trainee import Trainee
+from .trainer import Trainer
+from .database import (
+    Database,
+    UsernameTakenError,
+    password_sha256,
+    InvalidCharactersException,
+    UserNotFoundError
+)
+from .configuration import Configuration
+from .workout import Workout
 from flask import (
     abort,
     Flask,
@@ -10,11 +21,6 @@ from flask import (
 )
 from flask_pymongo import PyMongo
 from markupsafe import escape
-from .trainee import Trainee
-from .trainer import Trainer
-from .database import Database, UsernameTakenError, password_sha256, InvalidCharactersException
-from .configuration import Configuration
-from .workout import Workout
 import re
 
 
@@ -168,6 +174,7 @@ def create_app():
     def profile(username: str):
         """Profile page for a given username"""
         if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
 
         app.logger.info('Rendering Profile')
@@ -306,7 +313,7 @@ def create_app():
         app.logger.debug('Trainee {} has loaded Trainee Overview.'.format(
             str(session['user_id'])))
         return render_template("trainee/overview.html",
-                               trainers=[],
+                               trainers=g.user.trainers,
                                workouts=[]
                                )
 
@@ -340,8 +347,8 @@ def create_app():
         return render_template("trainee/schedule.html",
                                events=[])
 
-    @app.route('/trainee_add_trainer', methods=["GET", "POST"])
-    def trainee_add_trainer():
+    @app.route('/trainer_search', methods=["GET", "POST"])
+    def trainer_search():
         """Page for a trainer to add a trainer."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
@@ -356,9 +363,23 @@ def create_app():
         if (request.method == "POST"):
             trainer_name = escape(request.form['trainer_name'])
             found_trainers = g.database.list_trainers_by_search(trainer_name)
-            return render_template("trainee/add_trainer.html", trainers=found_trainers)
+            return render_template("trainee/trainer_search.html", trainers=found_trainers)
 
-        return render_template("trainee/add_trainer.html")
+        return render_template("trainee/trainer_search.html")
+
+    @app.route('/add_trainer', methods=["POST"])
+    def add_trainer():
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        try:
+            trainer_id = escape(request.form['trainer_id'])
+            g.database.trainee_add_trainer(g.user._id, trainer_id)
+            return "", 204
+
+        except UserNotFoundError:
+            return "", 500
 
     """Workout pages"""
     @app.route('/new_workout', methods=["GET"])

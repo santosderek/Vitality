@@ -21,14 +21,8 @@ class Database:
 
     def trainee_dict_to_class(self, trainee_dict: dict):
         """Return a Trainee class from a dictionary"""
-        return Trainee(
-            _id=str(trainee_dict['_id']),
-            username=trainee_dict['username'],
-            password=trainee_dict['password'],
-            name=trainee_dict['name'],
-            location=trainee_dict['location'],
-            phone=trainee_dict['phone']
-        )
+        trainee_dict['_id'] = str(trainee_dict['_id'])
+        return Trainee(**trainee_dict)
 
     def get_trainee_id_by_login(self, username: str, password: str):
         """
@@ -111,6 +105,22 @@ class Database:
                 }
             })
 
+    def trainee_add_trainer(self, trainee_id: str, trainer_id: str):
+        """Add trainer object id to trainee's trainer list"""
+        if self.get_trainee_by_id(trainee_id) is None:
+            raise UserNotFoundError("Trainee ID does not exist.")
+
+        if self.get_trainer_by_id(trainer_id) is None:
+            raise UserNotFoundError("Trainer ID does not exist.")
+
+        self.mongo.db.trainee.update_one(
+            {"_id": ObjectId(trainee_id)},
+            {
+                "$addToSet": {
+                    "trainers": [ObjectId(trainer_id)]
+                }
+            })
+
     def add_trainee(self, trainee: Trainee):
         """Adds a user to the database based on a provided Trainee class."""
         if (self.get_trainee_by_username(trainee.username) is not None):
@@ -132,14 +142,8 @@ class Database:
 
     def trainer_dict_to_class(self, trainer_dict: str):
         """Return a Trainer class from a dictionary"""
-        return Trainer(
-            _id=str(trainer_dict['_id']),
-            username=trainer_dict['username'],
-            password=trainer_dict['password'],
-            name=trainer_dict['name'],
-            location=trainer_dict['location'],
-            phone=trainer_dict['phone']
-        )
+        trainer_dict['_id'] = str(trainer_dict['_id'])
+        return Trainer(**trainer_dict)
 
     def get_trainer_id_by_login(self, username: str, password: str):
         """Return the trainer id if login matches"""
@@ -267,14 +271,8 @@ class Database:
 
     def workout_dict_to_class(self, workout_dict: Workout):
         """Takes in a workout dictionary and returns a Workout class"""
-        return Workout(
-            _id=workout_dict['_id'],
-            creator_id=workout_dict['creator_id'],
-            name=workout_dict['name'],
-            difficulty=workout_dict['difficulty'],
-            about=workout_dict['about'],
-            exp=workout_dict['exp']
-        )
+        workout_dict['_id'] = str(workout_dict['_id'])
+        return Workout(**workout_dict)
 
     def get_workout_class_by_id(self, id: str):
         """Returns the Workout class found by the workout's id."""
@@ -352,7 +350,7 @@ class Database:
         """Adds a workout to the database based on a provided Workout class."""
 
         if self.get_trainee_by_id(workout.creator_id) is None or not self.get_trainer_by_id(workout.creator_id) is None:
-            raise WorkoutCreatorIdNotFound("Creator Id Not Found")
+            raise WorkoutCreatorIdNotFoundError("Creator Id Not Found")
 
         self.mongo.db.workout.insert_one({
             "creator_id": workout.creator_id,
@@ -367,7 +365,12 @@ class UsernameTakenError(ValueError):
     pass
 
 
-class WorkoutCreatorIdNotFound(AttributeError):
+class UserNotFoundError(ValueError):
+    """If a username was taken within the database class"""
+    pass
+
+
+class WorkoutCreatorIdNotFoundError(AttributeError):
     """Error for when Workout creator id is missing"""
     pass
 
