@@ -7,7 +7,8 @@ from markupsafe import escape
 import re
 import hashlib
 
-def password_sha256(password: str): 
+
+def password_sha256(password: str):
     return hashlib.sha256(escape(password).encode()).hexdigest()
 
 
@@ -30,7 +31,12 @@ class Database:
         )
 
     def get_trainee_id_by_login(self, username: str, password: str):
-        """Return the trainer id if login matches"""
+        """
+        Return the trainer id if login matches.
+
+        username: str - The user created user name.
+        password: str - The user created password hashed in SHA256. 
+        """
         trainee = self.mongo.db.trainee.find_one({
             'username': username,
             'password': password})
@@ -105,20 +111,18 @@ class Database:
                 }
             })
 
-    def add_trainee(self, user: Trainee):
+    def add_trainee(self, trainee: Trainee):
         """Adds a user to the database based on a provided Trainee class."""
-        if (self.get_trainee_by_username(user.username) is not None):
+        if (self.get_trainee_by_username(trainee.username) is not None):
             raise UsernameTakenError("Username was taken.")
 
-        if (self.get_trainer_by_username(user.username) is not None):
+        if (self.get_trainer_by_username(trainee.username) is not None):
             raise UsernameTakenError("Username was taken.")
 
-        self.mongo.db.trainee.insert_one({
-            'username': user.username,
-            'password': password_sha256(user.password),
-            'name': user.name,
-            'location': user.location,
-            'phone': user.phone})
+        trainee_dict = trainee.as_dict()
+        trainee_dict.pop('_id', None)
+        trainee_dict['password'] = password_sha256(trainee.password)
+        self.mongo.db.trainee.insert_one(trainee_dict)
 
     def remove_trainee(self, id: str):
         """Deletes a trainee by trainee id."""
@@ -373,4 +377,3 @@ class WorkoutCreatorIdNotFound(AttributeError):
 class InvalidCharactersException(Exception):
     """Error for invalid user input"""
     pass
-

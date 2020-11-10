@@ -31,4 +31,4 @@ class User:
 
     def as_dict(self):
         """Returns all attributes of the Trainee class as a dictionary."""
-        return self.__dict__
+        return dict(self.__dict__)

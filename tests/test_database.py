@@ -4,9 +4,9 @@ from flask import Flask
 from flask_pymongo import PyMongo
 from vitality import create_app
 from vitality.database import (
-    Database, 
-    WorkoutCreatorIdNotFound, 
-    UsernameTakenError, 
+    Database,
+    WorkoutCreatorIdNotFound,
+    UsernameTakenError,
     password_sha256
 )
 from vitality.trainee import Trainee
@@ -50,6 +50,7 @@ class TestDatabase(unittest.TestCase):
 
     def setUp(self):
         self.tearDown()
+        self.assertTrue(self.test_trainee.password == 'password')
         self.database.add_trainee(self.test_trainee)
         self.database.add_trainer(self.test_trainer)
 
@@ -57,6 +58,8 @@ class TestDatabase(unittest.TestCase):
         self.test_workout.creator_id = self.database.get_trainee_by_username(
             self.test_trainee.username)._id
         self.database.add_workout(self.test_workout)
+
+        self.assertTrue(self.test_trainee.password == 'password')
 
     def tearDown(self):
         # Remove test Trainee if found
@@ -76,6 +79,11 @@ class TestDatabase(unittest.TestCase):
             db_user = self.database.get_workout_class_by_name(
                 self.test_workout.name)
             self.database.remove_workout(db_user._id)
+
+    def test_password_sha256(self):
+        password = 'asupersecretpassword'
+        hashed_password = '009e3e71eed006baa4441cdc417e58f72a635e52f814400e6301881620628d8b'
+        self.assertTrue(password_sha256(password) == hashed_password)
 
     """Trainee tests"""
 

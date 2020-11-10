@@ -17,6 +17,7 @@ from .configuration import Configuration
 from .workout import Workout
 import re
 
+
 def create_app():
     """Application factory for our flask web server"""
     config = Configuration()
@@ -60,16 +61,15 @@ def create_app():
             app.logger.debug(
                 "Poping out the the user id if found in the session.")
             session.pop('user_id', None)
+
             username = escape(request.form['username'])
-            if alphaPattern.search(username):
-                print("valid")
-            else:
+            if not alphaPattern.search(username):
                 raise InvalidCharactersException("Invalid characters")
+
             password = escape(request.form['password'])
-            if alphaPattern.search(password):
-                print("valid")
-            else:
+            if not alphaPattern.search(password):
                 raise InvalidCharactersException("Invalid characters")
+
             password = password_sha256(password)
 
             # Check if Trainee
@@ -97,31 +97,31 @@ def create_app():
         if request.method == 'POST':
             session.pop('user_id', None)
             username = escape(request.form['username'])
-            if alphaPattern.search(username):
-                print("valid")
-            else:
+            if not alphaPattern.search(username):
                 raise InvalidCharactersException("Invalid characters")
+
             password = escape(request.form['password'])
+            if not alphaPattern.search(password):
+                raise InvalidCharactersException("Invalid characters")
+
             name = escape(request.form['name'])
-            if alphaPattern.search(password):
-                print("valid")
-            else:
+            if not alphaPattern.search(name):
                 raise InvalidCharactersException("Invalid characters")
+
             re_password = escape(request.form['repassword'])
+            if not alphaPattern.search(re_password):
+                raise InvalidCharactersException("Invalid characters")
+
             location = escape(request.form['location'])
-            if alphaPattern.search(re_password):
-                print("valid")
-            else:
+            if not alphaPattern.search(location):
                 raise InvalidCharactersException("Invalid characters")
+
             phone = escape(request.form['phone'])
-            if numberPattern.search(phone):
-                print("valid")
-            else:
+            if not numberPattern.search(phone):
                 raise InvalidCharactersException("Invalid characters")
+
             usertype = escape(request.form['usertype'])
-            if stringPattern.search(usertype):
-                print("valid")
-            else:
+            if not stringPattern.search(usertype):
                 raise InvalidCharactersException("Invalid characters")
 
             if username and password == re_password:
@@ -173,7 +173,7 @@ def create_app():
         app.logger.info('Rendering Profile')
         username = escape(username)
         user = g.database.get_trainee_by_username(username)
-        if user is None: 
+        if user is None:
             user = g.database.get_trainer_by_username(username)
         return render_template("account/profile.html", user=user)
 
