@@ -1,6 +1,6 @@
 import pytest
 import unittest
-from flask import g, session
+from flask import g, session, url_for
 from vitality import create_app
 from vitality.database import Database, password_sha256
 from vitality.trainee import Trainee
@@ -60,7 +60,6 @@ def client():
     def setup():
         """ Code run after client has been used """
         teardown()
-
         database.add_trainer(test_trainer)
         database.add_trainee(test_trainee)
 
@@ -427,21 +426,21 @@ def test_trainee_overview(client):
     assert b'Page Forbidden' in returned_value.data
 
 
-def test_trainee_add_trainer(client):
-    """Test the /trainee_add_trianer page to add a trainer to a trainee"""
-    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+def test_trainer_search(client):
+    """Test the /trainer_search page to add a trainer to a trainee"""
+    returned_value = client.get('/trainer_search', follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
     assert b'login' in returned_value.data
 
     login_as_testTrainer(client)
-    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+    returned_value = client.get('/trainer_search', follow_redirects=True)
     assert returned_value.status_code == 403
     assert type(g.user) == Trainer
     assert b'Page Forbidden' in returned_value.data
 
     login_as_testTrainee(client)
-    returned_value = client.get('/trainee_add_trainer', follow_redirects=True)
+    returned_value = client.get('/trainer_search', follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
     assert b'Overview' in returned_value.data
@@ -451,9 +450,10 @@ def test_trainee_add_trainer(client):
 
     # Search for trainer with only first 3 letters
     login_as_testTrainee(client)
-    returned_value = client.post('/trainee_add_trainer', data=dict(
-        trainer_name=test_trainer.username[0:3]
-    ), follow_redirects=True)
+    returned_value = client.post('/trainer_search',
+                                 data=dict(
+                                     trainer_name=test_trainer.username[0:3]
+                                 ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
     assert bytes(test_trainer.username, 'utf-8') in returned_value.data
@@ -463,6 +463,44 @@ def test_trainee_add_trainer(client):
     assert b'Diets' in returned_value.data
 
     # TODO: need to add checks to see if trainer gets added to trainee list
+
+
+def test_add_trainer(client):
+    """Testing the add_trainer page"""
+
+    # Redirect to login page if not logged in
+    returned_value = client.post('/add_trainer',
+                                 data={
+                                     'trainer_id': 0
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert b'login' in returned_value.data
+
+    login_as_testTrainer(client)
+
+    # Get a 403 if logged in as trainer
+    returned_value = client.post('/add_trainer',
+                                 data={
+                                     'trainer_id': 0
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 403
+    assert type(g.user) == Trainer
+    assert b'Page Forbidden!' in returned_value.data
+
+    login_as_testTrainee(client)
+
+    # Add a trainer as a trainee
+    trainer_id = g.database.get_trainer_by_username(test_trainer.username)._id
+    returned_value = client.post('/add_trainer',
+                                 data={
+                                     'trainer_id': trainer_id
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 204
+    assert type(g.user) == Trainee
 
 
 def test_trainee_list_trainers(client):

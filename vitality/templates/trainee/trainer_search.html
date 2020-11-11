@@ -13,7 +13,7 @@
     <div class="col-md-3 col-lg-10" id="contentblock">
         <div class="col pt-4 text-center">
 
-            <form action="/trainee_add_trainer" method="POST">
+            <form action="{{ url_for('trainer_search') }}" method="POST">
                 <div class="col-sm-12">
                     <input class="col-sm-3 text-center" name="trainer_name" style="height: 30px;"
                         placeholder="Trainer Name" />
@@ -37,7 +37,13 @@
                                     <a class="btn mb-1 col-sm-12">Assigned Workouts</a>
                                     <a class="btn mb-1 col-sm-12"
                                         href="{{ url_for('profile', username=trainer.username) }}">Info</a>
-                                    <a class="btn mb-1 col-sm-12">Accept | Remove</a>
+                                    
+                                    {% if trainer._id in user_trainer_id_list %}
+                                    <a class="btn mb-1 col-sm-12" id="add" style="pointer-events: none; background-color: grey;">Already Added!</a>
+                                    {% else %}
+                                    <a class="btn mb-1 col-sm-12" id="add"
+                                        onclick="add_trainer('{{ trainer._id }}')">Add</a>
+                                    {% endif %}
 
                                 </div>
                             </div>
@@ -50,4 +56,21 @@
         </div>
     </div>
 </div>
+<script>
+    function add_trainer (trainer_id) {
+        $.post("{{ url_for("add_trainer") }}", {"trainer_id": trainer_id}, function (data, status) {
+            $("#add").text("Trainer Added!");
+            $("#add").css("background-color", "grey");
+            $('#add').prop('disabled', true);
+        })
+            .fail(function () {
+                $("#add").text("Could not add!");
+                var timeoutID = window.setTimeout(function () {
+                    $("#add").css("background-color", "grey");
+                    $("#add").text("Add");
+                    $('#add').prop('disabled', false);
+                }, 2 * 1000);
+            });
+    };
+</script>
 {% endblock %}

@@ -5,7 +5,7 @@ from flask_pymongo import PyMongo
 from vitality import create_app
 from vitality.database import (
     Database,
-    WorkoutCreatorIdNotFound,
+    WorkoutCreatorIdNotFoundError,
     UsernameTakenError,
     password_sha256
 )
@@ -643,5 +643,5 @@ class TestDatabase(unittest.TestCase):
         # Testing to see if an error occurs if adding a workout with no creator id
         new_workout = deepcopy(self.test_workout)
         new_workout.creator_id = None
-        with self.assertRaises(WorkoutCreatorIdNotFound):
+        with self.assertRaises(WorkoutCreatorIdNotFoundError):
             self.database.add_workout(new_workout)

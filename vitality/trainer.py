@@ -2,7 +2,33 @@ from .user import User
 
 
 class Trainer(User):
-    def __init__(self, _id: str, username: str, password: str, trainees: list = [], name: str = None,  location: str = None, phone: int = None):
+    def __init__(self,
+                 _id: str,
+                 username: str,
+                 password: str,
+                 name: str = None,
+                 location: str = None,
+                 phone: int = None,
+                 body_type: str = None,
+                 body_fat: str = None,
+                 height: str = None,
+                 weight: str = None,
+                 exp: str = None,
+                 goal_weight: str = None,
+                 goal_body_fat: str = None,
+                 trainees=[]):
         """Constructor for Trainer."""
-        super().__init__(_id, username, password, name,  location, phone)
+        super().__init__(_id,
+                         username,
+                         password,
+                         name,
+                         location,
+                         phone,
+                         body_type,
+                         body_fat,
+                         height,
+                         weight,
+                         exp,
+                         goal_weight,
+                         goal_body_fat)
         self.trainees = trainees
