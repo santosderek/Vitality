@@ -363,7 +363,9 @@ def create_app():
         if (request.method == "POST"):
             trainer_name = escape(request.form['trainer_name'])
             found_trainers = g.database.list_trainers_by_search(trainer_name)
-            return render_template("trainee/trainer_search.html", trainers=found_trainers)
+            return render_template("trainee/trainer_search.html",
+                                   trainers=found_trainers,
+                                   user_trainer_id_list=[trainer._id for trainer in g.user.trainers])
 
         return render_template("trainee/trainer_search.html")
 
@@ -372,6 +374,9 @@ def create_app():
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
+
+        if type(g.user) is not Trainee:
+            abort(403)
 
         try:
             trainer_id = escape(request.form['trainer_id'])

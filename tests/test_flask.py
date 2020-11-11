@@ -465,6 +465,44 @@ def test_trainer_search(client):
     # TODO: need to add checks to see if trainer gets added to trainee list
 
 
+def test_add_trainer(client):
+    """Testing the add_trainer page"""
+
+    # Redirect to login page if not logged in
+    returned_value = client.post('/add_trainer',
+                                 data={
+                                     'trainer_id': 0
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert b'login' in returned_value.data
+
+    login_as_testTrainer(client)
+
+    # Get a 403 if logged in as trainer
+    returned_value = client.post('/add_trainer',
+                                 data={
+                                     'trainer_id': 0
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 403
+    assert type(g.user) == Trainer
+    assert b'Page Forbidden!' in returned_value.data
+
+    login_as_testTrainee(client)
+
+    # Add a trainer as a trainee
+    trainer_id = g.database.get_trainer_by_username(test_trainer.username)._id
+    returned_value = client.post('/add_trainer',
+                                 data={
+                                     'trainer_id': trainer_id
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 204
+    assert type(g.user) == Trainee
+
+
 def test_trainee_list_trainers(client):
     """Testing the trainer overview page"""
 

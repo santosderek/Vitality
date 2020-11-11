@@ -22,6 +22,11 @@ class Database:
     def trainee_dict_to_class(self, trainee_dict: dict):
         """Return a Trainee class from a dictionary"""
         trainee_dict['_id'] = str(trainee_dict['_id'])
+        # Convert trainer ids to Trainer objects
+        new_trainer_list = [] 
+        for trainer_id in trainee_dict['trainers']: 
+            new_trainer_list.append(self.get_trainer_by_id(trainer_id))
+        trainee_dict['trainers'] = new_trainer_list
         return Trainee(**trainee_dict)
 
     def get_trainee_id_by_login(self, username: str, password: str):
@@ -117,7 +122,7 @@ class Database:
             {"_id": ObjectId(trainee_id)},
             {
                 "$addToSet": {
-                    "trainers": [ObjectId(trainer_id)]
+                    "trainers": ObjectId(trainer_id)
                 }
             })
 
@@ -143,6 +148,11 @@ class Database:
     def trainer_dict_to_class(self, trainer_dict: str):
         """Return a Trainer class from a dictionary"""
         trainer_dict['_id'] = str(trainer_dict['_id'])
+        # Convert trainer ids to Trainer objects
+        new_trainee_list = [] 
+        for trainee_id in trainer_dict['trainees']: 
+            new_trainee_list.append(self.get_trainer_by_id(trainee_id))
+        trainer_dict['trainees'] = new_trainee_list
         return Trainer(**trainer_dict)
 
     def get_trainer_id_by_login(self, username: str, password: str):
