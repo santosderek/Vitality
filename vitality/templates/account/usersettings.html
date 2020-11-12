@@ -2,18 +2,12 @@
 
 {% block content %}
 <header>
-    <nav class="navd">
-        <ul>
-            <a href="">Overview</a>
-            <li><a href="{{ url_for("logout") }}">logout</a></li>
-        </ul>
-    </nav>
-</header>
-
-<main>
     <h1>User Settings</h1>
     <button onclick="makeChanges()">Make Changes</button>
     <button onclick="cancel()">Cancel</button>
+</header>
+
+<main>
     <div class="container">
         <form action="/usersettings" method="POST">
             <label for="username"><b>Username</b></label>
@@ -42,7 +36,9 @@
             <br />
 
             <input class="fields" type="submit" placeholder="Submit Changes" value="Submit Changes" disabled>
+            <br><br>
         </form>
+        <a class="btn" style="background-color: red; color: white;" href =" {{ url_for("delete") }}">Delete Account</a>
     </div>
     <script>
         function makeChanges() {

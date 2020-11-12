@@ -27,6 +27,9 @@
                 <a class="nav-link" href=""><b>Workouts</b></a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="{{ url_for("usersettings", username=g.user.username)}}"><b>Settings</b></a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{{ url_for("logout") }}"><b>Signout</b></a>
             </li>
             {% else %}
