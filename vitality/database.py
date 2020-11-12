@@ -23,8 +23,8 @@ class Database:
         """Return a Trainee class from a dictionary"""
         trainee_dict['_id'] = str(trainee_dict['_id'])
         # Convert trainer ids to Trainer objects
-        new_trainer_list = [] 
-        for trainer_id in trainee_dict['trainers']: 
+        new_trainer_list = []
+        for trainer_id in trainee_dict['trainers']:
             new_trainer_list.append(self.get_trainer_by_id(trainer_id))
         trainee_dict['trainers'] = new_trainer_list
         return Trainee(**trainee_dict)
@@ -149,9 +149,9 @@ class Database:
         """Return a Trainer class from a dictionary"""
         trainer_dict['_id'] = str(trainer_dict['_id'])
         # Convert trainer ids to Trainer objects
-        new_trainee_list = [] 
-        for trainee_id in trainer_dict['trainees']: 
-            new_trainee_list.append(self.get_trainer_by_id(trainee_id))
+        new_trainee_list = []
+        for trainee_id in trainer_dict['trainees']:
+            new_trainee_list.append(self.get_trainee_by_id(trainee_id))
         trainer_dict['trainees'] = new_trainee_list
         return Trainer(**trainer_dict)
 
@@ -210,6 +210,33 @@ class Database:
 
         return trainers
 
+    def list_trainees_by_search(self, name: str):
+        """Return a list of trainees by using regex against the 'name' and 'username' fields"""
+        def escape_regex(word: str):
+            """Escaping the user input being passed into regex"""
+            word = escape(word)
+            word = re.escape(word)
+            return word
+
+        trainees = []
+
+        found_trainees = self.mongo.db.trainee.find(
+            {"$or": [
+                {
+                    "username": {"$regex": r".*{}.*".format(escape_regex(name))}
+                },
+                {
+                    "name": {"$regex": r".*{}.*".format(escape_regex(name))}
+                }
+            ]}
+        )
+
+        if found_trainees is not None:
+            for trainee in found_trainees:
+                trainees.append(self.trainee_dict_to_class(trainee))
+
+        return trainees
+
     def set_trainer_username(self, id: str, username: str):
         """Updates a trainer's username given a trainer id."""
         self.mongo.db.trainer.update_one(
@@ -257,6 +284,22 @@ class Database:
             {
                 "$set": {
                     "name": name
+                }
+            })
+
+    def trainer_add_trainee(self, trainer_id: str, trainee_id: str):
+        """Add trainer object id to trainee's trainer list"""
+        if self.get_trainee_by_id(trainee_id) is None:
+            raise UserNotFoundError("Trainee ID does not exist.")
+
+        if self.get_trainer_by_id(trainer_id) is None:
+            raise UserNotFoundError("Trainer ID does not exist.")
+
+        self.mongo.db.trainer.update_one(
+            {"_id": ObjectId(trainer_id)},
+            {
+                "$addToSet": {
+                    "trainees": ObjectId(trainee_id)
                 }
             })
 

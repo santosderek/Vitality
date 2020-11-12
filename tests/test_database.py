@@ -253,6 +253,14 @@ class TestDatabase(unittest.TestCase):
         trainer = self.database.get_trainer_by_username("testTrainer")
         self.assertEqual(found_trainers[0].as_dict(), trainer.as_dict())
 
+    def test_list_trainees_by_search(self):
+        # Searching for testTrainee with input "testTrain"
+        found_trainees = self.database.list_trainees_by_search("testTrain")
+        self.assertEqual(len(found_trainees), 1)
+
+        trainee = self.database.get_trainee_by_username("testTrainee")
+        self.assertEqual(found_trainees[0].as_dict(), trainee.as_dict())
+
     """ Test trainer """
 
     def test_add_trainer(self):

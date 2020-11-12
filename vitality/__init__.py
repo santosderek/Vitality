@@ -349,7 +349,7 @@ def create_app():
 
     @app.route('/trainer_search', methods=["GET", "POST"])
     def trainer_search():
-        """Page for a trainer to add a trainer."""
+        """Page for a trainee to add a trainer."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
@@ -369,8 +369,32 @@ def create_app():
 
         return render_template("trainee/trainer_search.html")
 
+    @app.route('/trainee_search', methods=["GET", "POST"])
+    def trainee_search():
+        """Page for a trainer to add a trainee."""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        if type(g.user) is not Trainer:
+            abort(403)
+
+        app.logger.debug('Trainer {} loaded add trainer page.'.format(
+            str(session['user_id'])))
+
+        if (request.method == "POST"):
+            trainee_name = escape(request.form['trainee_name'])
+            found_trainees = g.database.list_trainees_by_search(trainee_name)
+            print (g.user.as_dict())
+            return render_template("trainer/trainee_search.html",
+                                   trainees=found_trainees,
+                                   user_trainee_id_list=[trainee._id for trainee in g.user.trainees])
+
+        return render_template("trainer/trainee_search.html")
+
     @app.route('/add_trainer', methods=["POST"])
     def add_trainer():
+        """This route allows trainees to add trainers to their added list"""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
@@ -381,6 +405,24 @@ def create_app():
         try:
             trainer_id = escape(request.form['trainer_id'])
             g.database.trainee_add_trainer(g.user._id, trainer_id)
+            return "", 204
+
+        except UserNotFoundError:
+            return "", 500
+
+    @app.route('/add_trainee', methods=["POST"])
+    def add_trainee():
+        """This route allows trainers to add trainees to their added list"""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        if type(g.user) is not Trainer:
+            abort(403)
+
+        try:
+            trainee_id = escape(request.form['trainee_id'])
+            g.database.trainer_add_trainee(g.user._id, trainee_id)
             return "", 204
 
         except UserNotFoundError:
