@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>Delete Account</h1>
+    <h2>We're sorry to see you go!</h2>
+</header>
+<main>
+    <form id="delAccount" action="/delete" method="POST" onsubmit="event.preventDefault(); delConfirm()">
+        <a class="btn" style="background-color: red; color: white" href="{{ url_for("usersettings", username=g.user.username)}}" >Cancel</a>
+        <input type="submit" class="btn" value="Delete" style="background-color: red; color: white;" >
+    </form>
+    <script>
+        function delConfirm() {
+            var thisForm = document.getElementById("delAccount");
+            if(confirm("Are you sure you want to delete your account? Doing so is irreversible!")){
+                alert("Deleting user profile. Goodbye!");
+                thisForm.submit();
+            }
+            else {
+                event.preventDefault();
+                return false;
+            }
+        }
+    </script>
+</main>
+{% endblock %}

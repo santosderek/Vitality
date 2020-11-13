@@ -239,6 +239,29 @@ def create_app():
 
         return render_template("account/usersettings.html")
 
+    @app.route('/delete', methods=["GET","POST"])
+    def delete():
+        """Delete account page for logged in user"""
+        app.logger.info('Rendering Delete account page')
+
+        if not g.user:
+            return redirect(url_for('login'))
+
+        if request.method == 'POST':
+
+            if g.database.get_trainee_by_id(g.user._id) is not None:
+                app.logger.info('Deleting user ' + g.user.username)
+                g.database.remove_trainee(session['user_id'])
+                return redirect(url_for('home'))
+
+            elif g.database.get_trainer_by_id(g.user._id) is not None:
+                app.logger.info('Deleting user ' + g.user.username)
+                g.database.remove_trainer(session['user_id'])
+                return redirect(url_for('home'))
+        
+    
+        return render_template("account/delete.html")
+
     @app.route('/logout', methods=["GET", "POST"])
     def logout():
         """Logout route"""
