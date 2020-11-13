@@ -239,7 +239,7 @@ def create_app():
 
         return render_template("account/usersettings.html")
 
-    @app.route('/delete', methods=["GET","POST"])
+    @app.route('/delete', methods=["GET", "POST"])
     def delete():
         """Delete account page for logged in user"""
         app.logger.info('Rendering Delete account page')
@@ -252,14 +252,17 @@ def create_app():
             if g.database.get_trainee_by_id(g.user._id) is not None:
                 app.logger.info('Deleting user ' + g.user.username)
                 g.database.remove_trainee(session['user_id'])
+                session.pop('user_id')
                 return redirect(url_for('home'))
 
             elif g.database.get_trainer_by_id(g.user._id) is not None:
                 app.logger.info('Deleting user ' + g.user.username)
                 g.database.remove_trainer(session['user_id'])
+                session.pop('user_id')
                 return redirect(url_for('home'))
-        
-    
+            
+            abort(500)
+
         return render_template("account/delete.html")
 
     @app.route('/logout', methods=["GET", "POST"])
@@ -408,7 +411,7 @@ def create_app():
         if (request.method == "POST"):
             trainee_name = escape(request.form['trainee_name'])
             found_trainees = g.database.list_trainees_by_search(trainee_name)
-            print (g.user.as_dict())
+            print(g.user.as_dict())
             return render_template("trainer/trainee_search.html",
                                    trainees=found_trainees,
                                    user_trainee_id_list=[trainee._id for trainee in g.user.trainees])
