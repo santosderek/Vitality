@@ -449,7 +449,6 @@ def test_trainer_search(client):
     assert b'Diets' in returned_value.data
 
     # Search for trainer with only first 3 letters
-    login_as_testTrainee(client)
     returned_value = client.post('/trainer_search',
                                  data=dict(
                                      trainer_name=test_trainer.username[0:3]
@@ -462,7 +461,41 @@ def test_trainer_search(client):
     assert b'Schedule' in returned_value.data
     assert b'Diets' in returned_value.data
 
-    # TODO: need to add checks to see if trainer gets added to trainee list
+
+def test_trainee_search(client):
+    """Test the /trainee_search page to add a trainee to a trainer"""
+    returned_value = client.get('/trainee_search', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert b'login' in returned_value.data
+
+    login_as_testTrainee(client)
+    returned_value = client.get('/trainee_search', follow_redirects=True)
+    assert returned_value.status_code == 403
+    assert type(g.user) == Trainee
+    assert b'Page Forbidden' in returned_value.data
+
+    login_as_testTrainer(client)
+    returned_value = client.get('/trainee_search', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert type(g.user) == Trainer
+    assert b'Overview' in returned_value.data
+    assert b'Workouts' in returned_value.data
+    assert b'Schedule' in returned_value.data
+    assert b'Diets' in returned_value.data
+
+    # Search for trainer with only first 3 letters
+    returned_value = client.post('/trainee_search',
+                                 data=dict(
+                                     trainee_name=test_trainee.username[0:3]
+                                 ), follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert type(g.user) == Trainer
+    assert bytes(test_trainee.username, 'utf-8') in returned_value.data
+    assert bytes('/profile/%s' % test_trainee.username,
+                 'utf-8') in returned_value.data
+    assert b'Schedule' in returned_value.data
+    assert b'Diets' in returned_value.data
 
 
 def test_add_trainer(client):
@@ -501,6 +534,44 @@ def test_add_trainer(client):
                                  follow_redirects=True)
     assert returned_value.status_code == 204
     assert type(g.user) == Trainee
+
+
+def test_add_trainee(client):
+    """Testing the add_trainee page"""
+
+    # Redirect to login page if not logged in
+    returned_value = client.post('/add_trainee',
+                                 data={
+                                     'trainer_id': 0
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert b'login' in returned_value.data
+
+    login_as_testTrainee(client)
+
+    # Get a 403 if logged in as trainee
+    returned_value = client.post('/add_trainee',
+                                 data={
+                                     'trainer_id': 0
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 403
+    assert type(g.user) == Trainee
+    assert b'Page Forbidden!' in returned_value.data
+
+    login_as_testTrainer(client)
+
+    # Add a trainer as a trainer
+    trainee_id = g.database.get_trainee_by_username(test_trainee.username)._id
+    returned_value = client.post('/add_trainee',
+                                 data={
+                                     'trainee_id': trainee_id
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 204
+    assert type(g.user) == Trainer
 
 
 def test_trainee_list_trainers(client):

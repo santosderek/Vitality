@@ -9,8 +9,14 @@
     <div id="contentblock" class="col-md-9 pt-3">
         <div class="row trainees">
             <div class="col-sm-12 text-center">
-                <a class="btn btn-outline-light btn-lg" href="{{ url_for("trainer_list_trainees") }}" role="button">See Trainees</a>
+                <a class="btn btn-outline-light btn-lg" href="{{ url_for("trainer_list_trainees") }}" role="button">
+                    See Trainees
+                </a>
+                <a href="{{url_for('trainee_search')}}" class="btn btn-primary btn-lg" role="button">
+                    Add Trainer
+                </a>
             </div>
+            
             {% if trainees|length < 1 %}
             <div class="col trainee text-center p-3">
                 <p style="color: #47525E;"><b>No trainees found!</b></p>
