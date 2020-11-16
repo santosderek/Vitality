@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    {% include "sidebar.html" ignore missing %}
+
+    <div class="col darkbg">
+        {% if g.user_type == "trainee" and users|length < 1 %}
+        <div class="col text-center" id="contentblock">
+            <p>No trainers found!</p>
+        </div>
+        {% elif g.user_type == "trainer" and users|length < 1%}
+        <div class="col text-center" id="contentblock">
+            <p>No trainees found!</p>
+        </div>
+        {% else %}
+        {% for user in users %}
+        {% if user %}
+        <div class="row text-center align-items-center p-5">
+            <div class="col-sm-3 align-middle">
+                <a class="align-middle"
+                    href="{{url_for("profile", username=user.username)}}">
+                    <img class="align-middle" src="{{ url_for("static", filename="images/profile.svg") }}"
+                    alt="User {{ user.username }}" style="width: 5em;">
+                </a>
+            </div>
+            <div class="col-sm-3 align-middle">
+                <a class="align-middle" style="font-size: larger;"
+                    href="{{url_for("profile", username=user.username)}}">
+                    {{ user.username|e }}
+                </a>
+            </div>
+            <div class="col-sm-3 align-middle">
+                <a class="button_title align-middle" style="font-size: large;"
+                    href="{{url_for("profile", username=user.username)}}">
+                    Info
+                </a>
+            </div>
+            <div class="col-sm-3 align-middle">
+                <a class="button_title align-middle" style="font-size: large;" href="">
+                    Remove
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

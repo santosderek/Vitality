@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css') }}" />
+{% endblock %}
+{% block content %}
+<div class="row">
+    {% include "sidebar.html" ignore missing %}
+    <div class="col-sm-12 col-md-9 col-lg-10 pt-3 darkbg">
+        <div class="row text-center">
+            <div class="col-sm-12">
+                {% if g.user_type == "trainer" %}
+                <a class="button_title" href="{{ url_for("trainee_list_trainers") }}">
+                    Trainees
+                </a>
+                <a class="button_title" href="{{url_for('trainer_search')}}">
+                    Add Trainee
+                </a>
+                {% elif g.user_type == "trainee" %}
+                <a class="button_title" href="{{ url_for("trainer_list_trainees") }}">
+                    Trainers
+                </a>
+                <a class="button_title" href="{{url_for('trainee_search')}}">
+                    Add Trainer
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                {% if g.user_type == "trainee" %}
+                {% if trainers|length < 1 %}
+                <div class="col trainee text-center p-3">
+                    <p style="color: #47525E;"><b>No trainers found!</b></p>
+                </div>
+                {% else %}
+                {% for trainer in trainers %}
+                {% if trainer %}
+                <div class="col-sm-12 col-md trainee"
+                    style="align-items: center; text-align: center; padding: 10px 20px;">
+                    <a href="{{ url_for("profile", username=trainer.username) }}">
+                        <img src="{{ url_for("static", filename="images/profile.svg") }}"
+                            alt="Trainee {{ trainer.username }}" width="100" heigh="100">
+                        <h3 class="trainer_name">{{ trainer.username }}</h3>
+                    </a>
+                </div>
+                {% endif%}
+                {% endfor %}
+                {% endif %}
+
+                {% elif g.user_type == "trainer" %}
+                {% if trainees|length < 1 %}
+                <div class="col trainee text-center p-3">
+                    <p style="color: #47525E;"><b>No trainees found!</b></p>
+                </div>
+                {% else %}
+                {% for trainee in trainees %}
+                {% if trainee %}
+                <div class="col-sm-12 col-md trainee"
+                    style="align-items: center; text-align: center; padding: 10px 20px;">
+                    <a href="{{ url_for("profile", username=trainee.username) }}">
+                        <img src="{{ url_for("static", filename="images/profile.svg") }}"
+                            alt="Trainee {{ trainee.username }}" width="100" heigh="100">
+                        <h3 class="trainee_name">{{ trainee.username }}</h3>
+                    </a>
+                </div>
+                {% endif%}
+                {% endfor %}
+                {% endif %}
+
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 workouts">
+                <div class="col-sm-12 text-center">
+                    <a class="button_title" href="" role="button">Workouts</a>
+                </div>
+                {% if workouts|length < 1 %}
+                <div class="col workout text-center p-3">
+                    <p style="color: #47525E;"><b>No workouts found!</b></p>
+                </div>
+                {% else %}
+                {% for workout in workouts %}
+                {% if workout %}
+                <div class="col-sm-12 col-md workout"
+                    style="align-items: center; text-align: center; padding: 10px 20px;">
+                    <a href="">
+                        <img src="{{ url_for("static", filename="images/profile.svg") }}"
+                            alt="workout {{ workout.name }}" width="100" heigh="100">
+                        <h3 class="workout_name">{{ workout.name }}</h3>
+                    </a>
+                </div>
+                {% endif%}
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row schedule">
+            <div class="col-sm-12 text-center">
+                <a class="button_title" href="" role="button">Schedule</a>
+            </div>
+            {% if events|length < 1 %}
+            <div class="col event text-center p-3">
+                <p style="color: #47525E;"><b>No events found!</b></p>
+            </div>
+            {% else %}
+            {% for event in events %}
+            {% if event %}
+            <div class="col-sm-12 col-md event" style="align-items: center; text-align: center; padding: 10px 20px;">
+                <a href="">
+                    <img src="{{ url_for("static", filename="images/profile.svg") }}" alt="event {{ event.name }}"
+                        width="100" heigh="100">
+                    <h3 class="event_name">{{ event.name }}</h3>
+                </a>
+            </div>
+            {% endif%}
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        {% if g.user_type == "trainer" %}
+        <div class="row peak_trainees">
+            <div class="col-sm-12 text-center">
+                <a class="button_title button_title-lg" href="" role="button">Trainees who have added you</a>
+            </div>
+            <div class="col-sm-12 text-center">
+                {% if peak_trainees|length < 1 %}
+                <div class="col peak_trainee text-center p-3">
+                    <p style="color: #47525E;"><b>No one added you.</b></p>
+                </div>
+                {% else %}
+                {% for trainee in peak_trainees %}
+                {% if trainee %}
+                <div class="col trainee text-center p-3">
+                    <a href="">
+                        <img src="{{ url_for("static", filename="images/profile.svg") }}"
+                            alt="trainee {{ trainee.name }}" width="100" heigh="100">
+                        <h3 class="trainee_name">{{ trainee.name }}</h3>
+                    </a>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
