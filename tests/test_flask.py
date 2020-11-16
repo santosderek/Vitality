@@ -33,7 +33,7 @@ def login_as_testTrainee(client):
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Could not log you in!' not in returned_value.data
-    assert b'See Trainers' in returned_value.data
+    assert b'Add Trainer' in returned_value.data
     assert b'Workouts' in returned_value.data
     assert b'Schedule' in returned_value.data
 
@@ -46,7 +46,7 @@ def login_as_testTrainer(client):
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Could not log you in!' not in returned_value.data
-    assert b'See Trainees' in returned_value.data
+    assert b'Add Trainee' in returned_value.data
     assert b'Workouts' in returned_value.data
     assert b'Schedule' in returned_value.data
 
@@ -102,7 +102,7 @@ def test_login(client):
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Could not log you in!' in returned_value.data
-    assert b'See Trainers' not in returned_value.data
+    assert b'Add Trainer' not in returned_value.data
     assert b'Username' in returned_value.data
     assert b'Password' in returned_value.data
     assert b'Login</button>' in returned_value.data

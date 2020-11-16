@@ -260,7 +260,7 @@ def create_app():
                 g.database.remove_trainer(session['user_id'])
                 session.pop('user_id')
                 return redirect(url_for('home'))
-            
+
             abort(500)
 
         return render_template("account/delete.html")
@@ -289,10 +289,18 @@ def create_app():
 
         app.logger.debug('Trainer {} loaded Trainer Overview.'.format(
             str(session['user_id'])))
-        return render_template("trainer/overview.html",
-                               trainees=[],
+
+        trainees = []
+        for trainee_id in g.user.trainees:
+            trainee = g.database.get_trainee_by_id(trainee_id)
+            if trainee is not None:
+                trainees.append(trainee)
+        peak_trainees = g.database.trainer_peak_trainees(g.user._id)
+        return render_template("user/overview.html",
+                               trainees=trainees,
                                workouts=[],
-                               events=[])
+                               events=[],
+                               peak_trainees=peak_trainees)
 
     @app.route('/trainer_list_trainees', methods=["GET"])
     def trainer_list_trainees():
@@ -307,8 +315,13 @@ def create_app():
 
         app.logger.debug('Trainer {} loaded Trainer List Trainees.'.format(
             str(session['user_id'])))
-        return render_template("trainer/list_trainees.html",
-                               trainees=[])
+        trainees = []
+        for trainee_id in g.user.trainees:
+            trainee = g.database.get_trainee_by_id(trainee_id)
+            if trainee is not None:
+                trainees.append(trainee)
+        return render_template("user/list_added.html",
+                               users=trainees)
 
     @app.route('/trainer_schedule', methods=["GET"])
     def trainer_schedule():
@@ -322,7 +335,7 @@ def create_app():
 
         app.logger.debug('Trainer {} loaded Trainer Schedule.'.format(
             str(session['user_id'])))
-        return render_template("trainer/schedule.html",
+        return render_template("user/schedule.html",
                                events=[])
 
     """ Trainee pages """
@@ -338,10 +351,14 @@ def create_app():
 
         app.logger.debug('Trainee {} has loaded Trainee Overview.'.format(
             str(session['user_id'])))
-        return render_template("trainee/overview.html",
-                               trainers=g.user.trainers,
-                               workouts=[]
-                               )
+        trainers = []
+        for trainer_id in g.user.trainers:
+            trainer = g.database.get_trainer_by_id(trainer_id)
+            if trainer is not None:
+                trainers.append(trainer)
+        return render_template("user/overview.html",
+                               trainers=trainers,
+                               workouts=[])
 
     @app.route('/trainee_list_trainers', methods=["GET"])
     def trainee_list_trainers():
@@ -355,8 +372,13 @@ def create_app():
 
         app.logger.debug('Trainer {} loaded Trainer List Trainees.'.format(
             str(session['user_id'])))
-        return render_template("trainee/list_trainers.html",
-                               trainers=[])
+        trainers = []
+        for trainer_id in g.user.trainers:
+            trainer = g.database.get_trainer_by_id(trainer_id)
+            if trainer is not None:
+                trainers.append(trainer)
+        return render_template("user/list_added.html",
+                               users=trainers)
 
     @app.route('/trainee_schedule', methods=["GET"])
     def trainee_schedule():
@@ -370,7 +392,7 @@ def create_app():
 
         app.logger.debug('Trainer {} loaded Trainer Schedule.'.format(
             str(session['user_id'])))
-        return render_template("trainee/schedule.html",
+        return render_template("user/schedule.html",
                                events=[])
 
     @app.route('/trainer_search', methods=["GET", "POST"])
@@ -391,7 +413,7 @@ def create_app():
             found_trainers = g.database.list_trainers_by_search(trainer_name)
             return render_template("trainee/trainer_search.html",
                                    trainers=found_trainers,
-                                   user_trainer_id_list=[trainer._id for trainer in g.user.trainers])
+                                   trainer_id_list=g.user.trainers)
 
         return render_template("trainee/trainer_search.html")
 
@@ -411,10 +433,9 @@ def create_app():
         if (request.method == "POST"):
             trainee_name = escape(request.form['trainee_name'])
             found_trainees = g.database.list_trainees_by_search(trainee_name)
-            print(g.user.as_dict())
             return render_template("trainer/trainee_search.html",
                                    trainees=found_trainees,
-                                   user_trainee_id_list=[trainee._id for trainee in g.user.trainees])
+                                   trainee_id_list=g.user.trainees)
 
         return render_template("trainer/trainee_search.html")
 

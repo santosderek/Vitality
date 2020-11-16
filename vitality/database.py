@@ -22,11 +22,8 @@ class Database:
     def trainee_dict_to_class(self, trainee_dict: dict):
         """Return a Trainee class from a dictionary"""
         trainee_dict['_id'] = str(trainee_dict['_id'])
-        # Convert trainer ids to Trainer objects
-        new_trainer_list = []
-        for trainer_id in trainee_dict['trainers']:
-            new_trainer_list.append(self.get_trainer_by_id(trainer_id))
-        trainee_dict['trainers'] = new_trainer_list
+        trainee_dict['trainers'] = [str(trainer_id) for trainer_id in trainee_dict['trainers']]
+        # WARNING: Removed converting trainers to classes due to unintended recursion
         return Trainee(**trainee_dict)
 
     def get_trainee_id_by_login(self, username: str, password: str):
@@ -148,11 +145,8 @@ class Database:
     def trainer_dict_to_class(self, trainer_dict: str):
         """Return a Trainer class from a dictionary"""
         trainer_dict['_id'] = str(trainer_dict['_id'])
-        # Convert trainer ids to Trainer objects
-        new_trainee_list = []
-        for trainee_id in trainer_dict['trainees']:
-            new_trainee_list.append(self.get_trainee_by_id(trainee_id))
-        trainer_dict['trainees'] = new_trainee_list
+        trainer_dict['trainees'] = [str(trainee_id) for trainee_id in trainer_dict['trainees']]
+        # WARNING: Removed converting trainees to classes due to unintended recursion
         return Trainer(**trainer_dict)
 
     def get_trainer_id_by_login(self, username: str, password: str):
@@ -165,10 +159,8 @@ class Database:
 
     def get_trainer_by_username(self, username: str):
         """Returns the trainer class of the trainer found by the trainer's username."""
-
         found_user = self.mongo.db.trainer.find_one(
             {"username": escape(username)})
-
         if found_user:
             return self.trainer_dict_to_class(found_user)
 
@@ -177,7 +169,6 @@ class Database:
     def get_trainer_by_id(self, id: str):
         """Returns the trainer class of the trainer found by the trainer's id."""
         found_trainer = self.mongo.db.trainer.find_one({"_id": ObjectId(id)})
-
         if found_trainer:
             return self.trainer_dict_to_class(found_trainer)
 
@@ -219,7 +210,6 @@ class Database:
             return word
 
         trainees = []
-
         found_trainees = self.mongo.db.trainee.find(
             {"$or": [
                 {
@@ -303,6 +293,22 @@ class Database:
                 }
             })
 
+    def trainer_peak_trainees(self, trainer_id: str):
+        """Returns a list of all trainees that have added this trainer"""
+        if self.get_trainer_by_id(trainer_id) is None:
+            raise UserNotFoundError("Trainer ID does not exist.")
+
+        trainees = []
+        found_trainees = self.mongo.db.trainee.find({
+            "trainers": ObjectId(trainer_id)
+        })
+
+        if found_trainees is not None:
+            for trainee in found_trainees:
+                trainees.append(self.trainee_dict_to_class(trainee))
+
+        return trainees
+
     def add_trainer(self, trainer: Trainer):
         """Adds a trainer to the database based on a provided trainer class."""
         if (self.get_trainer_by_username(trainer.username) is not None):
@@ -330,19 +336,15 @@ class Database:
     def get_workout_class_by_id(self, id: str):
         """Returns the Workout class found by the workout's id."""
         found_workout = self.mongo.db.workout.find_one({"_id": ObjectId(id)})
-
         if found_workout:
             return self.workout_dict_to_class(found_workout)
-
         return None
 
     def get_workout_class_by_name(self, name: str):
         """Returns the Workout class found by the workout's name."""
         found_workout = self.mongo.db.workout.find_one({"name": name})
-
         if found_workout:
             return self.workout_dict_to_class(found_workout)
-
         return None
 
     def set_workout_creator_id(self, id: str, creator_id: str):
@@ -401,10 +403,8 @@ class Database:
 
     def add_workout(self, workout: Workout):
         """Adds a workout to the database based on a provided Workout class."""
-
         if self.get_trainee_by_id(workout.creator_id) is None or not self.get_trainer_by_id(workout.creator_id) is None:
             raise WorkoutCreatorIdNotFoundError("Creator Id Not Found")
-
         self.mongo.db.workout.insert_one({
             "creator_id": workout.creator_id,
             'name': workout.name,
