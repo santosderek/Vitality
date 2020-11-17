@@ -302,8 +302,8 @@ def create_app():
                                events=[],
                                peak_trainees=peak_trainees)
 
-    @app.route('/trainer_list_trainees', methods=["GET"])
-    def trainer_list_trainees():
+    @app.route('/list_trainees', methods=["GET"])
+    def list_trainees():
         """Trainer list trainees page which will look for all trainees that the trainer has added."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
@@ -360,8 +360,8 @@ def create_app():
                                trainers=trainers,
                                workouts=[])
 
-    @app.route('/trainee_list_trainers', methods=["GET"])
-    def trainee_list_trainers():
+    @app.route('/list_trainers', methods=["GET"])
+    def list_trainers():
         """Trainee list trainers page which will look for all trainees that the trainer has added."""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')

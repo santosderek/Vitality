@@ -338,14 +338,14 @@ def test_trainer_overview(client):
     assert returned_value.status_code == 200
     assert type(g.user) == Trainer
     assert b'/trainee_search' in returned_value.data
-    assert b'/trainer_list_trainees' in returned_value.data
+    assert b'/list_trainees' in returned_value.data
 
 
-def test_trainer_list_trainees(client):
+def test_list_trainees(client):
     """Testing the trainer list page"""
 
     # Trainer Overview no user
-    returned_value = client.get('/trainer_list_trainees',
+    returned_value = client.get('/list_trainees',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
@@ -355,7 +355,7 @@ def test_trainer_list_trainees(client):
     login_as_testTrainee(client)
 
     # Trainer Overview as Trainee
-    returned_value = client.get('/trainer_list_trainees',
+    returned_value = client.get('/list_trainees',
                                 follow_redirects=True)
     assert returned_value.status_code == 403
     assert type(g.user) == Trainee
@@ -365,7 +365,7 @@ def test_trainer_list_trainees(client):
     login_as_testTrainer(client)
 
     # Trainer Overview as Trainer
-    returned_value = client.get('/trainer_list_trainees',
+    returned_value = client.get('/list_trainees',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainer
@@ -417,7 +417,7 @@ def test_trainee_overview(client):
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
     assert b'/trainer_search' in returned_value.data
-    assert b'/trainee_list_trainers' in returned_value.data
+    assert b'/list_trainers' in returned_value.data
 
     # Login as Trainer
     login_as_testTrainer(client)
@@ -578,11 +578,11 @@ def test_add_trainee(client):
     assert type(g.user) == Trainer
 
 
-def test_trainee_list_trainers(client):
+def test_list_trainers(client):
     """Testing the trainer overview page"""
 
     # Trainer Overview no user
-    returned_value = client.get('/trainee_list_trainers',
+    returned_value = client.get('/list_trainers',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
@@ -591,7 +591,7 @@ def test_trainee_list_trainers(client):
     login_as_testTrainee(client)
 
     # Trainer Overview as Trainee
-    returned_value = client.get('/trainee_list_trainers',
+    returned_value = client.get('/list_trainers',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
@@ -601,7 +601,7 @@ def test_trainee_list_trainers(client):
     login_as_testTrainer(client)
 
     # Trainee Overview as Trainer
-    returned_value = client.get('/trainee_list_trainers',
+    returned_value = client.get('/list_trainers',
                                 follow_redirects=True)
     assert returned_value.status_code == 403
     assert type(g.user) == Trainer
