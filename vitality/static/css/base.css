@@ -3,6 +3,17 @@ body {
     font-size: larger;
 }
 
+button {
+    color: white;
+    background-color: #8492A6;
+    border: 1px solid white;
+}
+
+button:hover {
+    color: #3f6499; 
+    text-decoration: none;
+}
+
 .button_title {
     color: white;
     background-color: none;
