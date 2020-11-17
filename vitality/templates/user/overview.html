@@ -9,17 +9,17 @@
         <div class="row text-center">
             <div class="col-sm-12">
                 {% if g.user_type == "trainer" %}
-                <a class="button_title" href="{{ url_for("trainee_list_trainers") }}">
+                <a class="button_title" href="{{ url_for("list_trainees") }}">
                     Trainees
                 </a>
-                <a class="button_title" href="{{url_for('trainer_search')}}">
+                <a class="button_title" href="{{url_for('trainee_search')}}">
                     Add Trainee
                 </a>
                 {% elif g.user_type == "trainee" %}
-                <a class="button_title" href="{{ url_for("trainer_list_trainees") }}">
+                <a class="button_title" href="{{ url_for("list_trainers") }}">
                     Trainers
                 </a>
-                <a class="button_title" href="{{url_for('trainee_search')}}">
+                <a class="button_title" href="{{url_for('trainer_search')}}">
                     Add Trainer
                 </a>
                 {% endif %}
