@@ -337,6 +337,8 @@ def test_trainer_overview(client):
     returned_value = client.get('/trainer_overview', follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainer
+    assert b'/trainee_search' in returned_value.data
+    assert b'/trainer_list_trainees' in returned_value.data
 
 
 def test_trainer_list_trainees(client):
@@ -414,6 +416,8 @@ def test_trainee_overview(client):
     returned_value = client.get('/trainee_overview', follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
+    assert b'/trainer_search' in returned_value.data
+    assert b'/trainee_list_trainers' in returned_value.data
 
     # Login as Trainer
     login_as_testTrainer(client)
