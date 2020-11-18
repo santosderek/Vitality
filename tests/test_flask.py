@@ -698,7 +698,7 @@ def test_search_workout(client):
 
 @pytest.mark.skip(reason="no way of currently testing if Trianer can login")
 def test_workout(client):
-    """Testing the search workout page"""
+    """Testing the workout page"""
 
     # TODO: Need to create a workout and add to database then check
     # Not logged in
@@ -712,6 +712,10 @@ def test_workout(client):
     assert returned_value.status_code == 200
 
     # TODO: need to test post requests
+    g.database.add_workout("test","test","test","test","test")
+    assert g._init_.workout("test") != g._init_.abort(404)
+
+
 
 
 @pytest.mark.skip(reason="no way of currently testing if Trianer can login")
@@ -746,3 +750,4 @@ def test_workout_list(client):
     assert returned_value.status_code == 200
 
     # TODO: need to test post requests
+
