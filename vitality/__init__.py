@@ -31,9 +31,9 @@ def create_app():
     app.secret_key = 'somethingverysecret'
     app.config["MONGO_URI"] = config.get_local_uri()
 
-    alphaPattern = re.compile("[a-zA-Z0-9*]+")
-    numberPattern = re.compile(r"[0-9]+")
-    stringPattern = re.compile("[a-zA-Z]+")
+    alphaPattern = re.compile(r"^[a-zA-Z0-9\s]*$")
+    numberPattern = re.compile(r"^[0-9]*$")
+    stringPattern = re.compile(r"^[a-zA-Z]*$")
 
     @app.before_request
     def before_request():
@@ -194,46 +194,78 @@ def create_app():
 
         if request.method == 'POST':
             username = escape(request.form['username'])
+            if not alphaPattern.search(username):
+                raise InvalidCharactersException("Invalid characters")
             password = escape(request.form['password'])
+            if not alphaPattern.search(password):
+                raise InvalidCharactersException("Invalid characters")
             name = escape(request.form['name'])
+            if not stringPattern.search(name):
+                raise InvalidCharactersException("Invalid characters")
             re_password = escape(request.form['repassword'])
+            if not alphaPattern.search(re_password):
+                raise InvalidCharactersException("Invalid characters")
             location = escape(request.form['location'])
+            if not alphaPattern.search(location):
+                raise InvalidCharactersException("Invalid characters")
             phone = escape(request.form['phone'])
+            if not numberPattern.search(phone):
+                raise InvalidCharactersException("Invalid characters")
 
             if g.database.get_trainee_by_id(g.user._id) is not None:
 
                 if username:
                     g.database.set_trainee_username(g.user._id, username)
+                    if not alphaPattern.search(username):
+                        raise InvalidCharactersException("Invalid characters")
 
                 if password and re_password and password == re_password:
                     g.database.set_trainee_password(g.user._id, password)
+                    if not alphaPattern.search(password):
+                        raise InvalidCharactersException("Invalid characters")
 
                 if location:
                     g.database.set_trainee_location(g.user._id, location)
+                    if not alphaPattern.search(location):
+                        raise InvalidCharactersException("Invalid characters")
 
                 if phone:
                     g.database.set_trainee_phone(g.user._id, phone)
+                    if not numberPattern.search(phone):
+                        raise InvalidCharactersException("Invalid characters")
 
                 if name:
                     g.database.set_trainee_name(g.user._id, name)
+                    if not stringPattern.search(name):
+                        raise InvalidCharactersException("Invalid characters")
 
                 return redirect(url_for('usersettings'))
 
             elif g.database.get_trainer_by_id(g.user._id) is not None:
                 if username:
                     g.database.set_trainer_username(g.user._id, username)
+                    if not alphaPattern.search(username):
+                        raise InvalidCharactersException("Invalid characters")
 
                 if password and re_password and password == re_password:
                     g.database.set_trainer_password(g.user._id, password)
+                    if not alphaPattern.search(password):
+                        raise InvalidCharactersException("Invalid characters")
 
                 if location:
                     g.database.set_trainer_location(g.user._id, location)
+                    if not alphaPattern.search(location):
+                        raise InvalidCharactersException("Invalid characters")
 
                 if phone:
                     g.database.set_trainer_phone(g.user._id, phone)
+                    if not numberPattern.search(phone):
+                        raise InvalidCharactersException("Invalid characters")
 
                 if name:
                     g.database.set_trainer_name(g.user._id, name)
+                    if not stringPattern.search(name):
+                        raise InvalidCharactersException("Invalid characters")
 
                 return redirect(url_for('usersettings'))
 

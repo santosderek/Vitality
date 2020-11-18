@@ -5,6 +5,7 @@ from vitality import create_app
 from vitality.database import Database, password_sha256
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
+from vitality.database import InvalidCharactersException
 
 test_trainee = Trainee(
     _id=None,
@@ -78,6 +79,52 @@ def client():
             setup()
             yield client
             teardown()
+
+def test_failed_login(client):
+    #Testing the failed login page
+    with pytest.raises(InvalidCharactersException):
+        returned_value = client.post('/login', data=dict(
+            username="testTrainee#%#^",
+            password="password#^#$#"
+        ), follow_redirects=True)
+        assert returned_value.status_code == 200
+
+def test_failed_signup(client):
+    #Testing the failed signup page
+    with pytest.raises(InvalidCharactersException):
+        returned_value = client.post('/signup', data=dict(
+            username="testTrainee^#$^%^",
+            password="password)^^&&",
+            name="test^##%^",
+            repassword="password)^^&&",
+            location="&@%&&*",
+            phone="asdasdasd",
+            usertype="123456"
+        ), follow_redirects=True)
+        assert returned_value.status_code == 200
+
+def test_failed_usersettings(client):
+    #Testing the failed user settings page
+    # Get without a user
+    with pytest.raises(InvalidCharactersException):
+        returned_value = client.get('/usersettings', follow_redirects=True)
+        assert returned_value.status_code == 200
+        assert b'login' in returned_value.data
+
+        # Login as trainee
+        login_as_testTrainee(client)
+
+        # Check profile page.
+        returned_value = client.post('/usersettings', data=dict(
+            username="testTrainee#^#$",
+            password="newpassword",
+            repassword="newpassword",
+            name="12345",
+            location="Venus",
+            phone="test"
+        ), follow_redirects=True)
+        assert returned_value.status_code == 200
+
 
 
 def test_home(client):
