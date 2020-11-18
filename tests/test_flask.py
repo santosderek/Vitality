@@ -696,7 +696,7 @@ def test_search_workout(client):
     # TODO: need to test post requests
 
 
-
+@pytest.mark.skip(reason="no way of currently testing if Trianer can login")
 def test_workout(client):
     """Testing the workout page"""
 
