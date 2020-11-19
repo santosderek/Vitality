@@ -26,7 +26,7 @@ test_trainer = Trainer(
 )
 
 workoutTest = Workout(
-    _id="12345",
+    _id=None,
     creator_id= "12345",
     name= "Arm Workout",
     difficulty= "easy",
