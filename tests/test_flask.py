@@ -31,7 +31,7 @@ workoutTest = Workout(
     name= "Arm Workout",
     difficulty= "easy",
     about= "2 Pushups, 1 Jumping Jack",
-    exp= "1000")
+    exp= "1000"
 )
 
 
@@ -709,20 +709,23 @@ def test_search_workout(client):
 
 def test_workout(client):
     """Testing the workout page"""
+    app = create_app()
+    app.config['TESTING'] = True
+    database = Database(app)
 
     # TODO: Need to create a workout and add to database then check
     response_value = client.get('/workout/')
     assert response_value.status_code == 200
-    assert b'login' in returned_value.data
+    assert b'login' in response_value.data
 
     # Login as Trainee
-    login_as_testTrainee()
+    login_as_testTrainee(client)
     database.add_workout(workoutTest)
     response_value = client.get('/workout/"12345"')
     assert response_value.status_code == 200
 
     # Login as Trainer
-    login_as_testTrainer()
+    login_as_testTrainer(client)
     response_value = client.get('/workout/"12345"')
     assert response_value.status_code == 200
 
