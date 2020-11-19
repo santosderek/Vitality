@@ -8,7 +8,7 @@ from vitality.trainer import Trainer
 from vitality.workout import Workout
 
 test_trainee = Trainee(
-    _id=None,
+    _id="666f6f2d6261722d71757578",
     username="testTrainee",
     password="password",
     name="first last",
