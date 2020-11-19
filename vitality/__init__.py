@@ -471,14 +471,12 @@ def create_app():
 
         return render_template("workout/search.html")
 
-    @app.route('/workout/<workout_id>', methods=["GET", "POST"])
+    @app.route('/workout/<workout_id>', methods=["GET"])
     def workout(workout_id: str):
         """Page that shows the workout details"""
         if not g.user:
             return redirect(url_for('login'))
-
-        if (request.method == "POST"):
-            if (g.database.get_workout_class_by_id(workout_id) == None):
+        if (g.database.get_workout_class_by_id(workout_id) == None):
                 abort(404)
 
         return render_template("workout/workout.html", workoutInfo = g.database.get_workout_class_by_id(workout_id))
