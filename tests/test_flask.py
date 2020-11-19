@@ -5,6 +5,7 @@ from vitality import create_app
 from vitality.database import Database, password_sha256
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
+from vitality.workout import Workout
 
 test_trainee = Trainee(
     _id=None,
@@ -22,6 +23,15 @@ test_trainer = Trainer(
     name="first last",
     location="Earth",
     phone=1234567890
+)
+
+workoutTest = Workout(
+    _id="12345",
+    creator_id= "12345",
+    name= "Arm Workout",
+    difficulty= "easy",
+    about= "2 Pushups, 1 Jumping Jack",
+    exp= "1000")
 )
 
 
@@ -696,24 +706,32 @@ def test_search_workout(client):
     # TODO: need to test post requests
 
 
-@pytest.mark.skip(reason="no way of currently testing if Trianer can login")
+
 def test_workout(client):
     """Testing the workout page"""
 
     # TODO: Need to create a workout and add to database then check
-    # Not logged in
-    returned_value = client.get('/workout/', follow_redirects=True)
-    assert returned_value.status_code == 200
+    response_value = client.get('/workout/')
+    assert response_value.status_code == 200
+    assert b'login' in returned_value.data
 
     # Login as Trainee
-    login_as_testTrainee(client)
+    login_as_testTrainee()
+    database.add_workout(workoutTest)
+    response_value = client.get('/workout/"12345"')
+    assert response_value.status_code == 200
 
-    returned_value = client.get('/workout', follow_redirects=True)
-    assert returned_value.status_code == 200
+    # Login as Trainer
+    login_as_testTrainer()
+    response_value = client.get('/workout/"12345"')
+    assert response_value.status_code == 200
 
-    # TODO: need to test post requests
-    g.database.add_workout("test","test","test","test","test")
-    assert g._init_.workout("test") != g._init_.abort(404)
+    # No workout test
+    database.remove_workout("12345")
+    response_value = client.get('/workout/"12345"')
+    assert response_value.status_code == 404
+
+
 
 
 
