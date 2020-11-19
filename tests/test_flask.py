@@ -8,7 +8,7 @@ from vitality.trainer import Trainer
 from vitality.workout import Workout
 
 test_trainee = Trainee(
-    _id="666f6f2d6261722d71757578",
+    _id=None,
     username="testTrainee",
     password="password",
     name="first last",
@@ -706,9 +706,9 @@ def test_workout(client):
     app.config['TESTING'] = True
     database = Database(app)
     workoutTest = Workout(
-    _id="666f6f2d6261722d71757578",
-    creator_id="666f6f2d6261722d71757578",
-    name= "Arm Workout",
+    _id="None",
+    creator_id="None",
+    name= "arm",
     difficulty= "easy",
     about= "2 Pushups, 1 Jumping Jack",
     exp= "1000"
@@ -722,18 +722,17 @@ def test_workout(client):
     # Login as Trainee
     login_as_testTrainee(client)
     database.add_workout(workoutTest)
-    database.set_workout_creator_id(database.get_trainee_id_by_login(test_trainee.username, test_trainee.password), "666f6f2d6261722d71757578")
-    response_value = client.get('/workout/666f6f2d6261722d71757578')
+    response_value = client.get('/workout/')
     assert response_value.status_code == 200
 
     # Login as Trainer
     login_as_testTrainer(client)
-    response_value = client.get('/workout/666f6f2d6261722d71757578')
+    response_value = client.get('/workout/arm')
     assert response_value.status_code == 200
 
     # No workout test
-    database.remove_workout("666f6f2d6261722d71757578")
-    response_value = client.get('/workout/666f6f2d6261722d71757578')
+    database.remove_workout("arm")
+    response_value = client.get('/workout/arm')
     assert response_value.status_code == 404
 
 
