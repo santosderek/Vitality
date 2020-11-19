@@ -702,13 +702,12 @@ def test_search_workout(client):
 
 def test_workout(client):
     """Testing the workout page"""
-    app = create_app()
-    app.config['TESTING'] = True
-    database = Database(app)
+    test_trainer = g.database.get_trainer_by_username("testTrainer")
+
     workoutTest = Workout(
-    _id="666f6f2d6261722d71757578",
-    creator_id="666f6f2d6261722d71757578",
-    name= "arm",
+    _id=None,
+    creator_id= test_trainer._id,
+    name= "testWorkout",
     difficulty= "easy",
     about= "2 Pushups, 1 Jumping Jack",
     exp= "1000"
@@ -721,18 +720,18 @@ def test_workout(client):
 
     # Login as Trainee
     login_as_testTrainee(client)
-    database.add_workout(workoutTest)
+    database_workout = g.database.add_workout(workoutTest)
     response_value = client.get('/workout/')
     assert response_value.status_code == 200
 
     # Login as Trainer
     login_as_testTrainer(client)
-    response_value = client.get('/workout/arm')
+    response_value = client.get('/workout/testWorkout')
     assert response_value.status_code == 200
 
     # No workout test
-    database.remove_workout("arm")
-    response_value = client.get('/workout/arm')
+    g.database.remove_workout(workoutTest._id)
+    response_value = client.get('/workout/testWorkout')
     assert response_value.status_code == 404
 
 
