@@ -26,8 +26,8 @@ test_trainer = Trainer(
 )
 
 workoutTest = Workout(
-    _id=None,
-    creator_id= "12345",
+    _id="666f6f2d6261722d71757578",
+    creator_id= "666f6f2d6261722d71757578",
     name= "Arm Workout",
     difficulty= "easy",
     about= "2 Pushups, 1 Jumping Jack",
@@ -721,17 +721,17 @@ def test_workout(client):
     # Login as Trainee
     login_as_testTrainee(client)
     database.add_workout(workoutTest)
-    response_value = client.get('/workout/12345')
+    response_value = client.get('/workout/666f6f2d6261722d71757578')
     assert response_value.status_code == 200
 
     # Login as Trainer
     login_as_testTrainer(client)
-    response_value = client.get('/workout/12345')
+    response_value = client.get('/workout/666f6f2d6261722d71757578')
     assert response_value.status_code == 200
 
     # No workout test
-    database.remove_workout("12345")
-    response_value = client.get('/workout/12345')
+    database.remove_workout("666f6f2d6261722d71757578")
+    response_value = client.get('/workout/666f6f2d6261722d71757578')
     assert response_value.status_code == 404
 
 
