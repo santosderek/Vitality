@@ -721,17 +721,17 @@ def test_workout(client):
     # Login as Trainee
     login_as_testTrainee(client)
     database.add_workout(workoutTest)
-    response_value = client.get('/workout/"12345"')
+    response_value = client.get('/workout/12345')
     assert response_value.status_code == 200
 
     # Login as Trainer
     login_as_testTrainer(client)
-    response_value = client.get('/workout/"12345"')
+    response_value = client.get('/workout/12345')
     assert response_value.status_code == 200
 
     # No workout test
     database.remove_workout("12345")
-    response_value = client.get('/workout/"12345"')
+    response_value = client.get('/workout/12345')
     assert response_value.status_code == 404
 
 
