@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Workout</h1>
 <div class="row"> 
-    <p> {{ workoutInfo }} </p>
+    <h1> {{ workoutInfo.name }} </h1><br><br>
+    <div class = "col-sm-12">
+        <p><b>Difficulty: </b>{{ workoutInfo.difficulty }}</p><br>
+        <p><b>Experience Points: </b>{{ workoutInfo.exp }}</p><br>
+        <p><b>Workout Details: </b>{{ workoutInfo.about }}</p>
+    </div>
 </div>
 {% endblock %}
