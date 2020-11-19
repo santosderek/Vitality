@@ -25,14 +25,7 @@ test_trainer = Trainer(
     phone=1234567890
 )
 
-workoutTest = Workout(
-    _id=None,
-    creator_id=None,
-    name= "Arm Workout",
-    difficulty= "easy",
-    about= "2 Pushups, 1 Jumping Jack",
-    exp= "1000"
-)
+
 
 
 def login_as_testTrainee(client):
@@ -712,6 +705,14 @@ def test_workout(client):
     app = create_app()
     app.config['TESTING'] = True
     database = Database(app)
+    workoutTest = Workout(
+    _id=database.get_trainee_id_by_login(test_trainee.username, test_trainee.password),
+    creator_id=database.get_trainee_id_by_login(test_trainee.username, test_trainee.password),
+    name= "Arm Workout",
+    difficulty= "easy",
+    about= "2 Pushups, 1 Jumping Jack",
+    exp= "1000"
+    )
 
     # TODO: Need to create a workout and add to database then check
     response_value = client.get()
@@ -721,7 +722,7 @@ def test_workout(client):
     # Login as Trainee
     login_as_testTrainee(client)
     database.add_workout(workoutTest)
-    database.set_workout_creator_id("666f6f2d6261722d71757578", "666f6f2d6261722d71757578")
+    database.set_workout_creator_id(database.get_trainee_id_by_login(test_trainee.username, test_trainee.password), "666f6f2d6261722d71757578")
     response_value = client.get('/workout/666f6f2d6261722d71757578')
     assert response_value.status_code == 200
 
