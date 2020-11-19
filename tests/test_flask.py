@@ -706,8 +706,8 @@ def test_workout(client):
     app.config['TESTING'] = True
     database = Database(app)
     workoutTest = Workout(
-    _id="None",
-    creator_id="None",
+    _id="666f6f2d6261722d71757578",
+    creator_id="666f6f2d6261722d71757578",
     name= "arm",
     difficulty= "easy",
     about= "2 Pushups, 1 Jumping Jack",
