@@ -714,7 +714,7 @@ def test_workout(client):
     database = Database(app)
 
     # TODO: Need to create a workout and add to database then check
-    response_value = client.get('/workout/')
+    response_value = client.get()
     assert response_value.status_code == 200
     assert b'login' in response_value.data
 
