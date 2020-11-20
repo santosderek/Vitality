@@ -73,7 +73,7 @@
         <div class="row">
             <div class="col-sm-12 workouts">
                 <div class="col-sm-12 text-center">
-                    <a class="button_title" href="" role="button">Workouts</a>
+                    <a class="button_title" href="{{ url_for("workout_overview") }}" role="button">Workouts</a>
                 </div>
                 {% if workouts|length < 1 %}
                 <div class="col workout text-center p-3">
