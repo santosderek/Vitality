@@ -1059,8 +1059,6 @@ def test_new_workout(client):
     assert b'Type your workout description here' in returned_value.data
     assert b'Create Routine' in returned_value.data
 
-    
-
 
 def test_search_workout(client):
     """Testing the search workout page"""

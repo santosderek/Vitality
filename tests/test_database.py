@@ -687,4 +687,21 @@ class TestDatabase(unittest.TestCase):
             self.database.add_workout(new_workout)
 
     def test_get_all_workouts_by_creatorid(self):
-        pass
+
+        # Checking if workout total is equal to 1        
+        trainee = self.database.get_trainee_by_username(self.test_trainee.username)
+        workouts = self.database.get_all_workouts_by_creatorid(trainee._id)
+        assert len(workouts) == 1
+
+        new_workout = Workout(
+            _id = None,
+            creator_id=trainee._id,
+            name="goingtoremove", # tearDown removes all of these 
+            difficulty="novice",
+            about="something something else",
+            exp=0
+        )
+
+        self.database.add_workout(new_workout)
+        workouts = self.database.get_all_workouts_by_creatorid(trainee._id)
+        assert len(workouts) == 2
