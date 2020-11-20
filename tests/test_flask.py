@@ -974,22 +974,32 @@ def test_workout(client):
     # TODO: need to test post requests
 
 
-@pytest.mark.skip(reason="no way of currently testing if Trianer can login")
 def test_workout_overview(client):
-    """Testing the search workout page"""
+    """Testing the workout overview page"""
 
-    # TODO: Need to create a workout and add to database then check
     # Not logged in
     returned_value = client.get('/workout_overview', follow_redirects=True)
     assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
+    assert g.user is None
 
     # Login as Trainee
     login_as_testTrainee(client)
 
     returned_value = client.get('/workout_overview', follow_redirects=True)
     assert returned_value.status_code == 200
+    assert b'Create a new workout routine.' in returned_value.data 
+    assert b'Search for workout routine.' in returned_value.data 
+    assert b'Your created workouts.' in returned_value.data 
 
-    # TODO: need to test post requests
+    # Login as Trainer
+    login_as_testTrainer(client)
+
+    returned_value = client.get('/workout_overview', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'Create a new workout routine.' in returned_value.data 
+    assert b'Search for workout routine.' in returned_value.data 
+    assert b'Your created workouts.' in returned_value.data 
 
 
 def test_workout_list(client):
