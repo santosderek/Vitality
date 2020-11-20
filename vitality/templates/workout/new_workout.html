@@ -1,30 +1,44 @@
 {% extends 'base.html' %}
 
 {% block header %}
-
 <title>New Routine</title>
-
 {% endblock %}
 
 {% block content %}
+<div class="row darkbg">
+    <div class="col text-center">
+        <h1 class="d-block mt-1">Create Workout</h1>
 
-<div class="row">
-    <div class="col">
+        {% if workout_added %}
+        <h3 style="color: green;">Workout has been added!</h3> 
+        {% else %}
 
-        <h1>Create Workout</h1>
-        <form>
-            <input type="text" placeholder="Workout Name" name="workout" required><br>
-            <select id="difficulty" name="difficulty" placeholder="workout Difficulty">
-                <option value="novice">Noive</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="experienced">Experienced</option>
-                <option value="superstar">Superstar</option>
-            </select><br>
-            <textarea id="description" type="text" placeholder="Type your workout description here" name="description"
-                required></textarea><br>
-            <button type="submit">Create Routine</button>
+        {% if invalid_creatorid %}
+        <h3>Invalid creator id! Your account somehow doesn't exist!</h3> 
+        {% endif %}
+
+        <form class="d-block mt-1 text-center" action="/new_workout" method="POST">
+            <div class="form-group">
+                <label for="difficulty">Difficulty</label>
+                <select class="text-center mt-1" id="difficulty" name="difficulty">
+                    <option value="novice">Novice</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="experienced">Experienced</option>
+                    <option value="superstar">Superstar</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input class="text-center mt-1" type="text" placeholder="Workout Name" name="name" required>
+            </div>
+            <div class="form-group">
+                <textarea class="text-center mt-1" id="description" placeholder="Type your workout description here"
+                    name="about" required></textarea>
+            </div>
+            <div class="form-group">
+                <button class="text-center mt-1" type="submit">Create Routine</button>
+            </div>
         </form>
+        {% endif %}
     </div>
 </div>
-
 {% endblock %}

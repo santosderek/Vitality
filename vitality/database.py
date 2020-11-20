@@ -358,16 +358,27 @@ class Database:
     def workout_dict_to_class(self, workout_dict: Workout):
         """Takes in a workout dictionary and returns a Workout class"""
         workout_dict['_id'] = str(workout_dict['_id'])
+        workout_dict['creator_id'] = str(workout_dict['creator_id'])
         return Workout(**workout_dict)
 
-    def get_workout_class_by_id(self, id: str):
+    def get_workout_by_id(self, id: str):
         """Returns the Workout class found by the workout's id."""
         found_workout = self.mongo.db.workout.find_one({"_id": ObjectId(id)})
         if found_workout:
             return self.workout_dict_to_class(found_workout)
         return None
 
-    def get_workout_class_by_name(self, name: str):
+    def get_all_workouts_by_creatorid(self, creator_id: str):
+        """Returns the Workout class found by the workout's id."""
+        found_workouts = self.mongo.db.workout.find(
+            {"creator_id": ObjectId(creator_id)})
+        workouts = []
+        if found_workouts:
+            for workout in found_workouts:
+                workouts.append(self.workout_dict_to_class(workout))
+        return workouts
+
+    def get_workout_by_name(self, name: str, creator_id: str):
         """Returns the Workout class found by the workout's name."""
         found_workout = self.mongo.db.workout.find_one({"name": name})
         if found_workout:
@@ -430,10 +441,10 @@ class Database:
 
     def add_workout(self, workout: Workout):
         """Adds a workout to the database based on a provided Workout class."""
-        if self.get_trainee_by_id(workout.creator_id) is None or not self.get_trainer_by_id(workout.creator_id) is None:
+        if self.get_trainee_by_id(workout.creator_id) is None and self.get_trainer_by_id(workout.creator_id) is None:
             raise WorkoutCreatorIdNotFoundError("Creator Id Not Found")
         self.mongo.db.workout.insert_one({
-            "creator_id": workout.creator_id,
+            "creator_id": ObjectId(workout.creator_id),
             'name': workout.name,
             "difficulty": workout.difficulty,
             "about": workout.about,
