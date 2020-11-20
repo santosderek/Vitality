@@ -653,3 +653,63 @@ class TestDatabase(unittest.TestCase):
         new_workout.creator_id = None
         with self.assertRaises(WorkoutCreatorIdNotFoundError):
             self.database.add_workout(new_workout)
+
+    def test_remove_trainee(self):
+
+        try:
+            self.database.add_trainee(Trainee(_id=None,
+                                              username="testTrainee1",
+                                              password="pass",
+                                              name="testTrainee1",
+                                              location="somewhere",
+                                              phone=1234567890))
+            self.database.add_trainee(Trainee(_id=None,
+                                              username="testTrainee2",
+                                              password="pass",
+                                              name="testTrainee2",
+                                              location="somewhere",
+                                              phone=1234567890))
+            self.database.add_trainee(Trainee(_id=None,
+                                              username="testTrainee3",
+                                              password="pass",
+                                              name="testTrainee3",
+                                              location="somewhere",
+                                              phone=1234567890))
+
+            self.database.add_trainer(Trainer(_id=None,
+                                              username="testTrainer1",
+                                              password="pass",
+                                              name="testTrainer3",
+                                              location="somewhere",
+                                              phone=1234567890))
+            
+            trainee1_id = str(self.database.mongo.db.trainee.find_one({'username': 'testTrainee1'})['_id'])
+            trainee2_id = str(self.database.mongo.db.trainee.find_one({'username': 'testTrainee2'})['_id'])
+            trainee3_id = str(self.database.mongo.db.trainee.find_one({'username': 'testTrainee3'})['_id'])
+            trainer_id =  str(self.database.mongo.db.trainer.find_one({'username': 'testTrainer1'})['_id'])
+
+            assert self.database.get_trainer_by_username("testTrainer1") is not None
+            assert self.database.get_trainee_by_username("testTrainee1") is not None
+            assert self.database.get_trainee_by_username("testTrainee2") is not None
+            assert self.database.get_trainee_by_username("testTrainee3") is not None
+
+            self.database.trainer_add_trainee(trainer_id, trainee1_id)
+            self.database.trainer_add_trainee(trainer_id, trainee2_id)
+            self.database.trainer_add_trainee(trainer_id, trainee3_id)
+
+            assert len(self.database.get_trainer_by_id(trainer_id).trainees) == 3
+
+            self.database.remove_trainee(trainee1_id)
+            assert len(self.database.get_trainer_by_id(trainer_id).trainees) == 2
+
+            self.database.remove_trainee(trainee2_id)
+            assert len(self.database.get_trainer_by_id(trainer_id).trainees) == 1
+
+            self.database.remove_trainee(trainee3_id)
+            assert len(self.database.get_trainer_by_id(trainer_id).trainees) == 0
+            
+        finally:
+            self.database.mongo.db.trainee.delete_many({"username": "testTrainee1"})
+            self.database.mongo.db.trainee.delete_many({"username": "testTrainee2"})
+            self.database.mongo.db.trainee.delete_many({"username": "testTrainee3"})
+            self.database.mongo.db.trainer.delete_many({"username": "testTrainer1"})

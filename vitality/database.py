@@ -22,7 +22,8 @@ class Database:
     def trainee_dict_to_class(self, trainee_dict: dict):
         """Return a Trainee class from a dictionary"""
         trainee_dict['_id'] = str(trainee_dict['_id'])
-        trainee_dict['trainers'] = [str(trainer_id) for trainer_id in trainee_dict['trainers']]
+        trainee_dict['trainers'] = [str(trainer_id)
+                                    for trainer_id in trainee_dict['trainers']]
         # WARNING: Removed converting trainers to classes due to unintended recursion
         return Trainee(**trainee_dict)
 
@@ -140,12 +141,26 @@ class Database:
         """Deletes a trainee by trainee id."""
         self.mongo.db.trainee.delete_one({"_id": ObjectId(id)})
 
+        # Remove trainee from trainer's list
+        self.mongo.db.trainer.update_many(
+            {},
+            {
+                "$pull": {
+                    "trainees": {
+                        "$in": [ObjectId(id)]
+                    }
+                }
+            }
+
+        )
+
     """ Trainer Functions """
 
     def trainer_dict_to_class(self, trainer_dict: str):
         """Return a Trainer class from a dictionary"""
         trainer_dict['_id'] = str(trainer_dict['_id'])
-        trainer_dict['trainees'] = [str(trainee_id) for trainee_id in trainer_dict['trainees']]
+        trainer_dict['trainees'] = [str(trainee_id)
+                                    for trainee_id in trainer_dict['trainees']]
         # WARNING: Removed converting trainees to classes due to unintended recursion
         return Trainer(**trainer_dict)
 
@@ -325,6 +340,18 @@ class Database:
     def remove_trainer(self, id: str):
         """Deletes a trainer by trainer id."""
         self.mongo.db.trainer.delete_one({"_id": ObjectId(id)})
+
+        # Remove trainer from trainee's list
+        self.mongo.db.trainee.update_many(
+            {},
+            {
+                "$pull": {
+                    "trainers": {
+                        "$in": [ObjectId(id)]
+                    }
+                }
+            }
+        )
 
     """Workout Functions"""
 
