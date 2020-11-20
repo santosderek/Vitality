@@ -2,7 +2,7 @@ from .trainee import Trainee
 from .trainer import Trainer
 from .database import (
     Database,
-    UsernameTakenError,
+    UsernameTakenError, WorkoutCreatorIdNotFoundError,
     password_sha256,
     InvalidCharactersException,
     UserNotFoundError
@@ -330,7 +330,7 @@ def create_app():
         peak_trainees = g.database.trainer_peak_trainees(g.user._id)
         return render_template("user/overview.html",
                                trainees=trainees,
-                               workouts=[],
+                               workouts=g.database.get_all_workouts_by_creatorid(g.user._id),
                                events=[],
                                peak_trainees=peak_trainees)
 
@@ -508,11 +508,31 @@ def create_app():
             return "", 500
 
     """Workout pages"""
-    @app.route('/new_workout', methods=["GET"])
+    @app.route('/new_workout', methods=["GET", "POST"])
     def new_workout():
         """Page to create a new workout"""
         if not g.user:
             return redirect(url_for('login'))
+
+        if request.method == "POST":
+
+            try: 
+                name = escape(request.form['name'])
+                about = escape(request.form['about'])
+                difficulty = escape(request.form['difficulty'])
+
+                g.database.add_workout(Workout(
+                    _id=None,
+                    creator_id=g.user._id,
+                    name=name,
+                    difficulty=difficulty,
+                    about=about,
+                    exp=0
+                ))
+                return render_template("workout/new_workout.html", workout_added = True)
+
+            except WorkoutCreatorIdNotFoundError: 
+                return render_template("workout/new_workout.html", invalid_creatorid = True)
 
         return render_template("workout/new_workout.html")
 
