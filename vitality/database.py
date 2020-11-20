@@ -350,7 +350,7 @@ class Database:
         workouts = []
         if found_workouts:
             for workout in found_workouts:
-                workouts.add(self.workout_dict_to_class(workout))
+                workouts.append(self.workout_dict_to_class(workout))
         return workouts
 
     def get_workout_by_name(self, name: str, creator_id: str):
