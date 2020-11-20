@@ -1,15 +1,13 @@
 class Workout:
-    def __init__(self, _id: str, creator_id: str, name: str, difficulty: str = "easy", about: str = None, exp: int = None):
+    def __init__(self, _id: str, creator_id: str, name: str, difficulty: str = "easy", about: str = None, exp: int = 0):
         """Constructor for Workout class."""
-        self.__dict__.update(dict(
-            _id=_id,
-            creator_id=creator_id,
-            name=name,
-            difficulty=difficulty,
-            about=about,
-            exp=exp
-        ))
+        self._id = _id
+        self.creator_id = creator_id
+        self.name = name
+        self.difficulty = difficulty
+        self.about = about
+        self.exp = exp
 
     def as_dict(self):
         """Returns all attributes of the Workout class as a dictionary."""
-        return self.__dict__
+        return dict(self.__dict__)

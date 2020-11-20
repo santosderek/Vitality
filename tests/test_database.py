@@ -6,7 +6,7 @@ from vitality import create_app
 from vitality.database import (
     Database,
     WorkoutCreatorIdNotFoundError,
-    UsernameTakenError,
+    UsernameTakenError, 
     password_sha256
 )
 from vitality.trainee import Trainee
@@ -62,23 +62,17 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(self.test_trainee.password == 'password')
 
     def tearDown(self):
+        # Remove test Workout if found
+        self.database.mongo.db.workout.delete_many({'name': self.test_workout.name})
+
+        # Removing a test workout
+        self.database.mongo.db.workout.delete_many({'name': 'goingtoremove'})
+
         # Remove test Trainee if found
-        while self.database.get_trainee_by_username(self.test_trainee.username) is not None:
-            db_user = self.database.get_trainee_by_username(
-                self.test_trainee.username)
-            self.database.remove_trainee(db_user._id)
+        self.database.mongo.db.trainee.delete_many({'username': self.test_trainee.username})
 
         # Remove test Trainer if found
-        while self.database.get_trainer_by_username(self.test_trainer.username) is not None:
-            db_user = self.database.get_trainer_by_username(
-                self.test_trainer.username)
-            self.database.remove_trainer(db_user._id)
-
-        # Remove test Workout if found
-        while self.database.get_workout_class_by_name(self.test_workout.name) is not None:
-            db_user = self.database.get_workout_class_by_name(
-                self.test_workout.name)
-            self.database.remove_workout(db_user._id)
+        self.database.mongo.db.trainer.delete_many({'username': self.test_trainer.username})
 
     def test_password_sha256(self):
         password = 'asupersecretpassword'
@@ -444,8 +438,12 @@ class TestDatabase(unittest.TestCase):
         new_workout = deepcopy(self.test_workout)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        # Get workout from database
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Need to pass in the mongo id
         new_workout._id = database_workout._id
@@ -454,8 +452,7 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
 
         # Get workout from database by id this time
-        database_workout = self.database.get_workout_class_by_id(
-            new_workout._id)
+        database_workout = self.database.get_workout_by_id(new_workout._id)
 
         # Check if workouts are the same
         self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
@@ -464,8 +461,12 @@ class TestDatabase(unittest.TestCase):
         new_workout = deepcopy(self.test_workout)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        # Get workout from database
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Need to pass in the mongo id
         new_workout._id = database_workout._id
@@ -473,12 +474,18 @@ class TestDatabase(unittest.TestCase):
         # Check if workouts are the same
         self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
 
+        self.database.remove_workout(database_workout._id)
+
     def test_set_workout_creator_id(self):
         new_workout = deepcopy(self.test_workout)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        # Get workout from database
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Get trainee from database
         database_trainee = self.database.get_trainee_by_username(
@@ -500,8 +507,8 @@ class TestDatabase(unittest.TestCase):
             new_workout._id, database_trainee._id)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
 
@@ -511,29 +518,35 @@ class TestDatabase(unittest.TestCase):
             new_workout._id, database_trainer._id)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
 
     def test_set_workout_name(self):
         new_workout = deepcopy(self.test_workout)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        while self.database.get_workout_by_name("newname", trainee._id):
+            workout = self.database.get_workout_by_name("newname", trainee._id)
+            self.database.remove_workout(workout._id)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Get id and change name
         new_workout._id = database_workout._id
         new_workout.name = "newname"
+        new_workout.creator_id = database_workout.creator_id
 
         # Set it in database
         self.database.set_workout_name(new_workout._id, new_workout.name)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
-
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
 
         # Removing workout since we changed name. Teardown wont do it
@@ -543,8 +556,12 @@ class TestDatabase(unittest.TestCase):
         new_workout = deepcopy(self.test_workout)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        # Get workout from database
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Get id and change name
         new_workout._id = database_workout._id
@@ -555,8 +572,8 @@ class TestDatabase(unittest.TestCase):
             new_workout._id, new_workout.difficulty)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
 
@@ -564,8 +581,12 @@ class TestDatabase(unittest.TestCase):
         new_workout = deepcopy(self.test_workout)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        # Get workout from database
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Get id and change name
         new_workout._id = database_workout._id
@@ -575,17 +596,19 @@ class TestDatabase(unittest.TestCase):
         self.database.set_workout_about(new_workout._id, new_workout.about)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
 
     def test_set_workout_exp(self):
         new_workout = deepcopy(self.test_workout)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Get id and change name
         new_workout._id = database_workout._id
@@ -595,8 +618,8 @@ class TestDatabase(unittest.TestCase):
         self.database.set_workout_exp(new_workout._id, new_workout.exp)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
 
@@ -608,18 +631,23 @@ class TestDatabase(unittest.TestCase):
         self.database.add_workout(new_workout)
 
         # Get workout from database
-        database_workout = self.database.get_workout_class_by_name(
-            new_workout.name)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        # Get workout from database
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Get id and change name
         new_workout._id = database_workout._id
+        new_workout.creator_id = database_workout.creator_id
 
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
 
         self.database.remove_workout(new_workout._id)
 
-        self.assertTrue(self.database.get_workout_class_by_name(
-            new_workout.name) is None)
+        self.assertTrue(self.database.get_workout_by_name(
+            new_workout.name, trainee._id) is None)
 
     def test_add_workout(self):
         new_trainee = self.database.get_trainee_by_username(
@@ -628,20 +656,24 @@ class TestDatabase(unittest.TestCase):
         new_workout = deepcopy(self.test_workout)
 
         # Getting the workout by their name
-        db_workout = self.database.get_workout_class_by_name(
-            self.test_workout.name)
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        # Get workout from database
+        database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                             trainee._id)
 
         # Set ids
-        new_workout._id = db_workout._id
+        new_workout._id = database_workout._id
         new_workout.creator_id = new_trainee._id
-        db_workout.creator_id = new_workout.creator_id
+        database_workout.creator_id = new_workout.creator_id
         self.assertTrue(new_trainee._id == new_workout.creator_id)
-        self.assertTrue(db_workout.as_dict() == new_workout.as_dict())
+        self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
 
         # Removing temp workout from database
         self.database.remove_workout(new_workout._id)
         self.assertTrue(
-            self.database.get_workout_class_by_id(db_workout._id) is None)
+            self.database.get_workout_by_id(database_workout._id) is None)
 
         # Removing temp user from database
         self.database.remove_trainee(new_trainee._id)
@@ -653,3 +685,6 @@ class TestDatabase(unittest.TestCase):
         new_workout.creator_id = None
         with self.assertRaises(WorkoutCreatorIdNotFoundError):
             self.database.add_workout(new_workout)
+
+    def test_get_all_workouts_by_creatorid(self):
+        pass
