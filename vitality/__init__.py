@@ -35,6 +35,7 @@ def create_app():
     numberPattern = re.compile(r"^[0-9]*$")
     stringPattern = re.compile(r"^[a-zA-Z]*$")
 
+
     @app.before_request
     def before_request():
         """Actions to take before each request"""
@@ -64,34 +65,36 @@ def create_app():
         app.logger.info('Rendering Login')
 
         if request.method == 'POST':
-            app.logger.debug(
-                "Poping out the the user id if found in the session.")
-            session.pop('user_id', None)
+            try:
+                app.logger.debug(
+                    "Poping out the the user id if found in the session.")
+                session.pop('user_id', None)
 
-            username = escape(request.form['username'])
-            if not alphaPattern.search(username):
-                raise InvalidCharactersException("Invalid characters")
+                username = escape(request.form['username'])
+                if not alphaPattern.search(username):
+                    raise InvalidCharactersException("Invalid characters")
 
-            password = escape(request.form['password'])
-            if not alphaPattern.search(password):
-                raise InvalidCharactersException("Invalid characters")
+                password = escape(request.form['password'])
+                if not alphaPattern.search(password):
+                    raise InvalidCharactersException("Invalid characters")
+                password = password_sha256(password)
 
-            password = password_sha256(password)
+                # Check if Trainee
+                session['user_id'] = g.database.get_trainee_id_by_login(
+                    username, password)
+                if session['user_id']:
+                    return redirect(url_for('trainee_overview'))
 
-            # Check if Trainee
-            session['user_id'] = g.database.get_trainee_id_by_login(
-                username, password)
-            if session['user_id']:
-                return redirect(url_for('trainee_overview'))
+                # Check if Trainer
+                session['user_id'] = g.database.get_trainer_id_by_login(
+                    username, password)
+                if session['user_id']:
+                    return redirect(url_for('trainer_overview'))
 
-            # Check if Trainer
-            session['user_id'] = g.database.get_trainer_id_by_login(
-                username, password)
-            if session['user_id']:
-                return redirect(url_for('trainer_overview'))
-
-            # If no user found, alert user, and reload page
-            return render_template("account/login.html", login_error=True)
+                # If no user found, alert user, and reload page
+                return render_template("account/login.html", login_error=True)
+            except InvalidCharactersException as e:
+                return render_template("account/login.html", invalid_characters=True)
 
         return render_template("account/login.html", login_error=False)
 
@@ -99,7 +102,7 @@ def create_app():
     def signup():
         """Sign up page for Vitality"""
         app.logger.info('Rendering Create User')
-
+        invalid = 0
         if request.method == 'POST':
             session.pop('user_id', None)
             username = escape(request.form['username'])
