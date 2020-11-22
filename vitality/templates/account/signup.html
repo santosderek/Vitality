@@ -21,6 +21,10 @@
 
 			{% if username_taken %}
 			<p style="color: red;">Username was taken!</p>
+			{% elif invalid_characters%}
+     	 	<div class="col-sm-12">
+      		<p style="color: red;">Invalid characters found!</p>
+      		</div>
 			{% endif %}
 		</div>
 		<div class="col-sm-12 mb-1">

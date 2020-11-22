@@ -94,7 +94,7 @@ def create_app():
                 # If no user found, alert user, and reload page
                 return render_template("account/login.html", login_error=True)
             except InvalidCharactersException as e:
-                return render_template("account/login.html", invalid_characters=True)
+                return render_template("account/login.html", invalid_characters=True), 400
 
         return render_template("account/login.html", login_error=False)
 
@@ -102,75 +102,76 @@ def create_app():
     def signup():
         """Sign up page for Vitality"""
         app.logger.info('Rendering Create User')
-        invalid = 0
         if request.method == 'POST':
-            session.pop('user_id', None)
-            username = escape(request.form['username'])
-            if not alphaPattern.search(username):
-                raise InvalidCharactersException("Invalid characters")
+           try:
+                session.pop('user_id', None)
+                username = escape(request.form['username'])
+                if not alphaPattern.search(username):
+                    raise InvalidCharactersException("Invalid characters")
 
-            password = escape(request.form['password'])
-            if not alphaPattern.search(password):
-                raise InvalidCharactersException("Invalid characters")
+                password = escape(request.form['password'])
+                if not alphaPattern.search(password):
+                    raise InvalidCharactersException("Invalid characters")
 
-            name = escape(request.form['name'])
-            if not alphaPattern.search(name):
-                raise InvalidCharactersException("Invalid characters")
+                name = escape(request.form['name'])
+                if not alphaPattern.search(name):
+                    raise InvalidCharactersException("Invalid characters")
 
-            re_password = escape(request.form['repassword'])
-            if not alphaPattern.search(re_password):
-                raise InvalidCharactersException("Invalid characters")
+                re_password = escape(request.form['repassword'])
+                if not alphaPattern.search(re_password):
+                    raise InvalidCharactersException("Invalid characters")
 
-            location = escape(request.form['location'])
-            if not alphaPattern.search(location):
-                raise InvalidCharactersException("Invalid characters")
+                location = escape(request.form['location'])
+                if not alphaPattern.search(location):
+                    raise InvalidCharactersException("Invalid characters")
 
-            phone = escape(request.form['phone'])
-            if not numberPattern.search(phone):
-                raise InvalidCharactersException("Invalid characters")
+                phone = escape(request.form['phone'])
+                if not numberPattern.search(phone):
+                    raise InvalidCharactersException("Invalid characters")
 
-            usertype = escape(request.form['usertype'])
-            if not stringPattern.search(usertype):
-                raise InvalidCharactersException("Invalid characters")
+                usertype = escape(request.form['usertype'])
+                if not stringPattern.search(usertype):
+                    raise InvalidCharactersException("Invalid characters")
 
-            if username and password == re_password:
-                try:
-                    new_user = None
-                    if usertype == 'trainee':
-                        new_user = Trainee(
-                            _id=None,
-                            username=username,
-                            password=password,
-                            name=name,
-                            location=location,
-                            phone=phone)
+                if username and password == re_password:
+                    try:
+                        new_user = None
+                        if usertype == 'trainee':
+                            new_user = Trainee(
+                                _id=None,
+                                username=username,
+                                password=password,
+                                name=name,
+                                location=location,
+                                phone=phone)
 
-                        g.database.add_trainee(new_user)
+                            g.database.add_trainee(new_user)
 
-                    elif usertype == 'trainer':
-                        new_user = Trainer(
-                            _id=None,
-                            username=username,
-                            password=password,
-                            name=name,
-                            location=location,
-                            phone=phone)
+                        elif usertype == 'trainer':
+                            new_user = Trainer(
+                                _id=None,
+                                username=username,
+                                password=password,
+                                name=name,
+                                location=location,
+                                phone=phone)
 
-                        g.database.add_trainer(new_user)
+                            g.database.add_trainer(new_user)
 
-                    else:
-                        return render_template("account/signup.html", error_message=True)
+                        else:
+                            return render_template("account/signup.html", error_message=True)
 
-                    # If username and password successful
-                    return render_template("account/signup.html", creation_successful=True)
+                        # If username and password successful
+                        return render_template("account/signup.html", creation_successful=True)
 
-                except UsernameTakenError as err:
-                    app.logger.debug("Username {} was taken.".format(new_user))
-                    return render_template("account/signup.html", username_taken=True)
+                    except UsernameTakenError as err:
+                        app.logger.debug("Username {} was taken.".format(new_user))
+                        return render_template("account/signup.html", username_taken=True)
 
-            # If username and password failed, render error messsage
-            return render_template("account/signup.html", error_message=True)
-
+                # If username and password failed, render error messsage
+                return render_template("account/signup.html", error_message=True)
+           except InvalidCharactersException as e:
+               return render_template("account/signup.html", invalid_characters=True), 400
         return render_template("account/signup.html")
 
     @app.route('/profile/<username>', methods=["GET"])
@@ -196,81 +197,85 @@ def create_app():
             return redirect(url_for('login'))
 
         if request.method == 'POST':
-            username = escape(request.form['username'])
-            if not alphaPattern.search(username):
-                raise InvalidCharactersException("Invalid characters")
-            password = escape(request.form['password'])
-            if not alphaPattern.search(password):
-                raise InvalidCharactersException("Invalid characters")
-            name = escape(request.form['name'])
-            if not stringPattern.search(name):
-                raise InvalidCharactersException("Invalid characters")
-            re_password = escape(request.form['repassword'])
-            if not alphaPattern.search(re_password):
-                raise InvalidCharactersException("Invalid characters")
-            location = escape(request.form['location'])
-            if not alphaPattern.search(location):
-                raise InvalidCharactersException("Invalid characters")
-            phone = escape(request.form['phone'])
-            if not numberPattern.search(phone):
-                raise InvalidCharactersException("Invalid characters")
+            try:
+                username = escape(request.form['username'])
+                if not alphaPattern.search(username):
+                    raise InvalidCharactersException("Invalid characters")
+                password = escape(request.form['password'])
+                if not alphaPattern.search(password):
+                    raise InvalidCharactersException("Invalid characters")
+                name = escape(request.form['name'])
+                if not stringPattern.search(name):
+                    raise InvalidCharactersException("Invalid characters")
+                re_password = escape(request.form['repassword'])
+                if not alphaPattern.search(re_password):
+                    raise InvalidCharactersException("Invalid characters")
+                location = escape(request.form['location'])
+                if not alphaPattern.search(location):
+                    raise InvalidCharactersException("Invalid characters")
+                phone = escape(request.form['phone'])
+                if not numberPattern.search(phone):
+                    raise InvalidCharactersException("Invalid characters")
 
-            if g.database.get_trainee_by_id(g.user._id) is not None:
+                if g.database.get_trainee_by_id(g.user._id) is not None:
 
-                if username:
-                    g.database.set_trainee_username(g.user._id, username)
-                    if not alphaPattern.search(username):
-                        raise InvalidCharactersException("Invalid characters")
+                    if username:
+                        g.database.set_trainee_username(g.user._id, username)
+                        if not alphaPattern.search(username):
+                            raise InvalidCharactersException("Invalid characters")
 
-                if password and re_password and password == re_password:
-                    g.database.set_trainee_password(g.user._id, password)
-                    if not alphaPattern.search(password):
-                        raise InvalidCharactersException("Invalid characters")
+                    if password and re_password and password == re_password:
+                        g.database.set_trainee_password(g.user._id, password)
+                        if not alphaPattern.search(password):
+                            raise InvalidCharactersException("Invalid characters")
 
-                if location:
-                    g.database.set_trainee_location(g.user._id, location)
-                    if not alphaPattern.search(location):
-                        raise InvalidCharactersException("Invalid characters")
+                    if location:
+                        g.database.set_trainee_location(g.user._id, location)
+                        if not alphaPattern.search(location):
+                            raise InvalidCharactersException("Invalid characters")
 
-                if phone:
-                    g.database.set_trainee_phone(g.user._id, phone)
-                    if not numberPattern.search(phone):
-                        raise InvalidCharactersException("Invalid characters")
+                    if phone:
+                        g.database.set_trainee_phone(g.user._id, phone)
+                        if not numberPattern.search(phone):
+                            raise InvalidCharactersException("Invalid characters")
 
-                if name:
-                    g.database.set_trainee_name(g.user._id, name)
-                    if not stringPattern.search(name):
-                        raise InvalidCharactersException("Invalid characters")
+                    if name:
+                        g.database.set_trainee_name(g.user._id, name)
+                        if not stringPattern.search(name):
+                            raise InvalidCharactersException("Invalid characters")
 
-                return redirect(url_for('usersettings'))
+                    return redirect(url_for('usersettings'))
 
-            elif g.database.get_trainer_by_id(g.user._id) is not None:
-                if username:
-                    g.database.set_trainer_username(g.user._id, username)
-                    if not alphaPattern.search(username):
-                        raise InvalidCharactersException("Invalid characters")
+                elif g.database.get_trainer_by_id(g.user._id) is not None:
+                    if username:
+                        g.database.set_trainer_username(g.user._id, username)
+                        if not alphaPattern.search(username):
+                            raise InvalidCharactersException("Invalid characters")
 
-                if password and re_password and password == re_password:
-                    g.database.set_trainer_password(g.user._id, password)
-                    if not alphaPattern.search(password):
-                        raise InvalidCharactersException("Invalid characters")
+                    if password and re_password and password == re_password:
+                        g.database.set_trainer_password(g.user._id, password)
+                        if not alphaPattern.search(password):
+                            raise InvalidCharactersException("Invalid characters")
 
-                if location:
-                    g.database.set_trainer_location(g.user._id, location)
-                    if not alphaPattern.search(location):
-                        raise InvalidCharactersException("Invalid characters")
+                    if location:
+                        g.database.set_trainer_location(g.user._id, location)
+                        if not alphaPattern.search(location):
+                            raise InvalidCharactersException("Invalid characters")
 
-                if phone:
-                    g.database.set_trainer_phone(g.user._id, phone)
-                    if not numberPattern.search(phone):
-                        raise InvalidCharactersException("Invalid characters")
+                    if phone:
+                        g.database.set_trainer_phone(g.user._id, phone)
+                        if not numberPattern.search(phone):
+                            raise InvalidCharactersException("Invalid characters")
 
-                if name:
-                    g.database.set_trainer_name(g.user._id, name)
-                    if not stringPattern.search(name):
-                        raise InvalidCharactersException("Invalid characters")
+                    if name:
+                        g.database.set_trainer_name(g.user._id, name)
+                        if not stringPattern.search(name):
+                            raise InvalidCharactersException("Invalid characters")
 
-                return redirect(url_for('usersettings'))
+                    return redirect(url_for('usersettings'))
+
+            except InvalidCharactersException as e:
+                return render_template("account/login.html", invalid_characters=True), 400
 
         return render_template("account/usersettings.html")
 
