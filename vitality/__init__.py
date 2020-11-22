@@ -275,7 +275,7 @@ def create_app():
                     return redirect(url_for('usersettings'))
 
             except InvalidCharactersException as e:
-                return render_template("account/login.html", invalid_characters=True), 400
+                return render_template("account/usersettings.html", invalid_characters=True), 400
 
         return render_template("account/usersettings.html")
 
