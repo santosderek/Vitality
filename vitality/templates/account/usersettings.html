@@ -38,6 +38,11 @@
                 <br><br>
             </form>
         </div>
+        {% if invalid_characters%}
+        <div class="col-sm-12">
+        <p style="color: red;">Invalid characters found!</p>
+        </div>
+        {% endif %}
         <div class="row">
             <a class="btn" style="background-color: red; color: white;" href=" {{ url_for("delete") }}">
                 Delete Account

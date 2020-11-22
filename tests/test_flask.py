@@ -84,265 +84,286 @@ def client():
 
 def test_failed_login_username(client):
     # Testing the failed login page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/login', data=dict(
-            username="testTrainee#%#^",
-            password="password"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/login', data=dict(
+        username="testTrainee#%#^",
+        password="password"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
+
 
 
 def test_failed_login_password(client):
     # Testing the failed login page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/login', data=dict(
-            username="testTrainee",
-            password="password#^#$#"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/login', data=dict(
+        username="testTrainee",
+        password="password#^#$#"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
+
 
 
 def test_failed_signup_username(client):
     # Testing the failed signup page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/signup', data=dict(
-            username="testTrainee^#$^%^",
-            password="password",
-            name="test",
-            repassword="password",
-            location="USA",
-            phone="12345678",
-            usertype="trainee"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee^#$^%^",
+        password="password",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+        usertype="trainee"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 
 def test_failed_signup_password(client):
     # Testing the failed signup page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/signup', data=dict(
-            username="testTrainee",
-            password="password^#$^%^",
-            name="test",
-            repassword="password",
-            location="USA",
-            phone="12345678",
-            usertype="trainee"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password^#$^%^",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+        usertype="trainee"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 
 def test_failed_signup_name(client):
     # Testing the failed signup page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/signup', data=dict(
-            username="testTrainee",
-            password="password",
-            name="1245667*#",
-            repassword="password",
-            location="USA",
-            phone="12345678",
-            usertype="trainee"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password",
+        name="1245667*#",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+        usertype="trainee"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 
 def test_failed_signup_repassword(client):
     # Testing the failed signup page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/signup', data=dict(
-            username="testTrainee",
-            password="password",
-            name="test",
-            repassword="password^#$^%",
-            location="USA",
-            phone="12345678",
-            usertype="trainee"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password",
+        name="test",
+        repassword="password^#$^%",
+        location="USA",
+        phone="12345678",
+        usertype="trainee"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 
 def test_failed_signup_location(client):
     # Testing the failed signup page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/signup', data=dict(
-            username="testTrainee",
-            password="password",
-            name="test",
-            repassword="password",
-            location="1234567^&$",
-            phone="12345678",
-            usertype="trainee"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password",
+        name="test",
+        repassword="password",
+        location="1234567^&$",
+        phone="12345678",
+        usertype="trainee"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 
 def test_failed_signup_phone(client):
     # Testing the failed signup page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/signup', data=dict(
-            username="testTrainee",
-            password="password",
-            name="test",
-            repassword="password",
-            location="USA",
-            phone="phone",
-            usertype="trainee"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="phone",
+        usertype="trainee"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 
 def test_failed_signup_usertype(client):
     # Testing the failed signup page
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.post('/signup', data=dict(
-            username="testTrainee",
-            password="password",
-            name="test",
-            repassword="password",
-            location="USA",
-            phone="12345678",
-            usertype="117"
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+        usertype="117"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 
 def test_failed_usersettings_username(client):
     # Testing the failed user settings page
     # Get without a user
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.get('/usersettings', follow_redirects=True)
-        assert returned_value.status_code == 200
-        assert b'login' in returned_value.data
 
-        # Login as trainee
-        login_as_testTrainee(client)
+    returned_value = client.get('/usersettings', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
 
-        # Check profile page.
-        returned_value = client.post('/usersettings', data=dict(
-            username="testTrainee^#$^%^",
-            password="password",
-            name="test",
-            repassword="password",
-            location="USA",
-            phone="12345678",
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    # Login as trainee
+    login_as_testTrainee(client)
+
+    # Check profile page.
+    returned_value = client.post('/usersettings', data=dict(
+        username="testTrainee^#$^%^",
+        password="password",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+
 
 
 def test_failed_usersettings_password(client):
     # Testing the failed user settings page
     # Get without a user
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.get('/usersettings', follow_redirects=True)
-        assert returned_value.status_code == 200
-        assert b'login' in returned_value.data
 
-        # Login as trainee
-        login_as_testTrainee(client)
+    returned_value = client.get('/usersettings', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
 
-        # Check profile page.
-        returned_value = client.post('/usersettings', data=dict(
-            username="testTrainee",
-            password="password^#$^%^",
-            name="test",
-            repassword="password",
-            location="USA",
-            phone="12345678",
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    # Login as trainee
+    login_as_testTrainee(client)
+
+    # Check profile page.
+    returned_value = client.post('/usersettings', data=dict(
+        username="testTrainee",
+        password="password^#$^%^",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
 
 
 def test_failed_usersettings_repassword(client):
     # Testing the failed user settings page
     # Get without a user
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.get('/usersettings', follow_redirects=True)
-        assert returned_value.status_code == 200
-        assert b'login' in returned_value.data
 
-        # Login as trainee
-        login_as_testTrainee(client)
+    returned_value = client.get('/usersettings', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
 
-        # Check profile page.
-        returned_value = client.post('/usersettings', data=dict(
-            username="testTrainee",
-            password="password",
-            name="test",
-            repassword="password^#$^%^",
-            location="USA",
-            phone="12345678",
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    # Login as trainee
+    login_as_testTrainee(client)
+
+    # Check profile page.
+    returned_value = client.post('/usersettings', data=dict(
+        username="testTrainee",
+        password="password",
+        name="test",
+        repassword="password^#$^%^",
+        location="USA",
+        phone="12345678",
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+
 
 
 def test_failed_usersettings_name(client):
     # Testing the failed user settings page
     # Get without a user
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.get('/usersettings', follow_redirects=True)
-        assert returned_value.status_code == 200
-        assert b'login' in returned_value.data
 
-        # Login as trainee
-        login_as_testTrainee(client)
+    returned_value = client.get('/usersettings', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
 
-        # Check profile page.
-        returned_value = client.post('/usersettings', data=dict(
-            username="testTrainee",
-            password="password",
-            name="117",
-            repassword="password",
-            location="USA",
-            phone="12345678",
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    # Login as trainee
+    login_as_testTrainee(client)
+
+    # Check profile page.
+    returned_value = client.post('/usersettings', data=dict(
+        username="testTrainee",
+        password="password",
+        name="117",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
 
 
 def test_failed_usersettings_location(client):
     # Testing the failed user settings page
     # Get without a user
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.get('/usersettings', follow_redirects=True)
-        assert returned_value.status_code == 200
-        assert b'login' in returned_value.data
 
-        # Login as trainee
-        login_as_testTrainee(client)
+    returned_value = client.get('/usersettings', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
 
-        # Check profile page.
-        returned_value = client.post('/usersettings', data=dict(
-            username="testTrainee",
-            password="password",
-            name="test",
-            repassword="password",
-            location="&^$^$123",
-            phone="12345678",
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    # Login as trainee
+    login_as_testTrainee(client)
+
+    # Check profile page.
+    returned_value = client.post('/usersettings', data=dict(
+        username="testTrainee",
+        password="password",
+        name="test",
+        repassword="password",
+        location="&^$^$123",
+        phone="12345678",
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+
 
 
 def test_failed_usersettings_phone(client):
     # Testing the failed user settings page
     # Get without a user
-    with pytest.raises(InvalidCharactersException):
-        returned_value = client.get('/usersettings', follow_redirects=True)
-        assert returned_value.status_code == 200
-        assert b'login' in returned_value.data
 
-        # Login as trainee
-        login_as_testTrainee(client)
+    returned_value = client.get('/usersettings', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
 
-        # Check profile page.
-        returned_value = client.post('/usersettings', data=dict(
-            username="testTrainee",
-            password="password",
-            name="test",
-            repassword="password",
-            location="USA",
-            phone="phone",
-        ), follow_redirects=True)
-        assert returned_value.status_code == 200
+    # Login as trainee
+    login_as_testTrainee(client)
+
+    # Check profile page.
+    returned_value = client.post('/usersettings', data=dict(
+        username="testTrainee",
+        password="password",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="phone",
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+
 
 
 def test_home(client):
