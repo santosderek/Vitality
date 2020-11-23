@@ -141,6 +141,19 @@ class Database:
         """Deletes a trainee by trainee id."""
         self.mongo.db.trainee.delete_one({"_id": ObjectId(id)})
 
+        # Remove trainee from trainer's list
+        self.mongo.db.trainer.update_many(
+            {},
+            {
+                "$pull": {
+                    "trainees": {
+                        "$in": [ObjectId(id)]
+                    }
+                }
+            }
+
+        )
+
     """ Trainer Functions """
 
     def trainer_dict_to_class(self, trainer_dict: str):
@@ -327,6 +340,18 @@ class Database:
     def remove_trainer(self, id: str):
         """Deletes a trainer by trainer id."""
         self.mongo.db.trainer.delete_one({"_id": ObjectId(id)})
+
+        # Remove trainer from trainee's list
+        self.mongo.db.trainee.update_many(
+            {},
+            {
+                "$pull": {
+                    "trainers": {
+                        "$in": [ObjectId(id)]
+                    }
+                }
+            }
+        )
 
     """Workout Functions"""
 
