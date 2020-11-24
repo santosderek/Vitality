@@ -19,12 +19,6 @@ Primarily written in Python 3.7.x, while using Flask as our webserver and PyMong
 
 Please look at the `requirements.txt` file found in the root of our repo for the complete list of requirements.
 
-### Software Requirements:
-
-- Python 3.7+
-
-- MongoDBCompass
-
 ### How to Launch:
 
 - Offline:
