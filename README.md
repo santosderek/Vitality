@@ -19,6 +19,20 @@ Primarily written in Python 3.7.x, while using Flask as our webserver and PyMong
 
 Please look at the `requirements.txt` file found in the root of our repo for the complete list of requirements.
 
+### How to Launch:
+
+- Offline:
+
+    1. Double click start_flask.bat
+
+    2. Launch MongoDBCompass w/ local server
+
+    3. Go to browser and type http://localhost:8080/
+    
+- Online:
+    
+    1. Go to http://viality.santosderek.com/
+
 --- 
 
 **Proof of concept. Everything is subject to change.**
