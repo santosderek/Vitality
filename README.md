@@ -39,9 +39,9 @@ Please look at the `requirements.txt` file found in the root of our repo for the
 
     4. Make sure Mongod service is running locally and reachable.
 
-    5. Double click start_flask.bat (windows) or start_flask.sh (linux/mac)
-        1. Alternatively type ./start_flask.sh (linux/mac)
-        2. Or type .\start_flask.bat (windows)
+    5. Double click `start_flask.bat` (windows) or `start_flask.sh` (linux/mac)
+        1. Alternatively type `./start_flask.sh` (linux/mac)
+        2. Or type `.\start_flask.bat` (windows)
 
     6. Go to browser and type http://localhost:8080/
    
