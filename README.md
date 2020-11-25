@@ -21,17 +21,25 @@ Please look at the `requirements.txt` file found in the root of our repo for the
 
 ### How to Launch:
 
-- Offline:
-
-    1. Double click start_flask.bat
-
-    2. Launch MongoDBCompass w/ local server
-
-    3. Go to browser and type http://localhost:8080/
-    
 - Online:
     
-    1. Go to http://viality.santosderek.com/
+    1. Go to https://vitality.santosderek.com/
+
+- Offline:
+
+    1. Install Python 3.7.x or greater. https://www.python.org/downloads/
+      1.1: Make sure to install Pip (a checkbox when installing) with python.
+      
+    2. Install MongoDB: https://www.mongodb.com/try/download/community
+      
+    3. Open a terminal and within the root folder of the vitality repo, next to `requirements.txt` run `pip3 install -r requirements.txt`.
+
+    4. Make sure Mongod service is running locally and reachable.
+
+    5. Double click start_flask.bat
+
+    6. Go to browser and type http://localhost:8080/
+   
 
 --- 
 
