@@ -33,6 +33,7 @@ Please look at the `requirements.txt` file found in the root of our repo for the
     2. Install MongoDB: https://www.mongodb.com/try/download/community
       
     3. Open a terminal and within the root folder of the vitality repo, next to `requirements.txt` run `pip3 install -r requirements.txt`.
+        3.1 `sudo` might be needed at the beginning of the command if you need root privileges. 
 
     4. Make sure Mongod service is running locally and reachable.
 
