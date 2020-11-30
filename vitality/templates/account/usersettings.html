@@ -1,65 +1,76 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<header>
-    <h1>User Settings</h1>
-    <button onclick="makeChanges()">Make Changes</button>
-    <button onclick="cancel()">Cancel</button>
-</header>
-
-<main>
-    <div class="container">
-        <form action="/usersettings" method="POST">
-            <label for="username"><b>Username</b></label>
-            <input class="fields" type="text" placeholder="{{g.user.username}}" name="username" disabled>
-            <br />
-
-            <label for="name"><b>Name</b></label>
-            <input class="fields" type="text" placeholder="{{g.user.name}}" name="name" disabled>
-            <br />
-
-
-            <label for="password"><b>Password</b></label>
-            <input class="fields" type="password" placeholder="" name="password" disabled>
-            <br />
-
-            <label for="repassword"><b>Re-enter Password:</b></label>
-            <input class="fields" type="password" placeholder="" name="repassword" disabled>
-            <br />
-
-            <label for="location"><b>Location</b></label>
-            <input class="fields" type="text" placeholder="{{g.user.location}}" name="location" disabled>
-            <br />
-
-            <label for="phone"><b>Phone</b></label><br>
-            <input class="fields" type="number" placeholder="{{g.user.phone}}" name="phone" disabled><br>
-            <br />
-
-            <input class="fields" type="submit" placeholder="Submit Changes" value="Submit Changes" disabled>
-            <br><br>
-        </form>
-        <a class="btn" style="background-color: red; color: white;" href =" {{ url_for("delete") }}">Delete Account</a>
+<div class="row">
+    <div class="col-sm-12 text-center">
+        <h1>User Settings</h1>
+        <button onclick="makeChanges()">Make Changes</button>
+        <button onclick="cancel()">Cancel</button>
     </div>
-    <script>
-        function makeChanges() {
-            var arr = document.getElementsByClassName("fields");
-            for (var i = 0; i < arr.length; i++) {
-                arr[i].disabled = false;
-                arr[i].value = arr[i].placeholder;
-            }
+    <div class="col">
+        <div class="row">
+            <form action="/usersettings" method="POST">
+                <label for="username"><b>Username</b></label>
+                <input class="fields" type="text" placeholder="{{g.user.username}}" name="username" disabled>
+                <br />
 
+                <label for="name"><b>Name</b></label>
+                <input class="fields" type="text" placeholder="{{g.user.name}}" name="name" disabled>
+                <br />
+
+                <label for="password"><b>Password</b></label>
+                <input class="fields" type="password" placeholder="" name="password" disabled>
+                <br />
+
+                <label for="repassword"><b>Re-enter Password:</b></label>
+                <input class="fields" type="password" placeholder="" name="repassword" disabled>
+                <br />
+
+                <label for="location"><b>Location</b></label>
+                <input class="fields" type="text" placeholder="{{g.user.location}}" name="location" disabled>
+                <br />
+
+                <label for="phone"><b>Phone</b></label><br>
+                <input class="fields" type="number" placeholder="{{g.user.phone}}" name="phone" disabled><br>
+                <br />
+
+                <input class="fields" type="submit" placeholder="Submit Changes" value="Submit Changes" disabled>
+                <br><br>
+            </form>
+        </div>
+        {% if invalid_characters%}
+        <div class="col-sm-12">
+        <p style="color: red;">Invalid characters found!</p>
+        </div>
+        {% endif %}
+        <div class="row">
+            <a class="btn" style="background-color: red; color: white;" href=" {{ url_for("delete") }}">
+                Delete Account
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function makeChanges() {
+        var arr = document.getElementsByClassName("fields");
+        for (var i = 0; i < arr.length; i++) {
+            arr[i].disabled = false;
+            arr[i].value = arr[i].placeholder;
         }
 
-        function cancel() {
-            var arr = document.getElementsByClassName("fields");
-            for (var i = 0; i < arr.length; i++) {
-                arr[i].disabled = true;
-                if (arr[i].type != "submit") {
-                    arr[i].value = "";
-                }
+    }
+
+    function cancel() {
+        var arr = document.getElementsByClassName("fields");
+        for (var i = 0; i < arr.length; i++) {
+            arr[i].disabled = true;
+            if (arr[i].type != "submit") {
+                arr[i].value = "";
             }
         }
+    }
 
-    </script>
-</main>
+</script>
 {% endblock %}

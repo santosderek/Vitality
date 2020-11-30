@@ -13,36 +13,35 @@
     <div class="col-md-3 col-lg-10 darkbg">
         <div class="col pt-4 text-center">
 
-            <form action="{{ url_for('trainer_search') }}" method="POST">
+            <form action="{{ url_for('trainee_search') }}" method="POST">
                 <div class="col-sm-12">
-                    <input class="col-sm-3 text-center" name="trainer_name" style="height: 30px;"
-                        placeholder="Trainer Name" />
+                    <input class="col-sm-3 text-center" name="trainee_name" style="height: 30px;"
+                        placeholder="Trainee Name" />
                     <button class="col-sm-2" style="width: 19%; height: 30px;" type="submit">
                         Search
                     </button>
                 </div>
 
-                {% for trainer in trainers%}
-
+                {% for trainee in trainees%}
                 <div class="col-sm-12">
                     <div class="card mb-3 mt-3 mx-auto" style="max-width: 540px;">
                         <div class="row no-gutters">
                             <div class="col-md-4">
                                 <img class="card-img" src="{{ url_for("static", filename="images/profile.svg") }}"
-                                    alt="Trainer {{ trainer.username }}" width="100" heigh="100">
+                                    alt="Trainee {{ trainee.username }}" width="100" heigh="100">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
-                                    <h5 class="card-title">{{ trainer.username|e }}</h5>
+                                    <h5 class="card-title">{{ trainee.username|e }}</h5>
                                     <a class="btn mb-1 col-sm-12">Assigned Workouts</a>
                                     <a class="btn mb-1 col-sm-12"
-                                        href="{{ url_for('profile', username=trainer.username) }}">Info</a>
+                                        href="{{ url_for('profile', username=trainee.username) }}">Info</a>
                                     
-                                    {% if trainer._id in trainer_id_list %}
+                                    {% if trainee._id in trainee_id_list %}
                                     <a class="btn mb-1 col-sm-12" id="add" style="pointer-events: none; background-color: grey;">Already Added!</a>
                                     {% else %}
                                     <a class="btn mb-1 col-sm-12" id="add"
-                                        onclick="add_trainer('{{ trainer._id }}')">Add</a>
+                                        onclick="add_trainee('{{ trainee._id }}')">Add</a>
                                     {% endif %}
 
                                 </div>
@@ -50,16 +49,15 @@
                         </div>
                     </div>
                 </div>
-
                 {% endfor%}
             </form>
         </div>
     </div>
 </div>
 <script>
-    function add_trainer (trainer_id) {
-        $.post("{{ url_for("add_trainer") }}", {"trainer_id": trainer_id}, function (data, status) {
-            $("#add").text("Trainer Added!");
+    function add_trainee (trainee_id) {
+        $.post("{{ url_for("add_trainee") }}", {"trainee_id": trainee_id}, function (data, status) {
+            $("#add").text("Trainee Added!");
             $("#add").css("background-color", "grey");
             $('#add').prop('disabled', true);
         })
