@@ -1156,7 +1156,7 @@ def test_delete_user(client):
     # Not logged in 
     returned_value = client.get('/delete', follow_redirects=True)
     assert returned_value.status_code == 200
-	assert 'login' in returned_value.data
+    assert 'login' in returned_value.data
 
     # login as testTrainee 
     login_as_testTrainee(client)
