@@ -293,12 +293,14 @@ def create_app():
                 app.logger.info('Deleting user ' + g.user.username)
                 g.database.remove_trainee(session['user_id'])
                 session.pop('user_id')
+                g.user = None
                 return redirect(url_for('home'))
 
             elif g.database.get_trainer_by_id(g.user._id) is not None:
                 app.logger.info('Deleting user ' + g.user.username)
                 g.database.remove_trainer(session['user_id'])
                 session.pop('user_id')
+                g.user = None
                 return redirect(url_for('home'))
 
             abort(500)
