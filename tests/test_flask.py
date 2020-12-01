@@ -1157,7 +1157,7 @@ def test_delete_user(client):
     returned_value = client.get('/delete', follow_redirects=True)
     assert returned_value.status_code == 200
     assert 'login' in returned_value.data
-    
+
     # login as testTrainee 
     login_as_testTrainee(client)
 
@@ -1166,7 +1166,7 @@ def test_delete_user(client):
     assert returned_value.status_code == 200
     assert g.user is None
     assert 'user_id' not in session
-	assert g.database.get_trainee_by_username("testTrainee") is None
+    assert g.database.get_trainee_by_username("testTrainee") is None
 
     # login as testTrainer
     login_as_testTrainer(client)
@@ -1176,7 +1176,7 @@ def test_delete_user(client):
     assert returned_value.status_code == 200
     assert g.user is None
     assert 'user_id' not in session
-	assert g.database.get_trainer_by_username("testTrainer") is None
+    assert g.database.get_trainer_by_username("testTrainer") is None
 
 
 
