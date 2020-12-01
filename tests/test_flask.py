@@ -1172,7 +1172,7 @@ def test_delete_user(client):
     login_as_testTrainer(client)
 
     # delete testTrainer
-    returned_value = client/get('/delete', follow_redirects=True)
+    returned_value = client.get('/delete', follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
     assert 'user_id' not in session
