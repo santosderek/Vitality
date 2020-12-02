@@ -1,3 +1,4 @@
+from .invitation import Invitation
 from .trainee import Trainee
 from .trainer import Trainer
 from .workout import Workout
@@ -460,10 +461,15 @@ class Database:
 
             returns the object id of the invitation.
         """
-        return self.mongo.db.invitation.insert_one({
-            'sender': sender,
-            'recipient': recipient
+        if self.get_trainee_by_id(sender) is None and self.get_trainer_by_id(sender)is None:
+            raise UserNotFoundError('Sender could not be found')
+        if self.get_trainee_by_id(recipient)is None and self.get_trainer_by_id(recipient)is None:
+            raise UserNotFoundError('Recipient could not be found')
+        invitation = self.mongo.db.invitation.insert_one({
+            'sender': ObjectId(sender),
+            'recipient': ObjectId(recipient)
         })
+        return str(invitation.inserted_id)
 
     def delete_invitation(self, invitation_id: str):
         """
@@ -488,7 +494,8 @@ class Database:
 
         if invitation is None:
             raise InvitationNotFound('Invitation not found')
-        return invitation
+        else: 
+            return Invitation(invitation['_id'], invitation['sender'], invitation['recipient'])
 
     def search_all_user_invitations(self, user_id: str):
         """
