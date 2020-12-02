@@ -24,7 +24,7 @@
                 <a class="nav-link" href="{{ url_for("profile", username=g.user.username)}}"><b>Profile</b></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href=""><b>Workouts</b></a>
+                <a class="nav-link" href="{{ url_for("workout_overview") }}"><b>Workouts</b></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for("usersettings", username=g.user.username)}}"><b>Settings</b></a>
