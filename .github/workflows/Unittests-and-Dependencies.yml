@@ -55,4 +55,4 @@ jobs:
       -
         name: Building the docker container
         run: |
-          docker build . 
+          docker build .
