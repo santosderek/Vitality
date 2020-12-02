@@ -16,20 +16,20 @@
 </head>
 
 <body>
-    <div class="container" id="whileLoading">
+    <div id="loading">
         <div class="d-flex justify-content-center align-items-center min-vh-100">
             <div class="spinner-border text-success" style="width: 100px; height: 100px;"></div>
         </div>
     </div>
-    <div class="container" style="display: none;" id="loading">
+    <div style="display: none;" id="content">
         {% include "navbar.html" ignore missing %}
 
         {% block content %}{% endblock %}
     </div>
     <script>
         window.onload = function () {
-            $("#whileLoading").hide();
-            $("#loading").show();
+            $("#loading").hide();
+            $("#content").show();
         }
     </script>
 </body>
