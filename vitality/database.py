@@ -450,6 +450,52 @@ class Database:
             "about": workout.about,
             "exp": workout.exp})
 
+    """Invitation"""
+
+    def create_invitation(self, sender: str, recipient: str): 
+        """
+        Create an invitation based on a sender and recipient.
+            sender: str - The id given to a user document by mongodb.
+            recipient: str - The id given to a user document by mongodb.
+
+            returns the object id of the invitation.
+        """
+        return self.mongo.db.invitation.insert_one({
+            'sender': sender,
+            'recipient': recipient
+        });
+
+    def delete_invitation(self, invitation_id: str):
+        """
+        Delete an invitation from the database
+            invitation_id: str - The id given to the invitation document by mongodb.
+        
+        """
+        self.mongo.db.invitation.delete_one({
+            '_id': invitation_id
+        });
+
+    def search_invitation(self, invitation_id: str): 
+        """
+        Search for an invitation based on a user_id.
+            invitation_id: str - The id given to the invitation document by mongodb.
+
+            returns the document found. 
+        """
+        invitation = self.mongo.db.invitation.find_one({
+            '_id': invitation_id
+        }); 
+
+        if invitation is None: 
+            raise InvitationNotFound('Invitation not found')
+        return invitation
+
+    def accept_invitation(self, invitation_id: str):
+        """
+        Removes the invitation and adds the trainee to trainer list and vice versa.
+        """
+        pass
+
 
 class UsernameTakenError(ValueError):
     """If a username was taken within the database class"""
@@ -468,4 +514,9 @@ class WorkoutCreatorIdNotFoundError(AttributeError):
 
 class InvalidCharactersException(Exception):
     """Error for invalid user input"""
+    pass
+
+
+class InvitationNotFound(Exception): 
+    """Error for when an invitation is not found"""
     pass
