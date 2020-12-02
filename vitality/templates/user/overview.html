@@ -71,7 +71,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12 workouts">
+            <div class="col-sm-12">
                 <div class="col-sm-12 text-center">
                     <a class="button_title" href="{{ url_for("workout_overview") }}" role="button">Workouts</a>
                 </div>
@@ -82,11 +82,11 @@
                 {% else %}
                 {% for workout in workouts %}
                 {% if workout %}
-                <div class="col-sm-12 col-md workout"
+                <div class="col-sm-12 col-md text-center"
                     style="align-items: center; text-align: center; padding: 10px 20px;">
                     <a href="">
-                        <img src="{{ url_for("static", filename="images/profile.svg") }}"
-                            alt="workout {{ workout.name }}" width="100" heigh="100">
+                        <img style="width: 3em;" src="{{ url_for("static", filename="images/dumbbell.svg") }}"
+                            alt="workout {{ workout.name }}">
                         <h3 class="workout_name">{{ workout.name }}</h3>
                     </a>
                 </div>

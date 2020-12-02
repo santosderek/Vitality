@@ -12,6 +12,10 @@
       <div class="col-sm-12">
         <p style="color: red;">Could not log you in!</p>
       </div>
+      {% elif invalid_characters%}
+      <div class="col-sm-12">
+      <p style="color: red;">Invalid characters found!</p>
+      </div>
       {% endif %}
       <div class="col-sm-12 mb-2">
         <input type="text" placeholder="Enter Username" name="username" required>

@@ -19,6 +19,33 @@ Primarily written in Python 3.7.x, while using Flask as our webserver and PyMong
 
 Please look at the `requirements.txt` file found in the root of our repo for the complete list of requirements.
 
+### How to Launch:
+
+- Online:
+    
+    1. Go to https://vitality.santosderek.com/
+
+- Offline:
+
+    1. Install Python 3.7.x or greater. https://www.python.org/downloads/
+    
+        1. Make sure to install Pip (a checkbox when installing) with python.
+      
+    2. Install MongoDB: https://www.mongodb.com/try/download/community
+      
+    3. Open a terminal and within the root folder of the vitality repo, next to `requirements.txt` run `pip3 install -r requirements.txt`.
+    
+        1. `sudo` might be needed at the beginning of the command if you need root privileges. 
+
+    4. Make sure Mongod service is running locally and reachable.
+
+    5. Double click `start_flask.bat` (windows) or `start_flask.sh` (linux/mac)
+        1. Alternatively type `./start_flask.sh` (linux/mac)
+        2. Or type `.\start_flask.bat` (windows)
+
+    6. Go to browser and type http://localhost:8080/
+   
+
 --- 
 
 **Proof of concept. Everything is subject to change.**
