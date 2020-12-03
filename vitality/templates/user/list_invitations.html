@@ -54,7 +54,7 @@
                 'invitation_id': invitation_id
             })
             .done(() => {
-                $("#button_{{invitation_id}}").text("Trainee Added!");
+                $("#button_{{invitation_id}}").text("Invitation Accepted!");
                 $("#button_{{invitation_id}}").css("background-color", "grey");
                 $("#button_{{invitation_id}}").prop('disabled', true);
             })
@@ -62,7 +62,7 @@
                 $("#button_{{invitation_id}}").text("Could not accept the invitation!");
                 window.setTimeout(function () {
                     $("#button_{{invitation_id}}").css("background-color", "grey");
-                    $("#button_{{invitation_id}}").text("Add");
+                    $("#button_{{invitation_id}}").text("Accept");
                     $("#button_{{invitation_id}}").prop('disabled', false);
                 }, 2 * 1000);
             });

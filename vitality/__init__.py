@@ -292,6 +292,40 @@ def create_app():
 
         return render_template("account/usersettings.html")
 
+    @app.route('/remove_added_user', methods=["POST"])
+    def remove_added_user():
+        """Remove an added user from both the trainees and trainers list of each respective user."""
+
+        if not g.user:
+            return redirect(url_for('login'))
+
+        try:
+            confirmation = escape(request.form['confirmation'])
+            user_id = escape(request.form['user_id'])
+
+            if confirmation != 'true':
+                app.logger.debug('Confirmation was not true')
+                abort(500)
+
+            if not user_id:
+                app.logger.debug('User id was not given.')
+                abort(500)
+
+            if type(g.user) is Trainer:
+                g.database.trainer_remove_trainee(g.user._id, user_id)
+                g.database.trainee_remove_trainer(user_id, g.user._id)
+
+            elif type(g.user) is Trainee:
+                g.database.trainee_remove_trainer(g.user._id, user_id)
+                g.database.trainer_remove_trainee(user_id, g.user._id)
+
+            return '', 204
+
+        except UserNotFoundError as error:
+            message = 'Could not find a user id to delete within the added user list.'
+            app.logger.debug(message)
+            abort(500)
+
     @app.route('/delete', methods=["GET", "POST"])
     def delete():
         """Delete account page for logged in user"""
@@ -497,45 +531,6 @@ def create_app():
 
         return render_template("trainer/trainee_search.html")
 
-    @app.route('/invitations', methods=["GET"])
-    def invitations():
-        """Show all sent and recieved invitations from other users."""
-        if not g.user:
-            app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'))
-
-        sent_invitations, recieved_invitaitons = g.database.search_all_user_invitations(
-            g.user._id)
-
-        return render_template('user/list_invitations.html',
-                               all_sent=sent_invitations,
-                               all_recieved=recieved_invitaitons)
-
-    @app.route('/accept_invitation', methods=['POST'])
-    def accept_invitation():
-        if not g.user:
-            app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'))
-
-        try:
-            confirmation = escape(request.form['confirmation'])
-            invitation_id = escape(request.form['invitation_id'])
-
-            if confirmation != 'true':
-                abort(500)
-
-            g.database.accept_invitation(invitation_id, g.user._id)
-            return '', 204
-
-        except IncorrectRecipientID as error:
-            app.logger.debug("There is no invitation for given recipient id.")
-            abort(500)
-
-
-        except InvitationNotFound as error:
-            app.logger.debug("User could not find invitation!")
-            abort(500)
-
     @app.route('/add_trainer', methods=["POST"])
     def add_trainer():
         """This route allows trainees to add trainers to their added list"""
@@ -632,6 +627,45 @@ def create_app():
             return redirect(url_for('login'))
 
         return render_template("workout/workoutlist.html")
+
+    """Invitation System"""
+    @app.route('/invitations', methods=["GET"])
+    def invitations():
+        """Show all sent and recieved invitations from other users."""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        sent_invitations, recieved_invitaitons = g.database.search_all_user_invitations(
+            g.user._id)
+
+        return render_template('user/list_invitations.html',
+                               all_sent=sent_invitations,
+                               all_recieved=recieved_invitaitons)
+
+    @app.route('/accept_invitation', methods=['POST'])
+    def accept_invitation():
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        try:
+            confirmation = escape(request.form['confirmation'])
+            invitation_id = escape(request.form['invitation_id'])
+
+            if confirmation != 'true':
+                abort(500)
+
+            g.database.accept_invitation(invitation_id, g.user._id)
+            return '', 204
+
+        except IncorrectRecipientID as error:
+            app.logger.debug("There is no invitation for given recipient id.")
+            abort(500)
+
+        except InvitationNotFound as error:
+            app.logger.debug("User could not find invitation!")
+            abort(500)
 
     @app.errorhandler(400)
     def page_bad_request(e):

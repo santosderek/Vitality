@@ -155,6 +155,27 @@ class Database:
 
         )
 
+    def trainee_remove_trainer(self, trainee_id: str, trainer_id: str):
+        """Remove trainer object id from trainees's trainer list"""
+        if self.get_trainee_by_id(trainee_id) is None:
+            raise UserNotFoundError("Trainee ID does not exist.")
+
+        if self.get_trainer_by_id(trainer_id) is None:
+            raise UserNotFoundError("Trainer ID does not exist.")
+
+        self.mongo.db.trainee.update_one(
+            {
+                '_id': ObjectId(trainee_id)
+            },
+            {
+                "$pull": {
+                    "trainers": {
+                        "$in": [ObjectId(trainer_id)]
+                    }
+                }
+            }
+        )
+
     """ Trainer Functions """
 
     def trainer_dict_to_class(self, trainer_dict: str):
@@ -308,6 +329,27 @@ class Database:
                     "trainees": ObjectId(trainee_id)
                 }
             })
+
+    def trainer_remove_trainee(self, trainer_id: str, trainee_id: str):
+        """Remove trainee object id from trainers's trainee list"""
+        if self.get_trainee_by_id(trainee_id) is None:
+            raise UserNotFoundError("Trainee ID does not exist.")
+
+        if self.get_trainer_by_id(trainer_id) is None:
+            raise UserNotFoundError("Trainer ID does not exist.")
+
+        self.mongo.db.trainer.update_one(
+            {
+                '_id': ObjectId(trainer_id)
+            },
+            {
+                "$pull": {
+                    "trainees": {
+                        "$in": [ObjectId(trainee_id)]
+                    }
+                }
+            }
+        )
 
     def trainer_peak_trainees(self, trainer_id: str):
         """Returns a list of all trainees that have added this trainer"""
