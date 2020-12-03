@@ -3,6 +3,7 @@ from copy import deepcopy
 from bson.objectid import ObjectId
 from flask import Flask
 from flask_pymongo import PyMongo
+from pymongo.common import clean_node
 from vitality import create_app
 from vitality.database import (
     Database, InvitationNotFound, UserNotFoundError,
@@ -871,22 +872,25 @@ class TestDatabase(unittest.TestCase):
 
     def test_create_invitation(self):
         """Testing invitation creation"""
+
+        def clean_up(user_one, user_two):
+            # Clean up
+            self.database.mongo.db.invitation.delete_many({
+                'sender': user_one._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': user_one._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'sender': user_two._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': user_two._id
+            })
         trainee = self.database.get_trainee_by_username('testTrainee')
         trainer = self.database.get_trainer_by_username('testTrainer')
 
-        # Clean up
-        self.database.mongo.db.invitation.delete_many({
-            'sender': trainee._id
-        })
-        self.database.mongo.db.invitation.delete_many({
-            'recipient': trainee._id
-        })
-        self.database.mongo.db.invitation.delete_many({
-            'sender': trainer._id
-        })
-        self.database.mongo.db.invitation.delete_many({
-            'recipient': trainer._id
-        })
+        clean_up(trainee, trainer)
 
         invitation_id = self.database.create_invitation(trainee._id,
                                                         trainer._id)
@@ -910,23 +914,11 @@ class TestDatabase(unittest.TestCase):
             self.database.create_invitation('000000000000000000000000',
                                             '000000000000000000000000')
 
-        # Clean up
-        self.database.mongo.db.invitation.delete_many({
-            'sender': trainee._id
-        })
-        self.database.mongo.db.invitation.delete_many({
-            'recipient': trainee._id
-        })
-        self.database.mongo.db.invitation.delete_many({
-            'sender': trainer._id
-        })
-        self.database.mongo.db.invitation.delete_many({
-            'recipient': trainer._id
-        })
+        clean_up(trainee, trainer)
 
-    def test_delete_invitation(self): 
+    def test_delete_invitation(self):
         """Testing invitation deletion"""
-        def clean_up(user_one, user_two): 
+        def clean_up(user_one, user_two):
             # Clean up
             self.database.mongo.db.invitation.delete_many({
                 'sender': user_one._id
@@ -939,7 +931,7 @@ class TestDatabase(unittest.TestCase):
             })
             self.database.mongo.db.invitation.delete_many({
                 'recipient': user_two._id
-            }) 
+            })
 
         trainee = self.database.get_trainee_by_username('testTrainee')
         trainer = self.database.get_trainer_by_username('testTrainer')
@@ -963,4 +955,77 @@ class TestDatabase(unittest.TestCase):
 
         clean_up(trainee, trainer)
 
+    def test_search_invitation(self):
+        """Testing invitation search"""
 
+        def clean_up(user_one, user_two):
+            # Clean up
+            self.database.mongo.db.invitation.delete_many({
+                'sender': user_one._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': user_one._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'sender': user_two._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': user_two._id
+            })
+
+        trainee = self.database.get_trainee_by_username('testTrainee')
+        trainer = self.database.get_trainer_by_username('testTrainer')
+        clean_up(trainee, trainer)
+
+        invitation = self.database.mongo.db.invitation.insert_one({
+            'sender': ObjectId(trainee._id),
+            'recipient': ObjectId(trainer._id)
+        })
+        searched_invitation = self.database.search_invitation(
+            invitation.inserted_id)
+
+        assert searched_invitation._id == str(invitation.inserted_id)
+        assert searched_invitation.sender == str(trainee._id)
+        assert searched_invitation.recipient == str(trainer._id)
+
+        clean_up(trainee, trainer)
+
+    def test_search_all_user_invitations(self):
+        """Testing the search feature to get all sent and recieved invitations by a user."""
+
+        def clean_up(user_one, user_two):
+            # Clean up
+            self.database.mongo.db.invitation.delete_many({
+                'sender': user_one._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': user_one._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'sender': user_two._id
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': user_two._id
+            })
+
+            trainee = self.database.get_trainee_by_username('testTrainee')
+            trainer = self.database.get_trainer_by_username('testTrainer')
+
+            clean_up(trainee, trainer)
+
+            invitation = self.database.mongo.db.invitation.insert_one({
+                'sender': ObjectId(trainee._id),
+                'recipient': ObjectId(trainer._id)
+            })
+
+            all_sent, all_recieved = self.database.search_all_user_invitations(
+                trainee._id)
+            assert all_sent > 0
+            assert all_recieved == 0
+
+            all_sent, all_recieved = self.database.search_all_user_invitations(
+                trainer._id)
+            assert all_recieved > 0
+            assert all_sent == 0
+
+            clean_up(trainee, trainer)

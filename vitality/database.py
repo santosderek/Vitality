@@ -495,7 +495,7 @@ class Database:
         if invitation is None:
             raise InvitationNotFound('Invitation not found')
         else: 
-            return Invitation(invitation['_id'], invitation['sender'], invitation['recipient'])
+            return Invitation(str(invitation['_id']), str(invitation['sender']), str(invitation['recipient']))
 
     def search_all_user_invitations(self, user_id: str):
         """
