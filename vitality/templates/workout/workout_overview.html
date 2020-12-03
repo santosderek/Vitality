@@ -7,32 +7,54 @@
 {% endblock %}
 
 {% block content %}
-
-
-
-
-<div class="row">
-    <div class="col">
-
-        <img src="{{ url_for("static", filename="images/lunge.jpg") }}" alt="New Workout Routine"><br><br>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br>
-            Nulla vestibulum mauris ut diam vulputate, nec scelerisque <br>
-            magna maximus. Suspendisse sit amet ex vestibulum, semper nunc quis, <br>
-            consequat arcu. Pellentesque feugiat molestie enim a aliquam. </p>
-        <button onclick="window.location.href='newroutine.html'">New</button><br><br>
-        <img src="{{ url_for("static", filename="images/pushup.jpg") }}" alt="Search"><br><br>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br>
-            Nulla vestibulum mauris ut diam vulputate, nec scelerisque <br>
-            magna maximus. Suspendisse sit amet ex vestibulum, semper nunc quis, <br>
-            consequat arcu. Pellentesque feugiat molestie enim a aliquam. </p>
-        <button onclick="window.location.href='search.html'">Search</button><br><br>
-        <img src="{{ url_for("static", filename="images/equipment.jpg") }}" alt="Workout List"><br><br>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br>
-            Nulla vestibulum mauris ut diam vulputate, nec scelerisque <br>
-            magna maximus. Suspendisse sit amet ex vestibulum, semper nunc quis, <br>
-            consequat arcu. Pellentesque feugiat molestie enim a aliquam. </p>
-        <button onclick="window.location.href='workoutlsit.html'">Favorites</button>
+<div class="row darkbg">
+    <div class="col-sm-12 col-md-12 col-lg-4 text-center pt-3 pb-3">
+        <div class="col">
+            <img style="border: 4px solid #47525E;" class="w-100"
+                src="{{ url_for("static", filename="images/lunge.jpg") }}" alt="New Workout Routine">
+        </div>
+        <div class="col">
+            <h3 class="pt-3">Create a new workout routine.</h3>
+            <p style="min-height: 200px;">
+                Tired of the same old routine or you need a less stressful workout just create a new one, or have two or
+                three. You can have power workout on some days and calisthenics on other days.
+            </p>
+        </div>
+        <div class="col">
+            <a class="button_title" href="{{ url_for("new_workout") }}">Create a Workout</a>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-12 col-lg-4  text-center  pt-3 pb-3">
+        <div class="col">
+            <img style="border: 4px solid #47525E;" class="w-100"
+                src="{{ url_for("static", filename="images/pushup.jpg") }}" alt="Search">
+        </div>
+        <div class="col">
+            <h3 class="pt-3">Search for workout routine.</h3>
+            <p style="min-height: 200px;">
+                First time and you really don't know what to do or how to prepare, we got you covered with over 100 of
+                the best workouts in any field that you want to give a try.
+            </p>
+        </div>
+        <div class="col">
+            <a class="button_title" href="{{ url_for("search_workout") }}">Search Workout</a>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-12 col-lg-4  text-center  pt-3 pb-3">
+        <div class="col">
+            <img style="border: 4px solid #47525E;" class="w-100"
+                src="{{ url_for("static", filename="images/equipment.jpg") }}" alt="Workout List">
+        </div>
+        <div class="col">
+            <h3 class="pt-3">Your created workouts.</h3>
+            <p style="min-height: 200px;">
+                Ready for a change-up you can save all your different types of workouts without missing a step, anytime
+                day or night just change it with one click.
+            </p>
+        </div>
+        <div class="col">
+            <a class="button_title" href="{{ url_for("workout_list") }}">Created Workouts</a>
+        </div>
     </div>
 </div>
-
 {% endblock %}
