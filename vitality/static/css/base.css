@@ -27,7 +27,7 @@ button, .button_title {
     background-color: none;
     border: 2px solid white;
     padding: .5em .7em;
-    margin: 1em .3em ;
+    margin: 1em .3em;
     font-size: larger;
     border-radius: .2em;
 }
@@ -44,9 +44,9 @@ button:hover, .button_title:hover {
 .card {
     background-color: #8492A6;
     border: none;
-    color: white; 
+    color: white;
     border-radius: .5em;
-    margin: 1em; 
+    margin: 1em;
 }
 
 .darkbg {
