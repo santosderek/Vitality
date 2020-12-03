@@ -1008,24 +1008,24 @@ class TestDatabase(unittest.TestCase):
                 'recipient': user_two._id
             })
 
-            trainee = self.database.get_trainee_by_username('testTrainee')
-            trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testTrainee')
+        trainer = self.database.get_trainer_by_username('testTrainer')
 
-            clean_up(trainee, trainer)
+        clean_up(trainee, trainer)
 
-            invitation = self.database.mongo.db.invitation.insert_one({
-                'sender': ObjectId(trainee._id),
-                'recipient': ObjectId(trainer._id)
-            })
+        invitation = self.database.mongo.db.invitation.insert_one({
+            'sender': ObjectId(trainee._id),
+            'recipient': ObjectId(trainer._id)
+        })
 
-            all_sent, all_recieved = self.database.search_all_user_invitations(
-                trainee._id)
-            assert all_sent > 0
-            assert all_recieved == 0
+        all_sent, all_recieved = self.database.search_all_user_invitations(
+            trainee._id)
+        assert len(all_sent) > 0
+        assert len(all_recieved) == 0
 
-            all_sent, all_recieved = self.database.search_all_user_invitations(
-                trainer._id)
-            assert all_recieved > 0
-            assert all_sent == 0
+        all_sent, all_recieved = self.database.search_all_user_invitations(
+            trainer._id)
+        assert len(all_recieved) > 0
+        assert len(all_sent) == 0
 
-            clean_up(trainee, trainer)
+        clean_up(trainee, trainer)
