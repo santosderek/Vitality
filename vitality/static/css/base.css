@@ -5,13 +5,17 @@
 
 body {
     font-family: 'Raleway', sans-serif;
-    font-size: larger;
+    font-size: 1.5em;
 }
 
 button {
     background-color: #8492A6;
 }
 
+button:hover {
+    color: #3f6499;
+    text-decoration: none;
+}
 h1, h2, h3 {
     color: #47525E;
     font-weight: bold;
@@ -28,7 +32,13 @@ button, .button_title {
     padding: 10px 15px;
     margin: 2px;  
     font-size: larger;
-    border-radius: .5em;
+    border-radius: .2em;
+}
+
+.button_title:hover {
+    color: #3f6499;
+
+    
 }
 
 button:hover, .button_title:hover {
@@ -52,8 +62,8 @@ button:hover, .button_title:hover {
 
 .navbar-toggler {
     background-color: #47525E;
-    
 }
+
 .navbar-toggler-icon {
     background-image: url("/static/images/bars.svg");
     fill: white;
@@ -70,4 +80,9 @@ button:hover, .button_title:hover {
 
 .navbar li a:hover {
     color: #F95F62;
+}
+
+#content {
+    width: 90%;
+    margin: auto;
 }
