@@ -908,10 +908,10 @@ class TestDatabase(unittest.TestCase):
         # Check if non-existent user throws error
         with self.assertRaises(UserNotFoundError):
             self.database.create_invitation('000000000000000000000000',
-                                            '000000000000000000000000')
+                                            None)
 
         with self.assertRaises(UserNotFoundError):
-            self.database.create_invitation('000000000000000000000000',
+            self.database.create_invitation(None,
                                             '000000000000000000000000')
 
         clean_up(trainee, trainer)
