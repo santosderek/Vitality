@@ -461,9 +461,9 @@ class Database:
 
             returns the object id of the invitation.
         """
-        if self.get_trainee_by_id(sender) is None and self.get_trainer_by_id(sender)is None:
+        if self.get_trainee_by_id(sender) is None and self.get_trainer_by_id(sender) is None:
             raise UserNotFoundError('Sender could not be found')
-        if self.get_trainee_by_id(recipient)is None and self.get_trainer_by_id(recipient)is None:
+        if self.get_trainee_by_id(recipient) is None and self.get_trainer_by_id(recipient) is None:
             raise UserNotFoundError('Recipient could not be found')
         invitation = self.mongo.db.invitation.insert_one({
             'sender': ObjectId(sender),
@@ -478,7 +478,7 @@ class Database:
 
         """
         self.mongo.db.invitation.delete_one({
-            '_id': invitation_id
+            '_id': ObjectId(invitation_id)
         })
 
     def search_invitation(self, invitation_id: str):
@@ -489,12 +489,12 @@ class Database:
             returns the document found. 
         """
         invitation = self.mongo.db.invitation.find_one({
-            '_id': invitation_id
+            '_id': ObjectId(invitation_id)
         })
 
         if invitation is None:
             raise InvitationNotFound('Invitation not found')
-        else: 
+        else:
             return Invitation(str(invitation['_id']), str(invitation['sender']), str(invitation['recipient']))
 
     def search_all_user_invitations(self, user_id: str):
@@ -519,23 +519,24 @@ class Database:
             accepter_id: str - The id of the user that is accepting the id.
         """
         invitation = self.mongo.db.invitation.find_one({
-            '_id': invitation_id
+            '_id': ObjectId(invitation_id),
+            'recipient': ObjectId(accepter_id)
         })
 
-        if not invitation['recipient'] == accepter_id:
-            raise IncorrectRecipientID(
-                'The ID of the accepter is not the same as the recipient')
+        if invitation is None:
+            raise InvitationNotFound(
+                "Could not find a recipient with the given accepter id.")
 
         sender = self.get_trainee_by_id(invitation['sender']) or\
             self.get_trainer_by_id(invitation['sender'])
         recipient = self.get_trainee_by_id(invitation['recipient']) or\
             self.get_trainer_by_id(invitation['recipient'])
 
-        if sender is Trainer:
+        if type(sender) is Trainer:
             self.trainer_add_trainee(sender._id, recipient._id)
             self.trainee_add_trainer(recipient._id, sender._id)
 
-        elif sender is Trainee:
+        elif type(sender) is Trainee:
             self.trainee_add_trainer(sender._id, recipient._id)
             self.trainer_add_trainee(recipient._id, sender._id)
 
