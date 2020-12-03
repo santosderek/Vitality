@@ -544,14 +544,30 @@ class Database:
         Search for all invitations a user has sent and recieved.
             user_id: str - The id of the user given by mongodb.
         """
-        all_sent = self.mongo.db.invitation.find({
+        database_sent = self.mongo.db.invitation.find({
             'sender': ObjectId(user_id)
         })
-        all_recieved = self.mongo.db.invitation.find({
+        database_recieved = self.mongo.db.invitation.find({
             'recipient': ObjectId(user_id)
         })
-        all_sent = [item for item in all_sent]
-        all_recieved = [item for item in all_recieved]
+
+        all_sent = []
+        all_recieved = []
+
+        for item in database_sent:
+            all_sent.append({
+                '_id': str(item['_id']),
+                'sender': str(item['sender']),
+                'recipient': str(item['recipient']),
+            })
+
+        for item in database_recieved:
+            all_recieved.append({
+                '_id': str(item['_id']),
+                'sender': str(item['sender']),
+                'recipient': str(item['recipient']),
+            })
+
         return (all_sent, all_recieved)
 
     def accept_invitation(self, invitation_id: str, accepter_id: str):

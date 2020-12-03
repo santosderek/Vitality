@@ -381,18 +381,32 @@ def create_app():
         app.logger.debug('Trainer {} loaded Trainer Overview.'.format(
             str(session['user_id'])))
 
+        # Get all trainees
         trainees = []
         for trainee_id in g.user.trainees:
             trainee = g.database.get_trainee_by_id(trainee_id)
             if trainee is not None:
                 trainees.append(trainee)
-        peak_trainees = g.database.trainer_peak_trainees(g.user._id)
+
+        # Get all Invitations
+        sent_invitations, recieved_invitations = g.database.search_all_user_invitations(
+            g.user._id)
+
+        invitations = []
+        for invitation in recieved_invitations:
+            invitations.append({
+                'sender': g.database.get_trainee_by_id(invitation['sender']),
+                'recipient': g.database.get_trainer_by_id(invitation['recipient'])
+            })
+
+        # Get all workouts
+        workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
+
         return render_template("user/overview.html",
                                trainees=trainees,
-                               workouts=g.database.get_all_workouts_by_creatorid(
-                                   g.user._id),
+                               workouts=workouts,
                                events=[],
-                               peak_trainees=peak_trainees)
+                               invitations=invitations)
 
     @app.route('/list_trainees', methods=["GET"])
     def list_trainees():

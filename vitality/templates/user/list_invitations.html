@@ -32,14 +32,18 @@
     </div>
     {% else %}
     {% for invitation in all_recieved %}
-    <div class="col-sm-12">
-        <p>Sent by:
-            {{g.database.get_trainer_by_id(invitation['sender']).username or g.database.get_trainee_by_id(invitation['sender']).username}}
-        </p>
-        <button class="button_title" onclick="confirm_invitation('true', '{{ invitation['_id'] }}' );"
-            id="button_{{invitation['_id']}}">
-            Accept
-        </button>
+    <div class="card col-sm-12 col-lg-3">
+
+        <div class="col-sm-12 text-center">
+            <p class="pt-2">
+                Sent by:
+                {{g.database.get_trainer_by_id(invitation['sender']).username or g.database.get_trainee_by_id(invitation['sender']).username}}
+            </p>
+            <button class="button_title" onclick="confirm_invitation('true', '{{ invitation['_id'] }}' );"
+                id="button_{{invitation['_id']}}">
+                Accept
+            </button>
+        </div>
     </div>
     {% endfor %}
     {% endif %}
