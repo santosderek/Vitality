@@ -111,10 +111,10 @@ class Database:
 
     def trainee_add_trainer(self, trainee_id: str, trainer_id: str):
         """Add trainer object id to trainee's trainer list"""
-        if self.get_trainee_by_id(trainee_id) is None:
+        if self.get_trainee_by_id(trainee_id) is None or self.get_trainee_by_id(trainee_id) is None:
             raise UserNotFoundError("Trainee ID does not exist.")
 
-        if self.get_trainer_by_id(trainer_id) is None:
+        if self.get_trainer_by_id(trainer_id) is None or self.get_trainer_by_id(trainer_id) is None:
             raise UserNotFoundError("Trainer ID does not exist.")
 
         self.mongo.db.trainee.update_one(
@@ -157,10 +157,10 @@ class Database:
 
     def trainee_remove_trainer(self, trainee_id: str, trainer_id: str):
         """Remove trainer object id from trainees's trainer list"""
-        if self.get_trainee_by_id(trainee_id) is None:
+        if self.get_trainee_by_id(trainee_id) is None or self.get_trainee_by_id(trainee_id) is None:
             raise UserNotFoundError("Trainee ID does not exist.")
 
-        if self.get_trainer_by_id(trainer_id) is None:
+        if self.get_trainer_by_id(trainer_id) is None or self.get_trainer_by_id(trainer_id) is None:
             raise UserNotFoundError("Trainer ID does not exist.")
 
         self.mongo.db.trainee.update_one(
@@ -316,10 +316,10 @@ class Database:
 
     def trainer_add_trainee(self, trainer_id: str, trainee_id: str):
         """Add trainer object id to trainee's trainer list"""
-        if self.get_trainee_by_id(trainee_id) is None:
+        if self.get_trainee_by_id(trainee_id) is None or self.get_trainee_by_id(trainee_id) is None:
             raise UserNotFoundError("Trainee ID does not exist.")
 
-        if self.get_trainer_by_id(trainer_id) is None:
+        if self.get_trainer_by_id(trainer_id) is None or self.get_trainer_by_id(trainer_id) is None:
             raise UserNotFoundError("Trainer ID does not exist.")
 
         self.mongo.db.trainer.update_one(
@@ -332,10 +332,10 @@ class Database:
 
     def trainer_remove_trainee(self, trainer_id: str, trainee_id: str):
         """Remove trainee object id from trainers's trainee list"""
-        if self.get_trainee_by_id(trainee_id) is None:
+        if self.get_trainee_by_id(trainee_id) is None or self.get_trainee_by_id(trainee_id) is None:
             raise UserNotFoundError("Trainee ID does not exist.")
 
-        if self.get_trainer_by_id(trainer_id) is None:
+        if self.get_trainer_by_id(trainer_id) is None or self.get_trainer_by_id(trainer_id) is None:
             raise UserNotFoundError("Trainer ID does not exist.")
 
         self.mongo.db.trainer.update_one(
@@ -350,22 +350,6 @@ class Database:
                 }
             }
         )
-
-    def trainer_peak_trainees(self, trainer_id: str):
-        """Returns a list of all trainees that have added this trainer"""
-        if self.get_trainer_by_id(trainer_id) is None:
-            raise UserNotFoundError("Trainer ID does not exist.")
-
-        trainees = []
-        found_trainees = self.mongo.db.trainee.find({
-            "trainers": ObjectId(trainer_id)
-        })
-
-        if found_trainees is not None:
-            for trainee in found_trainees:
-                trainees.append(self.trainee_dict_to_class(trainee))
-
-        return trainees
 
     def add_trainer(self, trainer: Trainer):
         """Adds a trainer to the database based on a provided trainer class."""
