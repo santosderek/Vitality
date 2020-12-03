@@ -479,6 +479,19 @@ def create_app():
 
         return render_template("trainer/trainee_search.html")
 
+    @app.route('/invitations', methods=["GET"])
+    def invitations(): 
+        """Show all sent and recieved invitations from other users."""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        sent_invitations, recieved_invitaitons = g.database.search_all_user_invitations(g.user._id)
+
+        return render_template('user/list_invitations.html',
+        all_sent = sent_invitations,
+        all_recieved = recieved_invitaitons)
+
     @app.route('/add_trainer', methods=["POST"])
     def add_trainer():
         """This route allows trainees to add trainers to their added list"""
@@ -491,7 +504,7 @@ def create_app():
 
         try:
             trainer_id = escape(request.form['trainer_id'])
-            g.database.trainee_add_trainer(g.user._id, trainer_id)
+            g.database.create_invitation(g.user._id, trainer_id)
             return "", 204
 
         except UserNotFoundError:
@@ -509,7 +522,7 @@ def create_app():
 
         try:
             trainee_id = escape(request.form['trainee_id'])
-            g.database.trainer_add_trainee(g.user._id, trainee_id)
+            g.database.create_invitation(g.user._id, trainee_id)
             return "", 204
 
         except UserNotFoundError:

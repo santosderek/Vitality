@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3>Sent Invitations</h3>
+    </div>
+    {% if all_sent|length == 0 %}
+    <div class="col-sm-12">
+        <p style="color: red;">You have no sent invitations.</p>
+    </div>
+    {% else %}
+    {% for invitation in all_sent %}
+    <div class="col-sm-12">
+        <p>Sent to: {{g.database.get_user_by_id(invitation['recipient']).username}}</p>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    <hr /> 
+
+    <div class="col-sm-12">
+        <h3>Recieved Invitations</h3>
+    </div>
+
+    {% if all_recieved|length == 0 %}
+    <div class="col-sm-12">
+        <p style="color: red;">You have no sent invitations.</p>
+    </div>
+    {% else %}
+    {% for invitation in all_recieved %}
+    <div class="col-sm-12">
+        <p>Sent by: {{g.database.get_user_by_id(invitation['sender']).username}}</p>
+        <a class="button_title" href="{{ user_for('accept_invitation', invitation_id = str(invitation['_id'])) }}">
+            Accept
+        </a>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+
+{% endblock %}
