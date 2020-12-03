@@ -1159,3 +1159,36 @@ def test_workout_list(client):
     assert returned_value.status_code == 200
 
     # TODO: need to test post requests
+
+def test_delete_user(client): 
+    """Testing the delete user route"""
+
+    # Not logged in 
+    returned_value = client.get('/delete', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
+
+    # login as testTrainee 
+    login_as_testTrainee(client)
+
+    # delete testTrainee
+    returned_value = client.post('/delete', data = {'confirmation': 'true'}, follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert 'user_id' not in session
+    assert g.database.get_trainee_by_username("testTrainee") is None
+
+    # login as testTrainer
+    login_as_testTrainer(client)
+
+    # delete testTrainer
+    returned_value = client.post('/delete', data = {'confirmation': 'true'}, follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert g.user is None
+    assert 'user_id' not in session
+    assert g.database.get_trainer_by_username("testTrainer") is None
+
+
+
+
+
