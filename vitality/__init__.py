@@ -186,9 +186,8 @@ def create_app():
 
         app.logger.info('Rendering Profile')
         username = escape(username)
-        user = g.database.get_trainee_by_username(username)
-        if user is None:
-            user = g.database.get_trainer_by_username(username)
+        user = g.database.get_trainer_by_username(username) \
+            or g.database.get_trainee_by_username(username)
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
@@ -224,66 +223,36 @@ def create_app():
 
                     if username:
                         g.database.set_trainee_username(g.user._id, username)
-                        if not alphaPattern.search(username):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     if password and re_password and password == re_password:
                         g.database.set_trainee_password(g.user._id, password)
-                        if not alphaPattern.search(password):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     if location:
                         g.database.set_trainee_location(g.user._id, location)
-                        if not alphaPattern.search(location):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     if phone:
                         g.database.set_trainee_phone(g.user._id, phone)
-                        if not numberPattern.search(phone):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     if name:
                         g.database.set_trainee_name(g.user._id, name)
-                        if not stringPattern.search(name):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     return redirect(url_for('usersettings'))
 
                 elif g.database.get_trainer_by_id(g.user._id) is not None:
                     if username:
                         g.database.set_trainer_username(g.user._id, username)
-                        if not alphaPattern.search(username):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     if password and re_password and password == re_password:
                         g.database.set_trainer_password(g.user._id, password)
-                        if not alphaPattern.search(password):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     if location:
                         g.database.set_trainer_location(g.user._id, location)
-                        if not alphaPattern.search(location):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     if phone:
                         g.database.set_trainer_phone(g.user._id, phone)
-                        if not numberPattern.search(phone):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     if name:
                         g.database.set_trainer_name(g.user._id, name)
-                        if not stringPattern.search(name):
-                            raise InvalidCharactersException(
-                                "Invalid characters")
 
                     return redirect(url_for('usersettings'))
 

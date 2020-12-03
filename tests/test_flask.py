@@ -1,3 +1,4 @@
+from bson.objectid import ObjectId
 import pytest
 import unittest
 from flask import g, session, url_for
@@ -93,7 +94,6 @@ def test_failed_login_username(client):
     assert g.user is None
 
 
-
 def test_failed_login_password(client):
     # Testing the failed login page
     returned_value = client.post('/login', data=dict(
@@ -103,7 +103,6 @@ def test_failed_login_password(client):
     assert returned_value.status_code == 400
     assert b'Invalid characters found' in returned_value.data
     assert g.user is None
-
 
 
 def test_failed_signup_username(client):
@@ -242,7 +241,6 @@ def test_failed_usersettings_username(client):
     assert b'Invalid characters found' in returned_value.data
 
 
-
 def test_failed_usersettings_password(client):
     # Testing the failed user settings page
     # Get without a user
@@ -289,7 +287,6 @@ def test_failed_usersettings_repassword(client):
     ), follow_redirects=True)
     assert returned_value.status_code == 400
     assert b'Invalid characters found' in returned_value.data
-
 
 
 def test_failed_usersettings_name(client):
@@ -340,7 +337,6 @@ def test_failed_usersettings_location(client):
     assert b'Invalid characters found' in returned_value.data
 
 
-
 def test_failed_usersettings_phone(client):
     # Testing the failed user settings page
     # Get without a user
@@ -363,7 +359,6 @@ def test_failed_usersettings_phone(client):
     ), follow_redirects=True)
     assert returned_value.status_code == 400
     assert b'Invalid characters found' in returned_value.data
-
 
 
 def test_home(client):
@@ -397,6 +392,15 @@ def test_login(client):
 
 def test_signup(client):
     """Testing the sign up page"""
+
+    def clean_up(trainer, trainee):
+        g.database.mongo.db.trainer.delete_many({
+            '_id': ObjectId(trainer._id)
+        })
+        g.database.mongo.db.trainee.delete_many({
+            '_id': ObjectId(trainee._id)
+        })
+
     # Get without a user
     returned_value = client.get('/signup', follow_redirects=True)
     assert returned_value.status_code == 200
@@ -449,11 +453,12 @@ def test_signup(client):
     assert b'Username was taken' in returned_value.data
     assert b'<form action="/signup" method="POST">' in returned_value.data
 
-    if g.database.get_trainee_by_username("testTrainee"):
-        g.database.remove_trainee(
-            g.database.get_trainee_by_username("testTrainee")._id)
+    trainee = g.database.get_trainee_by_username("testTrainee")
+    trainer = g.database.get_trainer_by_username("testTrainer")
 
-    # POST with a username that was not taken, success
+    clean_up(trainer, trainee)
+
+    # POST with a username that was not taken, success, Trainee
     returned_value = client.post('/signup', data=dict(
         username="testTrainee",
         password="password",
@@ -464,18 +469,17 @@ def test_signup(client):
         usertype="trainee"
     ), follow_redirects=True)
     assert returned_value.status_code == 200
+    print(returned_value.data)
     assert b'Account was created!' in returned_value.data
     assert b'Could not create account' not in returned_value.data
     assert b'Username was taken' not in returned_value.data
     assert b'<form action="/signup" method="POST">' not in returned_value.data
 
-    if g.database.get_trainee_by_username("testTrainee"):
-        g.database.remove_trainee(
-            g.database.get_trainee_by_username("testTrainee")._id)
+    clean_up(trainer, trainee)
 
-    # POST with a username that was not taken, success
+    # POST with a username that was not taken, success, Trainer
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testTrainer",
         password="password",
         repassword="password",
         name="first last",
@@ -489,9 +493,7 @@ def test_signup(client):
     assert b'Username was taken' not in returned_value.data
     assert b'<form action="/signup" method="POST">' not in returned_value.data
 
-    if g.database.get_trainer_by_username("testTrainee"):
-        g.database.remove_trainer(
-            g.database.get_trainer_by_username("testTrainee")._id)
+    clean_up(trainer, trainee)
 
 
 def test_profile(client):
@@ -501,16 +503,39 @@ def test_profile(client):
     assert returned_value.status_code == 200
     assert b'login' in returned_value.data
 
+    trainer = g.database.get_trainer_by_username("testTrainer")
+    trainee = g.database.get_trainee_by_username("testTrainee")
+
     # Login
     login_as_testTrainee(client)
 
     # Check profile page.
     returned_value = client.get('/profile/testTrainee', follow_redirects=True)
     assert returned_value.status_code == 200
-    assert b'Username: testTrainee' in returned_value.data
-    assert b'Name: first last' in returned_value.data
-    assert b'Phone: 1234567890' in returned_value.data
-    assert b'Location: Earth' in returned_value.data
+    assert bytes('Username: {}'.format(trainee.username),
+                 'utf-8') in returned_value.data
+    assert bytes('Name: {}'.format(trainee.name),
+                 'utf-8') in returned_value.data
+    assert bytes('Phone: {}'.format(trainee.phone),
+                 'utf-8') in returned_value.data
+    assert bytes('Location: {}'.format(trainee.location),
+                 'utf-8') in returned_value.data
+    assert b'login' not in returned_value.data
+
+    # Login
+    login_as_testTrainer(client)
+
+    # Check profile page.
+    returned_value = client.get('/profile/testTrainer', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert bytes('Username: {}'.format(trainer.username),
+                 'utf-8') in returned_value.data
+    assert bytes('Name: {}'.format(trainer.name),
+                 'utf-8') in returned_value.data
+    assert bytes('Phone: {}'.format(trainer.phone),
+                 'utf-8') in returned_value.data
+    assert bytes('Location: {}'.format(trainer.location),
+                 'utf-8') in returned_value.data
     assert b'login' not in returned_value.data
 
 
@@ -574,6 +599,85 @@ def test_usersettings(client):
     assert database_user.name == 'another'
     assert database_user.location == 'Venus'
     assert database_user.phone == '0987654321'
+
+    # Checking alphaPattern
+    for character in '!@#$%^&*()_+\\<>.':
+        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer.username = f"abc{character}"
+        returned_value = client.post('/usersettings', data=dict(
+            username=trainer.username,
+            password=trainer.password,
+            repassword=trainer.password,
+            name=trainer.name,
+            location=trainer.location,
+            phone=trainer.phone
+        ), follow_redirects=True)
+        assert returned_value.status_code == 400
+
+    for character in '!@#$%^&*()_+\\<>.':
+        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer.password = f"abc{character}"
+        returned_value = client.post('/usersettings', data=dict(
+            username=trainer.username,
+            password=trainer.password,
+            repassword=trainer.password,
+            name=trainer.name,
+            location=trainer.location,
+            phone=trainer.phone
+        ), follow_redirects=True)
+        assert returned_value.status_code == 400
+
+    for character in '!@#$%^&*()_+\\<>.':
+        trainer = g.database.get_trainer_by_username("testTrainer")
+        repassword = f"abc{character}"
+        returned_value = client.post('/usersettings', data=dict(
+            username=trainer.username,
+            password=trainer.password,
+            repassword=repassword,
+            name=trainer.name,
+            location=trainer.location,
+            phone=trainer.phone
+        ), follow_redirects=True)
+        assert returned_value.status_code == 400
+
+    for character in '!@#$%^&*()_+\\<>.':
+        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer.name = f"abc{character}"
+        returned_value = client.post('/usersettings', data=dict(
+            username=trainer.username,
+            password=trainer.password,
+            repassword=repassword,
+            name=trainer.name,
+            location=trainer.location,
+            phone=trainer.phone
+        ), follow_redirects=True)
+        assert returned_value.status_code == 400
+
+    for character in '!@#$%^&*()_+\\<>.':
+        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer.location = f"abc{character}"
+        returned_value = client.post('/usersettings', data=dict(
+            username=trainer.username,
+            password=trainer.password,
+            repassword=repassword,
+            name=trainer.name,
+            location=trainer.location,
+            phone=trainer.phone
+        ), follow_redirects=True)
+        assert returned_value.status_code == 400
+    
+    for character in '!@#$%^&*()_+\\<>.a':
+        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer.phone = f"abc{character}"
+        returned_value = client.post('/usersettings', data=dict(
+            username=trainer.username,
+            password=trainer.password,
+            repassword=repassword,
+            name=trainer.name,
+            location=trainer.location,
+            phone=trainer.phone
+        ), follow_redirects=True)
+        assert returned_value.status_code == 400
 
 
 def test_logout(client):
@@ -1131,18 +1235,18 @@ def test_workout_overview(client):
 
     returned_value = client.get('/workout_overview', follow_redirects=True)
     assert returned_value.status_code == 200
-    assert b'Create a new workout routine.' in returned_value.data 
-    assert b'Search for workout routine.' in returned_value.data 
-    assert b'Your created workouts.' in returned_value.data 
+    assert b'Create a new workout routine.' in returned_value.data
+    assert b'Search for workout routine.' in returned_value.data
+    assert b'Your created workouts.' in returned_value.data
 
     # Login as Trainer
     login_as_testTrainer(client)
 
     returned_value = client.get('/workout_overview', follow_redirects=True)
     assert returned_value.status_code == 200
-    assert b'Create a new workout routine.' in returned_value.data 
-    assert b'Search for workout routine.' in returned_value.data 
-    assert b'Your created workouts.' in returned_value.data 
+    assert b'Create a new workout routine.' in returned_value.data
+    assert b'Search for workout routine.' in returned_value.data
+    assert b'Your created workouts.' in returned_value.data
 
 
 def test_workout_list(client):
@@ -1160,19 +1264,21 @@ def test_workout_list(client):
 
     # TODO: need to test post requests
 
-def test_delete_user(client): 
+
+def test_delete_user(client):
     """Testing the delete user route"""
 
-    # Not logged in 
+    # Not logged in
     returned_value = client.get('/delete', follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'login' in returned_value.data
 
-    # login as testTrainee 
+    # login as testTrainee
     login_as_testTrainee(client)
 
     # delete testTrainee
-    returned_value = client.post('/delete', data = {'confirmation': 'true'}, follow_redirects=True)
+    returned_value = client.post(
+        '/delete', data={'confirmation': 'true'}, follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
     assert 'user_id' not in session
@@ -1182,13 +1288,9 @@ def test_delete_user(client):
     login_as_testTrainer(client)
 
     # delete testTrainer
-    returned_value = client.post('/delete', data = {'confirmation': 'true'}, follow_redirects=True)
+    returned_value = client.post(
+        '/delete', data={'confirmation': 'true'}, follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
     assert 'user_id' not in session
     assert g.database.get_trainer_by_username("testTrainer") is None
-
-
-
-
-
