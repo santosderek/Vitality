@@ -665,7 +665,7 @@ def test_usersettings(client):
             phone=trainer.phone
         ), follow_redirects=True)
         assert returned_value.status_code == 400
-    
+
     for character in '!@#$%^&*()_+\\<>.a':
         trainer = g.database.get_trainer_by_username("testTrainer")
         trainer.phone = f"abc{character}"
@@ -723,12 +723,32 @@ def test_trainer_overview(client):
     # Login as Trainer
     login_as_testTrainer(client)
 
+    trainee = g.database.get_trainee_by_username('testTrainee')
+    trainer = g.database.get_trainer_by_username('testTrainer')
+
+    g.database.mongo.db.trainer.update_one(
+        {"_id": ObjectId(trainer._id)},
+        {
+            "$addToSet": {
+                "trainees": ObjectId(trainee._id)
+            }
+        })
+
+    invitation = g.database.mongo.db.invitation.insert_one({
+        'sender': ObjectId(trainee._id),
+        'recipient': ObjectId(trainer._id)
+    })
+
     # Trainer Overview as Trainer
     returned_value = client.get('/trainer_overview', follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainer
     assert b'/trainee_search' in returned_value.data
     assert b'/list_trainees' in returned_value.data
+
+    g.database.mongo.db.invitation.delete_many({
+        'sender': ObjectId(trainee._id)
+    })
 
 
 def test_list_trainees(client):
@@ -760,6 +780,23 @@ def test_list_trainees(client):
     assert returned_value.status_code == 200
     assert type(g.user) == Trainer
     assert b'No trainees found' in returned_value.data
+
+    trainee = g.database.get_trainee_by_username('testTrainee')
+    trainer = g.database.get_trainer_by_username('testTrainer')
+
+    g.database.mongo.db.trainer.update_one(
+        {"_id": ObjectId(trainer._id)},
+        {
+            "$addToSet": {
+                "trainees": ObjectId(trainee._id)
+            }
+        })
+    # Trainer Overview as Trainer
+    returned_value = client.get('/list_trainees',
+                                follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert type(g.user) == Trainer
+    assert b'No trainees found' not in returned_value.data
 
 
 def test_trainer_schedule(client):
@@ -802,12 +839,32 @@ def test_trainee_overview(client):
     # Login as Trainee
     login_as_testTrainee(client)
 
+    trainee = g.database.get_trainee_by_username('testTrainee')
+    trainer = g.database.get_trainer_by_username('testTrainer')
+
+    g.database.mongo.db.trainee.update_one(
+        {"_id": ObjectId(trainee._id)},
+        {
+            "$addToSet": {
+                "trainers": ObjectId(trainer._id)
+            }
+        })
+
+    invitation = g.database.mongo.db.invitation.insert_one({
+        'sender': ObjectId(trainer._id),
+        'recipient': ObjectId(trainee._id)
+    })
+
     # Trainee Overview as Trainee
     returned_value = client.get('/trainee_overview', follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
     assert b'/trainer_search' in returned_value.data
     assert b'/list_trainers' in returned_value.data
+
+    g.database.mongo.db.invitation.delete_many({
+        'sender': ObjectId(trainer._id)
+    })
 
     # Login as Trainer
     login_as_testTrainer(client)
@@ -929,6 +986,14 @@ def test_add_trainer(client):
     assert returned_value.status_code == 204
     assert type(g.user) == Trainee
 
+    returned_value = client.post('/add_trainer',
+                                 data={
+                                     'trainer_id': "123456789012345678901234"
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 500
+    assert type(g.user) == Trainee
+
 
 def test_add_trainee(client):
     """Testing the add_trainee page"""
@@ -967,11 +1032,18 @@ def test_add_trainee(client):
     assert returned_value.status_code == 204
     assert type(g.user) == Trainer
 
+    returned_value = client.post('/add_trainee',
+                                 data={
+                                     'trainee_id': "123456789012345678901234"
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 500
+    assert type(g.user) == Trainer
+
 
 def test_list_trainers(client):
-    """Testing the trainer overview page"""
+    """Testing the trainee overview page"""
 
-    # Trainer Overview no user
     returned_value = client.get('/list_trainers',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
@@ -980,17 +1052,30 @@ def test_list_trainers(client):
     # Login as Trainee
     login_as_testTrainee(client)
 
-    # Trainer Overview as Trainee
     returned_value = client.get('/list_trainers',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
     assert type(g.user) != Trainer
 
-    # Login as Trainer
-    login_as_testTrainer(client)
+    trainee = g.database.get_trainee_by_username('testTrainee')
+    trainer = g.database.get_trainer_by_username('testTrainer')
 
-    # Trainee Overview as Trainer
+    g.database.mongo.db.trainee.update_one(
+        {"_id": ObjectId(trainee._id)},
+        {
+            "$addToSet": {
+                "trainers": ObjectId(trainer._id)
+            }
+        })
+
+    returned_value = client.get('/list_trainers',
+                                follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert type(g.user) == Trainee
+    assert b'No trainers found' not in returned_value.data
+
+    login_as_testTrainer(client)
     returned_value = client.get('/list_trainers',
                                 follow_redirects=True)
     assert returned_value.status_code == 403
@@ -1171,7 +1256,6 @@ def test_new_workout(client):
                                                       g.user._id)
     new_workout._id = database_workout._id
     assert database_workout.as_dict() == new_workout.as_dict()
-
     g.database.remove_workout(new_workout._id)
 
     # Login as Trainer
@@ -1276,6 +1360,10 @@ def test_delete_user(client):
     # login as testTrainee
     login_as_testTrainee(client)
 
+    returned_value = client.get('/delete', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'Delete Account' in returned_value.data
+
     # delete testTrainee
     returned_value = client.post(
         '/delete', data={'confirmation': 'true'}, follow_redirects=True)
@@ -1294,3 +1382,170 @@ def test_delete_user(client):
     assert g.user is None
     assert 'user_id' not in session
     assert g.database.get_trainer_by_username("testTrainer") is None
+
+
+def test_delete_user_without_confirmation(client):
+    """Reseting the environment and deleting without a confirmation should return a 500"""
+    login_as_testTrainer(client)
+    returned_value = client.post('/delete',
+                                 data={'confirmation': 'false'},
+                                 follow_redirects=True)
+    assert returned_value.status_code == 500
+
+
+def test_remove_added_user(client):
+    # Not logged in
+    returned_value = client.post('/remove_added_user', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
+    assert g.user is None
+
+    login_as_testTrainee(client)
+
+    returned_value = client.post('/remove_added_user',
+                                 data={
+                                     'confirmation': 'false',
+                                     'user_id': 'abc'
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 500
+
+    returned_value = client.post('/remove_added_user',
+                                 data={
+                                     'confirmation': 'true',
+                                     'user_id': ''
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 500
+
+    trainee = g.database.get_trainee_by_username("testTrainee")
+    trainer = g.database.get_trainer_by_username("testTrainer")
+
+    # Remove trainer from trainee
+
+    g.database.mongo.db.trainee.update_one(
+        {"_id": ObjectId(trainee._id)},
+        {
+            "$addToSet": {
+                "trainers": ObjectId(trainer._id)
+            }
+        })
+
+    assert ObjectId(trainer._id) in g.database.mongo.db.trainee.find_one({
+        '_id': ObjectId(trainee._id)
+    })['trainers']
+
+    returned_value = client.post('/remove_added_user',
+                                 data={
+                                     'confirmation': 'true',
+                                     'user_id': str(trainer._id)
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 204
+
+    # Remove trainee from trainer
+    login_as_testTrainer(client)
+
+    g.database.mongo.db.trainer.update_one(
+        {"_id": ObjectId(trainer._id)},
+        {
+            "$addToSet": {
+                "trainees": ObjectId(trainee._id)
+            }
+        })
+
+    assert ObjectId(trainee._id) in g.database.mongo.db.trainer.find_one({
+        '_id': ObjectId(trainer._id)
+    })['trainees']
+
+    returned_value = client.post('/remove_added_user',
+                                 data={
+                                     'confirmation': 'true',
+                                     'user_id': str(trainee._id)
+                                 },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 204
+
+    # User not found
+
+
+def test_invitations(client):
+    returned_value = client.get('/invitations', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
+    assert g.user is None
+
+    login_as_testTrainee(client)
+
+    trainee = g.database.get_trainee_by_username('testTrainee')
+    trainer = g.database.get_trainer_by_username('testTrainer')
+    invitation = g.database.mongo.db.invitation.insert_one({
+        'sender': ObjectId(trainer._id),
+        'recipient': ObjectId(trainee._id)
+    })
+
+    returned_value = client.get('/invitations', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert type(g.user) is Trainee
+    assert bytes('{}'.format(invitation.inserted_id),
+                 'utf-8') in returned_value.data
+
+
+def test_accept_invitation(client):
+    returned_value = client.post('/accept_invitation',
+                                 data={'confirmation': 'true'},
+                                 follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
+    assert g.user is None
+
+    login_as_testTrainee(client)
+
+    trainee = g.database.get_trainee_by_username('testTrainee')
+    trainer = g.database.get_trainer_by_username('testTrainer')
+    invitation = g.database.mongo.db.invitation.insert_one({
+        'sender': ObjectId(trainer._id),
+        'recipient': ObjectId(trainee._id)
+    })
+
+    returned_value = client.post('/accept_invitation',
+                                 data={
+                                     'confirmation': 'false',
+                                     'invitation_id': '000000000000000000000000'
+                                     },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 500
+    assert type(g.user) is Trainee
+
+    returned_value = client.post('/accept_invitation',
+                                 data={
+                                     'confirmation': 'true',
+                                     'invitation_id': str('000000000000000000000000')
+                                     },
+                                 follow_redirects=True)
+
+    assert returned_value.status_code == 500
+    
+    returned_value = client.post('/accept_invitation',
+                                 data={
+                                     'confirmation': 'true',
+                                     'invitation_id': str(invitation.inserted_id)
+                                     },
+                                 follow_redirects=True)
+    assert returned_value.status_code == 204
+    assert type(g.user) is Trainee
+    assert g.database.mongo.db.invitation.find_one({
+                'recipient': ObjectId(trainer._id)
+            }) is None
+    assert ObjectId(trainer._id) in g.database.mongo.db.trainee.find_one({
+                '_id': ObjectId(trainee._id)
+            })['trainers']
+    assert ObjectId(trainee._id) in g.database.mongo.db.trainer.find_one({
+                '_id': ObjectId(trainer._id)
+            })['trainees']
+
+
+    g.database.mongo.db.invitation.delete_many({
+                '_id': ObjectId(invitation.inserted_id)
+            })
+    

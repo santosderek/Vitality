@@ -278,7 +278,7 @@ def create_app():
 
             if not user_id:
                 app.logger.debug('User id was not given.')
-                abort(500)
+                raise UserNotFoundError("User id was not given")
 
             if type(g.user) is Trainer:
                 g.database.trainer_remove_trainee(g.user._id, user_id)
@@ -304,6 +304,11 @@ def create_app():
             return redirect(url_for('login'))
 
         if request.method == 'POST':
+            confirmation = escape(request.form['confirmation'])
+            
+            if str(confirmation) != 'true': 
+                return render_template("account/delete.html"), 500
+                 
 
             if g.database.get_trainee_by_id(g.user._id) is not None:
                 app.logger.info('Deleting user ' + g.user.username)
@@ -320,8 +325,6 @@ def create_app():
                     session.pop('user_id', None)
                 g.user = None
                 return redirect(url_for('home'))
-
-            abort(500)
 
         return render_template("account/delete.html")
 

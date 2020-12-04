@@ -1009,7 +1009,7 @@ class TestDatabase(unittest.TestCase):
         trainer = self.database.get_trainer_by_username('testTrainer')
         clean_up(trainee, trainer)
 
-        with self.assertRaises(InvitationNotFound): 
+        with self.assertRaises(InvitationNotFound):
             self.database.search_invitation("000000000000000000000000")
 
         invitation = self.database.mongo.db.invitation.insert_one({
