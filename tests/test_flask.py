@@ -1108,7 +1108,7 @@ def test_workout(client):
     assert g.user is None
     
     trainee = g.database.get_trainee_by_username('testTrainee')
-    
+
     trainer = g.database.get_trainer_by_username('testTrainer')
 
     workoutTest = Workout(
@@ -1130,6 +1130,8 @@ def test_workout(client):
     assert bytes("{}".format(database_workout.difficulty), "utf-8") in returned_value.data
     assert bytes("{}".format(database_workout.about), "utf-8") in returned_value.data
     assert bytes("{}".format(database_workout.exp), "utf-8") in returned_value.data
+
+    g.database.remove_workout(database_workout._id)
 
 
 
