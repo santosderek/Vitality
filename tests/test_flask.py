@@ -1287,22 +1287,41 @@ def test_search_workout(client):
     # TODO: need to test post requests
 
 
-@pytest.mark.skip(reason="no way of currently testing if Trianer can login")
 def test_workout(client):
-    """Testing the search workout page"""
-
-    # TODO: Need to create a workout and add to database then check
+    """Testing the workout page"""
     # Not logged in
-    returned_value = client.get('/workout/', follow_redirects=True)
+    returned_value = client.get('/workout/adjr/00000', follow_redirects=True)
     assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
+    assert g.user is None
+    
+    trainee = g.database.get_trainee_by_username('testTrainee')
 
-    # Login as Trainee
-    login_as_testTrainee(client)
+    trainer = g.database.get_trainer_by_username('testTrainer')
 
-    returned_value = client.get('/workout', follow_redirects=True)
+    workoutTest = Workout(
+    _id=None,
+    creator_id= trainer._id,
+    name= "testWorkout",
+    difficulty= "easy",
+    about= "2 Pushups, 1 Jumping Jack",
+    exp= "1000"
+    )
+
+    g.database.add_workout(workoutTest)
+    database_workout = g.database.get_workout_by_name(workoutTest.name, trainer._id)
+
+    login_as_testTrainer(client)
+    returned_value = client.get(f'/workout/{trainer._id}/{database_workout.name}', follow_redirects=True)
     assert returned_value.status_code == 200
+    assert bytes("{}".format(database_workout.name), "utf-8") in returned_value.data
+    assert bytes("{}".format(database_workout.difficulty), "utf-8") in returned_value.data
+    assert bytes("{}".format(database_workout.about), "utf-8") in returned_value.data
+    assert bytes("{}".format(database_workout.exp), "utf-8") in returned_value.data
 
-    # TODO: need to test post requests
+    g.database.remove_workout(database_workout._id)
+
+
 
 
 def test_workout_overview(client):
@@ -1332,7 +1351,7 @@ def test_workout_overview(client):
     assert b'Search for workout routine.' in returned_value.data
     assert b'Your created workouts.' in returned_value.data
 
-
+@pytest.mark.skip
 def test_workout_list(client):
     """Testing the workout list page"""
 
