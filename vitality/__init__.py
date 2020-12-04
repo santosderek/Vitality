@@ -611,6 +611,8 @@ def create_app():
         """Page that shows the workout details"""
         if not g.user:
             return redirect(url_for('login'))
+        creator_id = escape(creator_id)
+        workout_id = escape(workout_id)
         if (g.database.get_workout_by_name(workout_id, creator_id) == None):
                 abort(404)
 
