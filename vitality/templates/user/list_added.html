@@ -22,10 +22,9 @@
         {% if user %}
         <div class="row text-center align-items-center p-5">
             <div class="col-sm-3 align-middle">
-                <a class="align-middle"
-                    href="{{url_for("profile", username=user.username)}}">
+                <a class="align-middle" href="{{url_for("profile", username=user.username)}}">
                     <img class="align-middle" src="{{ url_for("static", filename="images/profile.svg") }}"
-                    alt="User {{ user.username }}" style="width: 5em;">
+                        alt="User {{ user.username }}" style="width: 5em;">
                 </a>
             </div>
             <div class="col-sm-3 align-middle">
@@ -41,9 +40,10 @@
                 </a>
             </div>
             <div class="col-sm-3 align-middle">
-                <a class="button_title align-middle" style="font-size: large;" href="">
+                <button class="button_title align-middle" id="button_{{user._id}}" style="font-size: large;"
+                    onclick="confirm_deletion('{{user._id}}')">
                     Remove
-                </a>
+                </button>
             </div>
         </div>
         {% endif %}
@@ -52,4 +52,30 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+    function confirm_deletion(user_id) {
+
+        if (confirm("Are you sure you would like to remove this user?")){
+            $.post("{{url_for("remove_added_user")}}",
+                {
+                    "confirmation": "true",
+                    "user_id": user_id
+                })
+                .done(() => {
+                    $(`#button_${user_id}`).text("Removed!");
+                    $(`#button_${user_id}`).css("background-color", "grey");
+                    $(`#button_${user_id}`).prop('disabled', false);
+                })
+                .fail(() => {
+                    $(`#button_${user_id}`).text("Could not accept the invitation!");
+                    window.setTimeout(function () {
+                        $(`#button_${user_id}`).css("background-color", "red");
+                        $(`#button_${user_id}`).text("Remove");
+                        $(`#button_${user_id}`).prop('disabled', false);
+                    }, 2 * 1000);
+                })
+        }
+    }
+</script>
 {% endblock %}

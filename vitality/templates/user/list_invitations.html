@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3>Sent Invitations</h3>
+    </div>
+    {% if all_sent|length == 0 %}
+    <div class="col-sm-12">
+        <p style="color: red;">You have no sent invitations.</p>
+    </div>
+    {% else %}
+    {% for invitation in all_sent %}
+    <div class="card col-sm-12 col-lg-3">
+        <div class="col-sm-12 text-center">
+            <p>Sent to:
+                {{g.database.get_trainer_by_id(invitation['recipient']).username or g.database.get_trainee_by_id(invitation['recipient']).username}}
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <hr />
+
+    <div class="col-sm-12">
+        <h3>Recieved Invitations</h3>
+    </div>
+
+    {% if all_recieved|length == 0 %}
+    <div class="col-sm-12">
+        <p style="color: red;">You have no sent invitations.</p>
+    </div>
+    {% else %}
+    {% for invitation in all_recieved %}
+    <div class="card col-sm-12 col-lg-3">
+        <div class="col-sm-12 text-center">
+            <p class="pt-2">
+                Sent by:
+                {{g.database.get_trainer_by_id(invitation['sender']).username or g.database.get_trainee_by_id(invitation['sender']).username}}
+            </p>
+            <button class="button_title" onclick="confirm_invitation('true', '{{ invitation['_id'] }}' );"
+                id="button_{{invitation['_id']}}">
+                Accept
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<script>
+    function confirm_invitation(confirmation_value, invitation_id) {
+
+
+        $.post('{{ url_for('accept_invitation') }}',
+            {
+                'confirmation': confirmation_value,
+                'invitation_id': invitation_id
+            })
+            .done(() => {
+                $(`#button_${invitation_id}`).text("Invitation Accepted!");
+                $(`#button_${invitation_id}`).css("background-color", "grey");
+                $(`#button_${invitation_id}`).prop('disabled', true);
+            })
+            .fail(() => {
+                $(`#button_${invitation_id}`).text("Could not accept the invitation!");
+                window.setTimeout(function () {
+                    $(`#button_${invitation_id}`).css("background-color", "grey");
+                    $(`#button_${invitation_id}`).text("Accept");
+                    $(`#button_${invitation_id}`).prop('disabled', false);
+                }, 2 * 1000);
+            });
+
+
+    }
+</script>
+{% endblock %}

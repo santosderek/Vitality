@@ -8,6 +8,7 @@
 <main>
     <form id="delAccount" action="/delete" method="POST" onsubmit="event.preventDefault(); delConfirm()">
         <a class="btn" style="background-color: red; color: white" href="{{ url_for("usersettings", username=g.user.username)}}" >Cancel</a>
+        <input type="hidden" id="confirmation" value="false" name="confirmation" >
         <input type="submit" class="btn" value="Delete" style="background-color: red; color: white;" >
     </form>
     <script>
@@ -15,6 +16,7 @@
             var thisForm = document.getElementById("delAccount");
             if(confirm("Are you sure you want to delete your account? Doing so is irreversible!")){
                 alert("Deleting user profile. Goodbye!");
+                $('#confirmation').val("true");
                 thisForm.submit();
             }
             else {

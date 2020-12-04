@@ -1,6 +1,6 @@
-* { 
-    margin:0; 
-    padding:0; 
+* {
+    margin: 0;
+    padding: 0;
 }
 
 body {
@@ -16,39 +16,37 @@ button:hover {
     color: #3f6499;
     text-decoration: none;
 }
+
 h1, h2, h3 {
     color: #47525E;
     font-weight: bold;
+}
+
+button, .button_title {
+    color: white;
+    background-color: none;
+    border: 2px solid white;
+    padding: .5em .7em;
+    margin: 1em .3em;
+    font-size: larger;
+    border-radius: .2em;
+}
+
+button:hover, .button_title:hover {
+    color: #3f6499;
+    text-decoration: none;
 }
 
 .row {
     margin: auto;
 }
 
-button, .button_title {
-    color: white;
-    background-color: none;
-    border: 2px solid white; 
-    padding: 10px 15px;
-    margin: 2px;  
-    font-size: larger;
-    border-radius: .2em;
-}
-
-.button_title:hover {
-    color: #3f6499;
-
-    
-}
-
-button:hover, .button_title:hover {
-    color: #3f6499; 
-    text-decoration: none;
-}
-
 .card {
     background-color: #8492A6;
     border: none;
+    color: white;
+    border-radius: .5em;
+    margin: 1em;
 }
 
 .darkbg {
@@ -71,7 +69,7 @@ button:hover, .button_title:hover {
 
 .navbar, .navbar-expand-lg, .jumbotron {
     background-color: #E5E9F2 !important;
-    width: 100%; 
+    width: 100%;
 }
 
 .navbar li a {
