@@ -12,10 +12,12 @@
     </div>
     {% else %}
     {% for invitation in all_sent %}
-    <div class="col-sm-12">
-        <p>Sent to:
-            {{g.database.get_trainer_by_id(invitation['recipient']).username or g.database.get_trainee_by_id(invitation['recipient']).username}}
-        </p>
+    <div class="card col-sm-12 col-lg-3">
+        <div class="col-sm-12 text-center">
+            <p>Sent to:
+                {{g.database.get_trainer_by_id(invitation['recipient']).username or g.database.get_trainee_by_id(invitation['recipient']).username}}
+            </p>
+        </div>
     </div>
     {% endfor %}
     {% endif %}
