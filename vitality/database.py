@@ -1,3 +1,4 @@
+from .invitation import Invitation
 from .trainee import Trainee
 from .trainer import Trainer
 from .workout import Workout
@@ -110,10 +111,10 @@ class Database:
 
     def trainee_add_trainer(self, trainee_id: str, trainer_id: str):
         """Add trainer object id to trainee's trainer list"""
-        if self.get_trainee_by_id(trainee_id) is None:
+        if self.get_trainee_by_id(trainee_id) is None or self.get_trainee_by_id(trainee_id) is None:
             raise UserNotFoundError("Trainee ID does not exist.")
 
-        if self.get_trainer_by_id(trainer_id) is None:
+        if self.get_trainer_by_id(trainer_id) is None or self.get_trainer_by_id(trainer_id) is None:
             raise UserNotFoundError("Trainer ID does not exist.")
 
         self.mongo.db.trainee.update_one(
@@ -152,6 +153,27 @@ class Database:
                 }
             }
 
+        )
+
+    def trainee_remove_trainer(self, trainee_id: str, trainer_id: str):
+        """Remove trainer object id from trainees's trainer list"""
+        if self.get_trainee_by_id(trainee_id) is None or self.get_trainee_by_id(trainee_id) is None:
+            raise UserNotFoundError("Trainee ID does not exist.")
+
+        if self.get_trainer_by_id(trainer_id) is None or self.get_trainer_by_id(trainer_id) is None:
+            raise UserNotFoundError("Trainer ID does not exist.")
+
+        self.mongo.db.trainee.update_one(
+            {
+                '_id': ObjectId(trainee_id)
+            },
+            {
+                "$pull": {
+                    "trainers": {
+                        "$in": [ObjectId(trainer_id)]
+                    }
+                }
+            }
         )
 
     """ Trainer Functions """
@@ -294,10 +316,10 @@ class Database:
 
     def trainer_add_trainee(self, trainer_id: str, trainee_id: str):
         """Add trainer object id to trainee's trainer list"""
-        if self.get_trainee_by_id(trainee_id) is None:
+        if self.get_trainee_by_id(trainee_id) is None or self.get_trainee_by_id(trainee_id) is None:
             raise UserNotFoundError("Trainee ID does not exist.")
 
-        if self.get_trainer_by_id(trainer_id) is None:
+        if self.get_trainer_by_id(trainer_id) is None or self.get_trainer_by_id(trainer_id) is None:
             raise UserNotFoundError("Trainer ID does not exist.")
 
         self.mongo.db.trainer.update_one(
@@ -308,21 +330,26 @@ class Database:
                 }
             })
 
-    def trainer_peak_trainees(self, trainer_id: str):
-        """Returns a list of all trainees that have added this trainer"""
-        if self.get_trainer_by_id(trainer_id) is None:
+    def trainer_remove_trainee(self, trainer_id: str, trainee_id: str):
+        """Remove trainee object id from trainers's trainee list"""
+        if self.get_trainee_by_id(trainee_id) is None or self.get_trainee_by_id(trainee_id) is None:
+            raise UserNotFoundError("Trainee ID does not exist.")
+
+        if self.get_trainer_by_id(trainer_id) is None or self.get_trainer_by_id(trainer_id) is None:
             raise UserNotFoundError("Trainer ID does not exist.")
 
-        trainees = []
-        found_trainees = self.mongo.db.trainee.find({
-            "trainers": ObjectId(trainer_id)
-        })
-
-        if found_trainees is not None:
-            for trainee in found_trainees:
-                trainees.append(self.trainee_dict_to_class(trainee))
-
-        return trainees
+        self.mongo.db.trainer.update_one(
+            {
+                '_id': ObjectId(trainer_id)
+            },
+            {
+                "$pull": {
+                    "trainees": {
+                        "$in": [ObjectId(trainee_id)]
+                    }
+                }
+            }
+        )
 
     def add_trainer(self, trainer: Trainer):
         """Adds a trainer to the database based on a provided trainer class."""
@@ -450,6 +477,113 @@ class Database:
             "about": workout.about,
             "exp": workout.exp})
 
+    """Invitation"""
+
+    def create_invitation(self, sender: str, recipient: str):
+        """
+        Create an invitation based on a sender and recipient.
+            sender: str - The id given to a user document by mongodb.
+            recipient: str - The id given to a user document by mongodb.
+
+            returns the object id of the invitation.
+        """
+        if self.get_trainee_by_id(sender) is None and self.get_trainer_by_id(sender) is None:
+            raise UserNotFoundError('Sender could not be found')
+        if self.get_trainee_by_id(recipient) is None and self.get_trainer_by_id(recipient) is None:
+            raise UserNotFoundError('Recipient could not be found')
+        invitation = self.mongo.db.invitation.insert_one({
+            'sender': ObjectId(sender),
+            'recipient': ObjectId(recipient)
+        })
+        return str(invitation.inserted_id)
+
+    def delete_invitation(self, invitation_id: str):
+        """
+        Delete an invitation from the database
+            invitation_id: str - The id given to the invitation document by mongodb.
+
+        """
+        self.mongo.db.invitation.delete_one({
+            '_id': ObjectId(invitation_id)
+        })
+
+    def search_invitation(self, invitation_id: str):
+        """
+        Search for an invitation based on a user_id.
+            invitation_id: str - The id given to the invitation document by mongodb.
+
+            returns the document found. 
+        """
+        invitation = self.mongo.db.invitation.find_one({
+            '_id': ObjectId(invitation_id)
+        })
+
+        if invitation is None:
+            raise InvitationNotFound('Invitation not found')
+        else:
+            return Invitation(str(invitation['_id']), str(invitation['sender']), str(invitation['recipient']))
+
+    def search_all_user_invitations(self, user_id: str):
+        """
+        Search for all invitations a user has sent and recieved.
+            user_id: str - The id of the user given by mongodb.
+        """
+        database_sent = self.mongo.db.invitation.find({
+            'sender': ObjectId(user_id)
+        })
+        database_recieved = self.mongo.db.invitation.find({
+            'recipient': ObjectId(user_id)
+        })
+
+        all_sent = []
+        all_recieved = []
+
+        for item in database_sent:
+            all_sent.append({
+                '_id': str(item['_id']),
+                'sender': str(item['sender']),
+                'recipient': str(item['recipient']),
+            })
+
+        for item in database_recieved:
+            all_recieved.append({
+                '_id': str(item['_id']),
+                'sender': str(item['sender']),
+                'recipient': str(item['recipient']),
+            })
+
+        return (all_sent, all_recieved)
+
+    def accept_invitation(self, invitation_id: str, accepter_id: str):
+        """
+        Removes the invitation and adds the trainee to trainer list and vice versa.
+            invitation_id: str - The id of the invitation generated by mongodb.
+            accepter_id: str - The id of the user that is accepting the id.
+        """
+        invitation = self.mongo.db.invitation.find_one({
+            '_id': ObjectId(invitation_id),
+            'recipient': ObjectId(accepter_id)
+        })
+
+        if invitation is None:
+            raise InvitationNotFound(
+                "Could not find a recipient with the given accepter id.")
+
+        sender = self.get_trainee_by_id(invitation['sender']) or\
+            self.get_trainer_by_id(invitation['sender'])
+        recipient = self.get_trainee_by_id(invitation['recipient']) or\
+            self.get_trainer_by_id(invitation['recipient'])
+
+        if type(sender) is Trainer:
+            self.trainer_add_trainee(sender._id, recipient._id)
+            self.trainee_add_trainer(recipient._id, sender._id)
+
+        elif type(sender) is Trainee:
+            self.trainee_add_trainer(sender._id, recipient._id)
+            self.trainer_add_trainee(recipient._id, sender._id)
+
+        self.delete_invitation(invitation_id)
+
 
 class UsernameTakenError(ValueError):
     """If a username was taken within the database class"""
@@ -468,4 +602,17 @@ class WorkoutCreatorIdNotFoundError(AttributeError):
 
 class InvalidCharactersException(Exception):
     """Error for invalid user input"""
+    pass
+
+
+class InvitationNotFound(Exception):
+    """Error for when an invitation is not found"""
+    pass
+
+
+class IncorrectRecipientID(Exception):
+    """
+    Error for when accepting an invitation. 
+    The passed accepter's id must match the invitation's recipient id.
+    """
     pass

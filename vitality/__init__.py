@@ -2,10 +2,13 @@ from .trainee import Trainee
 from .trainer import Trainer
 from .database import (
     Database,
-    UsernameTakenError, WorkoutCreatorIdNotFoundError,
+    UsernameTakenError,
+    WorkoutCreatorIdNotFoundError,
     password_sha256,
     InvalidCharactersException,
-    UserNotFoundError
+    UserNotFoundError,
+    IncorrectRecipientID,
+    InvitationNotFound
 )
 from .configuration import Configuration
 from .workout import Workout
@@ -34,7 +37,6 @@ def create_app():
     alphaPattern = re.compile(r"^[a-zA-Z0-9\s]*$")
     numberPattern = re.compile(r"^[0-9]*$")
     stringPattern = re.compile(r"^[a-zA-Z]*$")
-
 
     @app.before_request
     def before_request():
@@ -103,7 +105,7 @@ def create_app():
         """Sign up page for Vitality"""
         app.logger.info('Rendering Create User')
         if request.method == 'POST':
-           try:
+            try:
                 session.pop('user_id', None)
                 username = escape(request.form['username'])
                 if not alphaPattern.search(username):
@@ -165,13 +167,14 @@ def create_app():
                         return render_template("account/signup.html", creation_successful=True)
 
                     except UsernameTakenError as err:
-                        app.logger.debug("Username {} was taken.".format(new_user))
+                        app.logger.debug(
+                            "Username {} was taken.".format(new_user))
                         return render_template("account/signup.html", username_taken=True)
 
                 # If username and password failed, render error messsage
                 return render_template("account/signup.html", error_message=True)
-           except InvalidCharactersException as e:
-               return render_template("account/signup.html", invalid_characters=True), 400
+            except InvalidCharactersException as e:
+                return render_template("account/signup.html", invalid_characters=True), 400
         return render_template("account/signup.html")
 
     @app.route('/profile/<username>', methods=["GET"])
@@ -183,9 +186,8 @@ def create_app():
 
         app.logger.info('Rendering Profile')
         username = escape(username)
-        user = g.database.get_trainee_by_username(username)
-        if user is None:
-            user = g.database.get_trainer_by_username(username)
+        user = g.database.get_trainer_by_username(username) \
+            or g.database.get_trainee_by_username(username)
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
@@ -221,56 +223,36 @@ def create_app():
 
                     if username:
                         g.database.set_trainee_username(g.user._id, username)
-                        if not alphaPattern.search(username):
-                            raise InvalidCharactersException("Invalid characters")
 
                     if password and re_password and password == re_password:
                         g.database.set_trainee_password(g.user._id, password)
-                        if not alphaPattern.search(password):
-                            raise InvalidCharactersException("Invalid characters")
 
                     if location:
                         g.database.set_trainee_location(g.user._id, location)
-                        if not alphaPattern.search(location):
-                            raise InvalidCharactersException("Invalid characters")
 
                     if phone:
                         g.database.set_trainee_phone(g.user._id, phone)
-                        if not numberPattern.search(phone):
-                            raise InvalidCharactersException("Invalid characters")
 
                     if name:
                         g.database.set_trainee_name(g.user._id, name)
-                        if not stringPattern.search(name):
-                            raise InvalidCharactersException("Invalid characters")
 
                     return redirect(url_for('usersettings'))
 
                 elif g.database.get_trainer_by_id(g.user._id) is not None:
                     if username:
                         g.database.set_trainer_username(g.user._id, username)
-                        if not alphaPattern.search(username):
-                            raise InvalidCharactersException("Invalid characters")
 
                     if password and re_password and password == re_password:
                         g.database.set_trainer_password(g.user._id, password)
-                        if not alphaPattern.search(password):
-                            raise InvalidCharactersException("Invalid characters")
 
                     if location:
                         g.database.set_trainer_location(g.user._id, location)
-                        if not alphaPattern.search(location):
-                            raise InvalidCharactersException("Invalid characters")
 
                     if phone:
                         g.database.set_trainer_phone(g.user._id, phone)
-                        if not numberPattern.search(phone):
-                            raise InvalidCharactersException("Invalid characters")
 
                     if name:
                         g.database.set_trainer_name(g.user._id, name)
-                        if not stringPattern.search(name):
-                            raise InvalidCharactersException("Invalid characters")
 
                     return redirect(url_for('usersettings'))
 
@@ -278,6 +260,40 @@ def create_app():
                 return render_template("account/usersettings.html", invalid_characters=True), 400
 
         return render_template("account/usersettings.html")
+
+    @app.route('/remove_added_user', methods=["POST"])
+    def remove_added_user():
+        """Remove an added user from both the trainees and trainers list of each respective user."""
+
+        if not g.user:
+            return redirect(url_for('login'))
+
+        try:
+            confirmation = escape(request.form['confirmation'])
+            user_id = escape(request.form['user_id'])
+
+            if confirmation != 'true':
+                app.logger.debug('Confirmation was not true')
+                abort(500)
+
+            if not user_id:
+                app.logger.debug('User id was not given.')
+                raise UserNotFoundError("User id was not given")
+
+            if type(g.user) is Trainer:
+                g.database.trainer_remove_trainee(g.user._id, user_id)
+                g.database.trainee_remove_trainer(user_id, g.user._id)
+
+            elif type(g.user) is Trainee:
+                g.database.trainee_remove_trainer(g.user._id, user_id)
+                g.database.trainer_remove_trainee(user_id, g.user._id)
+
+            return '', 204
+
+        except UserNotFoundError as error:
+            message = 'Could not find a user id to delete within the added user list.'
+            app.logger.debug(message)
+            abort(500)
 
     @app.route('/delete', methods=["GET", "POST"])
     def delete():
@@ -288,6 +304,11 @@ def create_app():
             return redirect(url_for('login'))
 
         if request.method == 'POST':
+            confirmation = escape(request.form['confirmation'])
+            
+            if str(confirmation) != 'true': 
+                return render_template("account/delete.html"), 500
+                 
 
             if g.database.get_trainee_by_id(g.user._id) is not None:
                 app.logger.info('Deleting user ' + g.user.username)
@@ -304,8 +325,6 @@ def create_app():
                     session.pop('user_id', None)
                 g.user = None
                 return redirect(url_for('home'))
-
-            abort(500)
 
         return render_template("account/delete.html")
 
@@ -334,17 +353,32 @@ def create_app():
         app.logger.debug('Trainer {} loaded Trainer Overview.'.format(
             str(session['user_id'])))
 
+        # Get all trainees
         trainees = []
         for trainee_id in g.user.trainees:
             trainee = g.database.get_trainee_by_id(trainee_id)
             if trainee is not None:
                 trainees.append(trainee)
-        peak_trainees = g.database.trainer_peak_trainees(g.user._id)
+
+        # Get all Invitations
+        sent_invitations, recieved_invitations = g.database.search_all_user_invitations(
+            g.user._id)
+
+        invitations = []
+        for invitation in recieved_invitations:
+            invitations.append({
+                'sender': g.database.get_trainee_by_id(invitation['sender']),
+                'recipient': g.database.get_trainer_by_id(invitation['recipient'])
+            })
+
+        # Get all workouts
+        workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
+
         return render_template("user/overview.html",
                                trainees=trainees,
-                               workouts=g.database.get_all_workouts_by_creatorid(g.user._id),
+                               workouts=workouts,
                                events=[],
-                               peak_trainees=peak_trainees)
+                               invitations=invitations)
 
     @app.route('/list_trainees', methods=["GET"])
     def list_trainees():
@@ -400,9 +434,25 @@ def create_app():
             trainer = g.database.get_trainer_by_id(trainer_id)
             if trainer is not None:
                 trainers.append(trainer)
+
+        # Get all Invitations
+        sent_invitations, recieved_invitations = g.database.search_all_user_invitations(
+            g.user._id)
+
+        invitations = []
+        for invitation in recieved_invitations:
+            invitations.append({
+                'sender': g.database.get_trainer_by_id(invitation['sender']),
+                'recipient': g.database.get_trainee_by_id(invitation['recipient'])
+            })
+
+        # Get all workouts
+        workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
+
         return render_template("user/overview.html",
                                trainers=trainers,
-                               workouts=[])
+                               workouts=workouts,
+                               invitations=invitations)
 
     @app.route('/list_trainers', methods=["GET"])
     def list_trainers():
@@ -495,7 +545,7 @@ def create_app():
 
         try:
             trainer_id = escape(request.form['trainer_id'])
-            g.database.trainee_add_trainer(g.user._id, trainer_id)
+            g.database.create_invitation(g.user._id, trainer_id)
             return "", 204
 
         except UserNotFoundError:
@@ -513,7 +563,7 @@ def create_app():
 
         try:
             trainee_id = escape(request.form['trainee_id'])
-            g.database.trainer_add_trainee(g.user._id, trainee_id)
+            g.database.create_invitation(g.user._id, trainee_id)
             return "", 204
 
         except UserNotFoundError:
@@ -528,7 +578,7 @@ def create_app():
 
         if request.method == "POST":
 
-            try: 
+            try:
                 name = escape(request.form['name'])
                 about = escape(request.form['about'])
                 difficulty = escape(request.form['difficulty'])
@@ -541,10 +591,10 @@ def create_app():
                     about=about,
                     exp=0
                 ))
-                return render_template("workout/new_workout.html", workout_added = True)
+                return render_template("workout/new_workout.html", workout_added=True)
 
-            except WorkoutCreatorIdNotFoundError: 
-                return render_template("workout/new_workout.html", invalid_creatorid = True)
+            except WorkoutCreatorIdNotFoundError:
+                return render_template("workout/new_workout.html", invalid_creatorid=True)
 
         return render_template("workout/new_workout.html")
 
@@ -556,13 +606,17 @@ def create_app():
 
         return render_template("workout/search.html")
 
-    @app.route('/workout/<workout_id>', methods=["GET"])
-    def workout(workout_id: str):
+    @app.route('/workout/<creator_id>/<workout_id>', methods=["GET"])
+    def workout(creator_id: str, workout_id: str):
         """Page that shows the workout details"""
         if not g.user:
             return redirect(url_for('login'))
+        creator_id = escape(creator_id)
+        workout_id = escape(workout_id)
+        if (g.database.get_workout_by_name(workout_id, creator_id) == None):
+                abort(404)
 
-        return render_template("workout/workout.html")
+        return render_template("workout/workout.html", workoutInfo = g.database.get_workout_by_name(workout_id, creator_id))
 
     @app.route('/workout_overview', methods=["GET"])
     def workout_overview():
@@ -579,6 +633,45 @@ def create_app():
             return redirect(url_for('login'))
 
         return render_template("workout/workoutlist.html")
+
+    """Invitation System"""
+    @app.route('/invitations', methods=["GET"])
+    def invitations():
+        """Show all sent and recieved invitations from other users."""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        sent_invitations, recieved_invitaitons = g.database.search_all_user_invitations(
+            g.user._id)
+
+        return render_template('user/list_invitations.html',
+                               all_sent=sent_invitations,
+                               all_recieved=recieved_invitaitons)
+
+    @app.route('/accept_invitation', methods=['POST'])
+    def accept_invitation():
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        try:
+            confirmation = escape(request.form['confirmation'])
+            invitation_id = escape(request.form['invitation_id'])
+
+            if confirmation != 'true':
+                abort(500)
+
+            g.database.accept_invitation(invitation_id, g.user._id)
+            return '', 204
+
+        except IncorrectRecipientID as error:
+            app.logger.debug("There is no invitation for given recipient id.")
+            abort(500)
+
+        except InvitationNotFound as error:
+            app.logger.debug("User could not find invitation!")
+            abort(500)
 
     @app.errorhandler(400)
     def page_bad_request(e):
