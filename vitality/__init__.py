@@ -434,9 +434,25 @@ def create_app():
             trainer = g.database.get_trainer_by_id(trainer_id)
             if trainer is not None:
                 trainers.append(trainer)
+
+        # Get all Invitations
+        sent_invitations, recieved_invitations = g.database.search_all_user_invitations(
+            g.user._id)
+
+        invitations = []
+        for invitation in recieved_invitations:
+            invitations.append({
+                'sender': g.database.get_trainer_by_id(invitation['sender']),
+                'recipient': g.database.get_trainee_by_id(invitation['recipient'])
+            })
+
+        # Get all workouts
+        workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
+
         return render_template("user/overview.html",
                                trainers=trainers,
-                               workouts=[])
+                               workouts=workouts,
+                               invitations=invitations)
 
     @app.route('/list_trainers', methods=["GET"])
     def list_trainers():
