@@ -11,3 +11,6 @@ class Event:
     def as_dict(self):
         """Returns all attributes of the Workout class as a dictionary."""
         return dict(self.__dict__)
+
+    def __repr__(self):
+        return f'Event({self._id}, {self.creator_id}, {self.date}, {self.title}, {self.description})'
