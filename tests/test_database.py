@@ -440,6 +440,7 @@ class TestDatabase(unittest.TestCase):
         # Get workout from database
         trainee = self.database.get_trainee_by_username(
             self.test_trainee.username)
+            
 
         # Get workout from database
         database_workout = self.database.get_workout_by_name(new_workout.name,

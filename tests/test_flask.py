@@ -1108,6 +1108,7 @@ def test_workout(client):
     assert g.user is None
     
     trainee = g.database.get_trainee_by_username('testTrainee')
+    
     trainer = g.database.get_trainer_by_username('testTrainer')
 
     workoutTest = Workout(
