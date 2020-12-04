@@ -53,6 +53,7 @@
 <script>
     function confirm_invitation(confirmation_value, invitation_id) {
 
+
         $.post('{{ url_for('accept_invitation') }}',
             {
                 'confirmation': confirmation_value,
