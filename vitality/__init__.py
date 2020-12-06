@@ -37,6 +37,7 @@ def create_app():
     alphaPattern = re.compile(r"^[a-zA-Z0-9\s]*$")
     numberPattern = re.compile(r"^[0-9]*$")
     stringPattern = re.compile(r"^[a-zA-Z]*$")
+    lowerPattern = re.compile(r"^[a-z0-9\s]*$")
 
     @app.before_request
     def before_request():
@@ -73,7 +74,7 @@ def create_app():
                 session.pop('user_id', None)
 
                 username = escape(request.form['username'])
-                if not alphaPattern.search(username):
+                if not lowerPattern.search(username):
                     raise InvalidCharactersException("Invalid characters")
 
                 password = escape(request.form['password'])
@@ -108,7 +109,7 @@ def create_app():
             try:
                 session.pop('user_id', None)
                 username = escape(request.form['username'])
-                if not alphaPattern.search(username):
+                if not lowerPattern.search(username):
                     raise InvalidCharactersException("Invalid characters")
 
                 password = escape(request.form['password'])
@@ -201,7 +202,7 @@ def create_app():
         if request.method == 'POST':
             try:
                 username = escape(request.form['username'])
-                if not alphaPattern.search(username):
+                if not lowerPattern.search(username):
                     raise InvalidCharactersException("Invalid characters")
                 password = escape(request.form['password'])
                 if not alphaPattern.search(password):

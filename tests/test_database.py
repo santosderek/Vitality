@@ -20,7 +20,7 @@ class TestDatabase(unittest.TestCase):
     # Creating new Trainee object
     test_trainee = Trainee(
         _id=None,
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="first last",
         location="Earth",
@@ -30,7 +30,7 @@ class TestDatabase(unittest.TestCase):
     # Creating new Trainer object
     test_trainer = Trainer(
         _id=None,
-        username="testTrainer",
+        username="testtrainer",
         password="password",
         name="first last",
         location="mars",
@@ -86,8 +86,8 @@ class TestDatabase(unittest.TestCase):
 
     def test_trainee_add_trainer(self):
 
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
 
         with self.assertRaises(UserNotFoundError):
             self.database.trainee_add_trainer("123456789012345678901234",
@@ -105,8 +105,8 @@ class TestDatabase(unittest.TestCase):
 
     def test_trainer_add_trainee(self):
 
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
 
         with self.assertRaises(UserNotFoundError):
             self.database.trainer_add_trainee("123456789012345678901234",
@@ -127,18 +127,18 @@ class TestDatabase(unittest.TestCase):
         # Raise exception if 'testTrainee' username found
         with self.assertRaises(UsernameTakenError):
             new_trainer = deepcopy(self.test_trainer)
-            new_trainer.username = "testTrainee"
+            new_trainer.username = "testtrainee"
             self.database.add_trainee(new_trainer)
 
         # Raise exception if 'testTrainer' username found
         with self.assertRaises(UsernameTakenError):
             new_trainer = deepcopy(self.test_trainer)
-            new_trainer.username = "testTrainer"
+            new_trainer.username = "testtrainer"
             self.database.add_trainee(new_trainer)
 
         # Copy test_trainer and change to unused trainer name
         new_trainee = deepcopy(self.test_trainee)
-        new_trainee.username = "testUsername"
+        new_trainee.username = "testusername"
 
         # Remove testUsername
         while self.database.get_trainee_by_username(new_trainee.username) is not None:
@@ -282,18 +282,18 @@ class TestDatabase(unittest.TestCase):
 
     def test_list_trainers_by_search(self):
         # Searching for testTrainer with input "testTrain"
-        found_trainers = self.database.list_trainers_by_search("testTrain")
+        found_trainers = self.database.list_trainers_by_search("testtrain")
         self.assertEqual(len(found_trainers), 1)
 
-        trainer = self.database.get_trainer_by_username("testTrainer")
+        trainer = self.database.get_trainer_by_username("testtrainer")
         self.assertEqual(found_trainers[0].as_dict(), trainer.as_dict())
 
     def test_list_trainees_by_search(self):
         # Searching for testTrainee with input "testTrain"
-        found_trainees = self.database.list_trainees_by_search("testTrain")
+        found_trainees = self.database.list_trainees_by_search("testtrain")
         self.assertEqual(len(found_trainees), 1)
 
-        trainee = self.database.get_trainee_by_username("testTrainee")
+        trainee = self.database.get_trainee_by_username("testtrainee")
         self.assertEqual(found_trainees[0].as_dict(), trainee.as_dict())
 
     """ Test trainer """
@@ -303,13 +303,13 @@ class TestDatabase(unittest.TestCase):
         # Raise exception if 'testTrainee' username found
         with self.assertRaises(UsernameTakenError):
             new_trainer = deepcopy(self.test_trainer)
-            new_trainer.username = "testTrainee"
+            new_trainer.username = "testtrainee"
             self.database.add_trainer(new_trainer)
 
         # Raise exception if 'testTrainer' username found
         with self.assertRaises(UsernameTakenError):
             new_trainer = deepcopy(self.test_trainer)
-            new_trainer.username = "testTrainer"
+            new_trainer.username = "testtrainer"
             self.database.add_trainer(new_trainer)
 
         # Copy test_trainer and change to unused trainer name
@@ -732,48 +732,48 @@ class TestDatabase(unittest.TestCase):
 
         try:
             self.database.add_trainee(Trainee(_id=None,
-                                              username="testTrainee1",
+                                              username="testtrainee1",
                                               password="pass",
                                               name="testTrainee1",
                                               location="somewhere",
                                               phone=1234567890))
             self.database.add_trainee(Trainee(_id=None,
-                                              username="testTrainee2",
+                                              username="testtrainee2",
                                               password="pass",
                                               name="testTrainee2",
                                               location="somewhere",
                                               phone=1234567890))
             self.database.add_trainee(Trainee(_id=None,
-                                              username="testTrainee3",
+                                              username="testtrainee3",
                                               password="pass",
                                               name="testTrainee3",
                                               location="somewhere",
                                               phone=1234567890))
 
             self.database.add_trainer(Trainer(_id=None,
-                                              username="testTrainer1",
+                                              username="testtrainer1",
                                               password="pass",
                                               name="testTrainer3",
                                               location="somewhere",
                                               phone=1234567890))
 
             trainee1_id = str(self.database.mongo.db.trainee.find_one(
-                {'username': 'testTrainee1'})['_id'])
+                {'username': 'testtrainee1'})['_id'])
             trainee2_id = str(self.database.mongo.db.trainee.find_one(
-                {'username': 'testTrainee2'})['_id'])
+                {'username': 'testtrainee2'})['_id'])
             trainee3_id = str(self.database.mongo.db.trainee.find_one(
-                {'username': 'testTrainee3'})['_id'])
+                {'username': 'testtrainee3'})['_id'])
             trainer_id = str(self.database.mongo.db.trainer.find_one(
-                {'username': 'testTrainer1'})['_id'])
+                {'username': 'testtrainer1'})['_id'])
 
             assert self.database.get_trainer_by_username(
-                "testTrainer1") is not None
+                "testtrainer1") is not None
             assert self.database.get_trainee_by_username(
-                "testTrainee1") is not None
+                "testtrainee1") is not None
             assert self.database.get_trainee_by_username(
-                "testTrainee2") is not None
+                "testtrainee2") is not None
             assert self.database.get_trainee_by_username(
-                "testTrainee3") is not None
+                "testtrainee3") is not None
 
             self.database.trainer_add_trainee(trainer_id, trainee1_id)
             self.database.trainer_add_trainee(trainer_id, trainee2_id)
@@ -796,11 +796,11 @@ class TestDatabase(unittest.TestCase):
 
         finally:
             self.database.mongo.db.trainee.delete_many(
-                {"username": "testTrainee1"})
+                {"username": "testtrainee1"})
             self.database.mongo.db.trainee.delete_many(
-                {"username": "testTrainee2"})
+                {"username": "testtrainee2"})
             self.database.mongo.db.trainee.delete_many(
-                {"username": "testTrainee3"})
+                {"username": "testtrainee3"})
             self.database.mongo.db.trainer.delete_many(
                 {"username": "testTrainer1"})
 
@@ -808,48 +808,48 @@ class TestDatabase(unittest.TestCase):
 
         try:
             self.database.add_trainer(Trainer(_id=None,
-                                              username="testTrainer1",
+                                              username="testtrainer1",
                                               password="pass",
                                               name="testTrainer1",
                                               location="somewhere",
                                               phone=1234567890))
             self.database.add_trainer(Trainer(_id=None,
-                                              username="testTrainer2",
+                                              username="testtrainer2",
                                               password="pass",
                                               name="testTrainer2",
                                               location="somewhere",
                                               phone=1234567890))
             self.database.add_trainer(Trainer(_id=None,
-                                              username="testTrainer3",
+                                              username="testtrainer3",
                                               password="pass",
                                               name="testTrainer3",
                                               location="somewhere",
                                               phone=1234567890))
 
             self.database.add_trainee(Trainee(_id=None,
-                                              username="testTrainee1",
+                                              username="testtrainee1",
                                               password="pass",
                                               name="testTrainer3",
                                               location="somewhere",
                                               phone=1234567890))
 
             trainer1_id = str(self.database.mongo.db.trainer.find_one(
-                {'username': 'testTrainer1'})['_id'])
+                {'username': 'testtrainer1'})['_id'])
             trainer2_id = str(self.database.mongo.db.trainer.find_one(
-                {'username': 'testTrainer2'})['_id'])
+                {'username': 'testtrainer2'})['_id'])
             trainer3_id = str(self.database.mongo.db.trainer.find_one(
-                {'username': 'testTrainer3'})['_id'])
+                {'username': 'testtrainer3'})['_id'])
             trainee_id = str(self.database.mongo.db.trainee.find_one(
-                {'username': 'testTrainee1'})['_id'])
+                {'username': 'testtrainee1'})['_id'])
 
             assert self.database.get_trainee_by_username(
-                "testTrainee1") is not None
+                "testtrainee1") is not None
             assert self.database.get_trainer_by_username(
-                "testTrainer1") is not None
+                "testtrainer1") is not None
             assert self.database.get_trainer_by_username(
-                "testTrainer2") is not None
+                "testtrainer2") is not None
             assert self.database.get_trainer_by_username(
-                "testTrainer3") is not None
+                "testtrainer3") is not None
 
             self.database.trainee_add_trainer(trainee_id, trainer1_id)
             self.database.trainee_add_trainer(trainee_id, trainer2_id)
@@ -872,13 +872,13 @@ class TestDatabase(unittest.TestCase):
 
         finally:
             self.database.mongo.db.trainer.delete_many(
-                {"username": "testTrainer1"})
+                {"username": "testtrainer1"})
             self.database.mongo.db.trainer.delete_many(
-                {"username": "testTrainer2"})
+                {"username": "testtrainer2"})
             self.database.mongo.db.trainer.delete_many(
-                {"username": "testTrainer3"})
+                {"username": "testtrainer3"})
             self.database.mongo.db.trainee.delete_many(
-                {"username": "testTrainee1"})
+                {"username": "testtrainee1"})
 
     def test_get_all_workouts_by_creatorid(self):
 
@@ -920,8 +920,8 @@ class TestDatabase(unittest.TestCase):
             self.database.mongo.db.invitation.delete_many({
                 'recipient': ObjectId(user_two._id)
             })
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
 
         clean_up(trainee, trainer)
 
@@ -966,8 +966,8 @@ class TestDatabase(unittest.TestCase):
                 'recipient': ObjectId(user_two._id)
             })
 
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
         clean_up(trainee, trainer)
 
         invitation = self.database.mongo.db.invitation.insert_one({
@@ -1006,8 +1006,8 @@ class TestDatabase(unittest.TestCase):
                 'recipient': ObjectId(user_two._id)
             })
 
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
         clean_up(trainee, trainer)
 
         with self.assertRaises(InvitationNotFound):
@@ -1044,8 +1044,8 @@ class TestDatabase(unittest.TestCase):
                 'recipient': ObjectId(user_two._id)
             })
 
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
 
         clean_up(trainee, trainer)
 
@@ -1083,8 +1083,8 @@ class TestDatabase(unittest.TestCase):
                 'recipient': ObjectId(user_two._id)
             })
 
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
 
         try:
 
@@ -1170,8 +1170,8 @@ class TestDatabase(unittest.TestCase):
     def test_trainee_remove_trainer(self):
         """Tests to see if a trainee gets removed from a trainers list"""
 
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
 
         with self.assertRaises(UserNotFoundError):
             self.database.trainee_remove_trainer("123456789012345678901234",
@@ -1202,8 +1202,8 @@ class TestDatabase(unittest.TestCase):
     def test_trainer_remove_trainee(self):
         """Tests to see if a trainee gets removed from a trainers list"""
 
-        trainee = self.database.get_trainee_by_username('testTrainee')
-        trainer = self.database.get_trainer_by_username('testTrainer')
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
 
         with self.assertRaises(UserNotFoundError):
             self.database.trainer_remove_trainee("123456789012345678901234",
