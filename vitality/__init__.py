@@ -75,8 +75,8 @@ def create_app():
 
                 username = escape(request.form['username'])
                 if not lowerPattern.search(username):
-                    raise InvalidCharactersException(
-                        "Usernames should be lowercase")
+                    msg = "Usernames should be lowercase"
+                    raise InvalidCharactersException(msg)
 
                 password = escape(request.form['password'])
                 if not alphaPattern.search(password):
@@ -111,8 +111,8 @@ def create_app():
                 session.pop('user_id', None)
                 username = escape(request.form['username'])
                 if not lowerPattern.search(username):
-                    raise InvalidCharactersException(
-                        "Usernames should be lowercase")
+                    msg = "Usernames should be lowercase"
+                    raise InvalidCharactersException(msg)
 
                 password = escape(request.form['password'])
                 if not alphaPattern.search(password):
