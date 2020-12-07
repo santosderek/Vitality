@@ -11,7 +11,7 @@
         <div class="row">
             <form action="/usersettings" method="POST">
                 <label for="username"><b>Username</b></label>
-                <input class="fields" type="text" placeholder="{{g.user.username}}" name="username" disabled>
+                <input class="fields" type="text" placeholder="{{g.user.username}}" name="username" onkeyup="return forceLower(this);" disabled>
                 <br />
 
                 <label for="name"><b>Name</b></label>
@@ -40,7 +40,7 @@
         </div>
         {% if invalid_characters%}
         <div class="col-sm-12">
-        <p style="color: red;">Invalid characters found!</p>
+            <p style="color: red;">Invalid characters found!</p>
         </div>
         {% endif %}
         <div class="row">
@@ -72,5 +72,8 @@
         }
     }
 
+    function forceLower(value) {
+        value.value = value.value.toLowerCase();
+    }
 </script>
 {% endblock %}
