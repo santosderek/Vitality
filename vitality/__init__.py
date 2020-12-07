@@ -10,7 +10,6 @@ from .database import (
     IncorrectRecipientID,
     InvitationNotFound
 )
-from .configuration import Configuration
 from .workout import Workout
 from flask import (
     abort,
@@ -22,17 +21,14 @@ from flask import (
     session,
     g
 )
-from flask_pymongo import PyMongo
 from markupsafe import escape
 import re
-
+from .settings import SECRET_KEY, MONGO_URI
 
 def create_app():
     """Application factory for our flask web server"""
-    config = Configuration()
-    app = Flask(__name__, instance_relative_config=True)
-    app.secret_key = 'somethingverysecret'
-    app.config["MONGO_URI"] = config.get_local_uri()
+    app = Flask(__name__)
+    app.secret_key = SECRET_KEY
 
     alphaPattern = re.compile(r"^[a-zA-Z0-9\s]*$")
     numberPattern = re.compile(r"^[0-9]*$")
@@ -43,7 +39,7 @@ def create_app():
     def before_request():
         """Actions to take before each request"""
         if 'database' not in g:
-            g.database = Database(app)
+            g.database = Database(MONGO_URI)
 
         g.user = None
         if 'user_id' in session:
