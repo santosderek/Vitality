@@ -11,7 +11,7 @@ from vitality.workout import Workout
 
 test_trainee = Trainee(
     _id=None,
-    username="testTrainee",
+    username="testtrainee",
     password="password",
     name="first last",
     location="Earth",
@@ -20,7 +20,7 @@ test_trainee = Trainee(
 
 test_trainer = Trainer(
     _id=None,
-    username="testTrainer",
+    username="testtrainer",
     password="password",
     name="first last",
     location="Earth",
@@ -31,7 +31,7 @@ test_trainer = Trainer(
 def login_as_testTrainee(client):
     """Login as testTrainee"""
     returned_value = client.post('/login', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password"
     ), follow_redirects=True)
     assert returned_value.status_code == 200
@@ -44,7 +44,7 @@ def login_as_testTrainee(client):
 def login_as_testTrainer(client):
     """Login as testTrainer"""
     returned_value = client.post('/login', data=dict(
-        username="testTrainer",
+        username="testtrainer",
         password="password"
     ), follow_redirects=True)
     assert returned_value.status_code == 200
@@ -68,13 +68,13 @@ def client():
 
     def teardown():
         """ Code run after client has been used """
-        while database.get_trainee_by_username("testTrainee"):
+        while database.get_trainee_by_username("testtrainee"):
             database.remove_trainee(
-                database.get_trainee_by_username("testTrainee")._id)
+                database.get_trainee_by_username("testtrainee")._id)
 
-        while database.get_trainer_by_username("testTrainer"):
+        while database.get_trainer_by_username("testtrainer"):
             database.remove_trainer(
-                database.get_trainer_by_username("testTrainer")._id)
+                database.get_trainer_by_username("testtrainer")._id)
 
     with app.test_client() as client:
         with app.app_context():
@@ -86,18 +86,27 @@ def client():
 def test_failed_login_username(client):
     # Testing the failed login page
     returned_value = client.post('/login', data=dict(
-        username="testTrainee#%#^",
+        username="testtrainee#%#^",
         password="password"
     ), follow_redirects=True)
     assert returned_value.status_code == 400
     assert b'Invalid characters found' in returned_value.data
     assert g.user is None
 
+def test_failed_login_username_uppercase(client):
+    # Testing the failed login page
+    returned_value = client.post('/login', data=dict(
+        username="testTrainee",
+        password="password"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 def test_failed_login_password(client):
     # Testing the failed login page
     returned_value = client.post('/login', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password#^#$#"
     ), follow_redirects=True)
     assert returned_value.status_code == 400
@@ -108,7 +117,7 @@ def test_failed_login_password(client):
 def test_failed_signup_username(client):
     # Testing the failed signup page
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee^#$^%^",
+        username="testtrainee^#$^%^",
         password="password",
         name="test",
         repassword="password",
@@ -120,11 +129,25 @@ def test_failed_signup_username(client):
     assert b'Invalid characters found' in returned_value.data
     assert g.user is None
 
+def test_failed_signup_username_uppercase(client):
+    # Testing the failed signup page
+    returned_value = client.post('/signup', data=dict(
+        username="testTrainee",
+        password="password",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+        usertype="trainee"
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+    assert g.user is None
 
 def test_failed_signup_password(client):
     # Testing the failed signup page
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password^#$^%^",
         name="test",
         repassword="password",
@@ -140,7 +163,7 @@ def test_failed_signup_password(client):
 def test_failed_signup_name(client):
     # Testing the failed signup page
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="1245667*#",
         repassword="password",
@@ -156,7 +179,7 @@ def test_failed_signup_name(client):
 def test_failed_signup_repassword(client):
     # Testing the failed signup page
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="test",
         repassword="password^#$^%",
@@ -172,7 +195,7 @@ def test_failed_signup_repassword(client):
 def test_failed_signup_location(client):
     # Testing the failed signup page
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="test",
         repassword="password",
@@ -188,7 +211,7 @@ def test_failed_signup_location(client):
 def test_failed_signup_phone(client):
     # Testing the failed signup page
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="test",
         repassword="password",
@@ -204,7 +227,7 @@ def test_failed_signup_phone(client):
 def test_failed_signup_usertype(client):
     # Testing the failed signup page
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="test",
         repassword="password",
@@ -230,7 +253,31 @@ def test_failed_usersettings_username(client):
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
-        username="testTrainee^#$^%^",
+        username="testtrainee^#$^%^",
+        password="password",
+        name="test",
+        repassword="password",
+        location="USA",
+        phone="12345678",
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Invalid characters found' in returned_value.data
+
+
+def test_failed_usersettings_username_uppercase(client):
+    # Testing the failed user settings page
+    # Get without a user
+
+    returned_value = client.get('/usersettings', follow_redirects=True)
+    assert returned_value.status_code == 200
+    assert b'login' in returned_value.data
+
+    # Login as trainee
+    login_as_testTrainee(client)
+
+    # Check profile page.
+    returned_value = client.post('/usersettings', data=dict(
+        username="testTrainee",
         password="password",
         name="test",
         repassword="password",
@@ -254,7 +301,7 @@ def test_failed_usersettings_password(client):
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password^#$^%^",
         name="test",
         repassword="password",
@@ -278,7 +325,7 @@ def test_failed_usersettings_repassword(client):
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="test",
         repassword="password^#$^%^",
@@ -302,7 +349,7 @@ def test_failed_usersettings_name(client):
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="117",
         repassword="password",
@@ -326,7 +373,7 @@ def test_failed_usersettings_location(client):
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="test",
         repassword="password",
@@ -350,7 +397,7 @@ def test_failed_usersettings_phone(client):
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="test",
         repassword="password",
@@ -407,7 +454,7 @@ def test_signup(client):
 
     # POST with a wrong password combination
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         repassword="repassword",
         name="first last",
@@ -423,7 +470,7 @@ def test_signup(client):
 
     # POST with a wrong usertype
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         repassword="password",
         name="first last",
@@ -439,7 +486,7 @@ def test_signup(client):
 
     # POST with a username that was taken
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         repassword="password",
         name="first last",
@@ -453,14 +500,14 @@ def test_signup(client):
     assert b'Username was taken' in returned_value.data
     assert b'<form action="/signup" method="POST">' in returned_value.data
 
-    trainee = g.database.get_trainee_by_username("testTrainee")
-    trainer = g.database.get_trainer_by_username("testTrainer")
+    trainee = g.database.get_trainee_by_username("testtrainee")
+    trainer = g.database.get_trainer_by_username("testtrainer")
 
     clean_up(trainer, trainee)
 
     # POST with a username that was not taken, success, Trainee
     returned_value = client.post('/signup', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         repassword="password",
         name="first last",
@@ -479,7 +526,7 @@ def test_signup(client):
 
     # POST with a username that was not taken, success, Trainer
     returned_value = client.post('/signup', data=dict(
-        username="testTrainer",
+        username="testtrainer",
         password="password",
         repassword="password",
         name="first last",
@@ -503,14 +550,14 @@ def test_profile(client):
     assert returned_value.status_code == 200
     assert b'login' in returned_value.data
 
-    trainer = g.database.get_trainer_by_username("testTrainer")
-    trainee = g.database.get_trainee_by_username("testTrainee")
+    trainer = g.database.get_trainer_by_username("testtrainer")
+    trainee = g.database.get_trainee_by_username("testtrainee")
 
     # Login
     login_as_testTrainee(client)
 
     # Check profile page.
-    returned_value = client.get('/profile/testTrainee', follow_redirects=True)
+    returned_value = client.get('/profile/testtrainee', follow_redirects=True)
     assert returned_value.status_code == 200
     assert bytes('Username: {}'.format(trainee.username),
                  'utf-8') in returned_value.data
@@ -526,7 +573,7 @@ def test_profile(client):
     login_as_testTrainer(client)
 
     # Check profile page.
-    returned_value = client.get('/profile/testTrainer', follow_redirects=True)
+    returned_value = client.get('/profile/testtrainer', follow_redirects=True)
     assert returned_value.status_code == 200
     assert bytes('Username: {}'.format(trainer.username),
                  'utf-8') in returned_value.data
@@ -550,11 +597,11 @@ def test_usersettings(client):
     login_as_testTrainee(client)
 
     # Get id before change
-    database_user_id = g.database.get_trainee_by_username("testTrainee")._id
+    database_user_id = g.database.get_trainee_by_username("testtrainee")._id
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
-        username="testTrainee",
+        username="testtrainee",
         password="newpassword",
         repassword="newpassword",
         name="another",
@@ -564,10 +611,10 @@ def test_usersettings(client):
     assert returned_value.status_code == 200
 
     # Check database
-    database_user = g.database.get_trainee_by_username("testTrainee")
+    database_user = g.database.get_trainee_by_username("testtrainee")
 
     assert database_user._id == database_user_id
-    assert database_user.username == 'testTrainee'
+    assert database_user.username == 'testtrainee'
     assert database_user.password == password_sha256('newpassword')
     assert database_user.name == 'another'
     assert database_user.location == 'Venus'
@@ -577,11 +624,11 @@ def test_usersettings(client):
     login_as_testTrainer(client)
 
     # Get id before change
-    database_user_id = g.database.get_trainer_by_username("testTrainer")._id
+    database_user_id = g.database.get_trainer_by_username("testtrainer")._id
 
     # Check profile page.
     returned_value = client.post('/usersettings', data=dict(
-        username="testTrainer",
+        username="testtrainer",
         password="newpassword",
         repassword="newpassword",
         name="another",
@@ -591,10 +638,10 @@ def test_usersettings(client):
     assert returned_value.status_code == 200
 
     # Check database
-    database_user = g.database.get_trainer_by_username("testTrainer")
+    database_user = g.database.get_trainer_by_username("testtrainer")
 
     assert database_user._id == database_user_id
-    assert database_user.username == 'testTrainer'
+    assert database_user.username == 'testtrainer'
     assert database_user.password == password_sha256('newpassword')
     assert database_user.name == 'another'
     assert database_user.location == 'Venus'
@@ -602,7 +649,7 @@ def test_usersettings(client):
 
     # Checking alphaPattern
     for character in '!@#$%^&*()_+\\<>.':
-        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer = g.database.get_trainer_by_username("testtrainer")
         trainer.username = f"abc{character}"
         returned_value = client.post('/usersettings', data=dict(
             username=trainer.username,
@@ -615,7 +662,7 @@ def test_usersettings(client):
         assert returned_value.status_code == 400
 
     for character in '!@#$%^&*()_+\\<>.':
-        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer = g.database.get_trainer_by_username("testtrainer")
         trainer.password = f"abc{character}"
         returned_value = client.post('/usersettings', data=dict(
             username=trainer.username,
@@ -628,7 +675,7 @@ def test_usersettings(client):
         assert returned_value.status_code == 400
 
     for character in '!@#$%^&*()_+\\<>.':
-        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer = g.database.get_trainer_by_username("testtrainer")
         repassword = f"abc{character}"
         returned_value = client.post('/usersettings', data=dict(
             username=trainer.username,
@@ -641,7 +688,7 @@ def test_usersettings(client):
         assert returned_value.status_code == 400
 
     for character in '!@#$%^&*()_+\\<>.':
-        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer = g.database.get_trainer_by_username("testtrainer")
         trainer.name = f"abc{character}"
         returned_value = client.post('/usersettings', data=dict(
             username=trainer.username,
@@ -654,7 +701,7 @@ def test_usersettings(client):
         assert returned_value.status_code == 400
 
     for character in '!@#$%^&*()_+\\<>.':
-        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer = g.database.get_trainer_by_username("testtrainer")
         trainer.location = f"abc{character}"
         returned_value = client.post('/usersettings', data=dict(
             username=trainer.username,
@@ -667,7 +714,7 @@ def test_usersettings(client):
         assert returned_value.status_code == 400
 
     for character in '!@#$%^&*()_+\\<>.a':
-        trainer = g.database.get_trainer_by_username("testTrainer")
+        trainer = g.database.get_trainer_by_username("testtrainer")
         trainer.phone = f"abc{character}"
         returned_value = client.post('/usersettings', data=dict(
             username=trainer.username,
@@ -723,8 +770,8 @@ def test_trainer_overview(client):
     # Login as Trainer
     login_as_testTrainer(client)
 
-    trainee = g.database.get_trainee_by_username('testTrainee')
-    trainer = g.database.get_trainer_by_username('testTrainer')
+    trainee = g.database.get_trainee_by_username('testtrainee')
+    trainer = g.database.get_trainer_by_username('testtrainer')
 
     g.database.mongo.db.trainer.update_one(
         {"_id": ObjectId(trainer._id)},
@@ -781,8 +828,8 @@ def test_list_trainees(client):
     assert type(g.user) == Trainer
     assert b'No trainees found' in returned_value.data
 
-    trainee = g.database.get_trainee_by_username('testTrainee')
-    trainer = g.database.get_trainer_by_username('testTrainer')
+    trainee = g.database.get_trainee_by_username('testtrainee')
+    trainer = g.database.get_trainer_by_username('testtrainer')
 
     g.database.mongo.db.trainer.update_one(
         {"_id": ObjectId(trainer._id)},
@@ -839,8 +886,8 @@ def test_trainee_overview(client):
     # Login as Trainee
     login_as_testTrainee(client)
 
-    trainee = g.database.get_trainee_by_username('testTrainee')
-    trainer = g.database.get_trainer_by_username('testTrainer')
+    trainee = g.database.get_trainee_by_username('testtrainee')
+    trainer = g.database.get_trainer_by_username('testtrainer')
 
     g.database.mongo.db.trainee.update_one(
         {"_id": ObjectId(trainee._id)},
@@ -1058,8 +1105,8 @@ def test_list_trainers(client):
     assert type(g.user) == Trainee
     assert type(g.user) != Trainer
 
-    trainee = g.database.get_trainee_by_username('testTrainee')
-    trainer = g.database.get_trainer_by_username('testTrainer')
+    trainee = g.database.get_trainee_by_username('testtrainee')
+    trainer = g.database.get_trainer_by_username('testtrainer')
 
     g.database.mongo.db.trainee.update_one(
         {"_id": ObjectId(trainee._id)},
@@ -1134,7 +1181,7 @@ def test_page_bad_request(client):
     """Testing the 400 page"""
     # Login as Trainee
     returned_value = client.post('/login', data=dict(
-        username="testTrainee",
+        username="testtrainee",
     ), follow_redirects=True)
     assert returned_value.status_code == 400
     assert b'Could not log you in!' not in returned_value.data
@@ -1295,9 +1342,9 @@ def test_workout(client):
     assert b'login' in returned_value.data
     assert g.user is None
     
-    trainee = g.database.get_trainee_by_username('testTrainee')
+    trainee = g.database.get_trainee_by_username('testtrainee')
 
-    trainer = g.database.get_trainer_by_username('testTrainer')
+    trainer = g.database.get_trainer_by_username('testtrainer')
 
     workoutTest = Workout(
     _id=None,
@@ -1389,7 +1436,7 @@ def test_delete_user(client):
     assert returned_value.status_code == 200
     assert g.user is None
     assert 'user_id' not in session
-    assert g.database.get_trainee_by_username("testTrainee") is None
+    assert g.database.get_trainee_by_username("testtrainee") is None
 
     # login as testTrainer
     login_as_testTrainer(client)
@@ -1400,7 +1447,7 @@ def test_delete_user(client):
     assert returned_value.status_code == 200
     assert g.user is None
     assert 'user_id' not in session
-    assert g.database.get_trainer_by_username("testTrainer") is None
+    assert g.database.get_trainer_by_username("testtrainer") is None
 
 
 def test_delete_user_without_confirmation(client):
@@ -1437,8 +1484,8 @@ def test_remove_added_user(client):
                                  follow_redirects=True)
     assert returned_value.status_code == 500
 
-    trainee = g.database.get_trainee_by_username("testTrainee")
-    trainer = g.database.get_trainer_by_username("testTrainer")
+    trainee = g.database.get_trainee_by_username("testtrainee")
+    trainer = g.database.get_trainer_by_username("testtrainer")
 
     # Remove trainer from trainee
 
@@ -1496,8 +1543,8 @@ def test_invitations(client):
 
     login_as_testTrainee(client)
 
-    trainee = g.database.get_trainee_by_username('testTrainee')
-    trainer = g.database.get_trainer_by_username('testTrainer')
+    trainee = g.database.get_trainee_by_username('testtrainee')
+    trainer = g.database.get_trainer_by_username('testtrainer')
     invitation = g.database.mongo.db.invitation.insert_one({
         'sender': ObjectId(trainer._id),
         'recipient': ObjectId(trainee._id)
@@ -1520,8 +1567,8 @@ def test_accept_invitation(client):
 
     login_as_testTrainee(client)
 
-    trainee = g.database.get_trainee_by_username('testTrainee')
-    trainer = g.database.get_trainer_by_username('testTrainer')
+    trainee = g.database.get_trainee_by_username('testtrainee')
+    trainer = g.database.get_trainer_by_username('testtrainer')
     invitation = g.database.mongo.db.invitation.insert_one({
         'sender': ObjectId(trainer._id),
         'recipient': ObjectId(trainee._id)
