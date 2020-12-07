@@ -75,7 +75,8 @@ def create_app():
 
                 username = escape(request.form['username'])
                 if not lowerPattern.search(username):
-                    raise InvalidCharactersException("Invalid characters")
+                    msg = "Usernames should be lowercase"
+                    raise InvalidCharactersException(msg)
 
                 password = escape(request.form['password'])
                 if not alphaPattern.search(password):
@@ -110,7 +111,8 @@ def create_app():
                 session.pop('user_id', None)
                 username = escape(request.form['username'])
                 if not lowerPattern.search(username):
-                    raise InvalidCharactersException("Invalid characters")
+                    msg = "Usernames should be lowercase"
+                    raise InvalidCharactersException(msg)
 
                 password = escape(request.form['password'])
                 if not alphaPattern.search(password):
@@ -203,7 +205,8 @@ def create_app():
             try:
                 username = escape(request.form['username'])
                 if not lowerPattern.search(username):
-                    raise InvalidCharactersException("Invalid characters")
+                    msg = "Usernames should be lowercase"
+                    raise InvalidCharactersException(msg)
                 password = escape(request.form['password'])
                 if not alphaPattern.search(password):
                     raise InvalidCharactersException("Invalid characters")
@@ -306,10 +309,9 @@ def create_app():
 
         if request.method == 'POST':
             confirmation = escape(request.form['confirmation'])
-            
-            if str(confirmation) != 'true': 
+
+            if str(confirmation) != 'true':
                 return render_template("account/delete.html"), 500
-                 
 
             if g.database.get_trainee_by_id(g.user._id) is not None:
                 app.logger.info('Deleting user ' + g.user.username)
@@ -615,9 +617,9 @@ def create_app():
         creator_id = escape(creator_id)
         workout_id = escape(workout_id)
         if (g.database.get_workout_by_name(workout_id, creator_id) == None):
-                abort(404)
+            abort(404)
 
-        return render_template("workout/workout.html", workoutInfo = g.database.get_workout_by_name(workout_id, creator_id))
+        return render_template("workout/workout.html", workoutInfo=g.database.get_workout_by_name(workout_id, creator_id))
 
     @app.route('/workout_overview', methods=["GET"])
     def workout_overview():

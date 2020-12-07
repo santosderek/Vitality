@@ -14,11 +14,11 @@
       </div>
       {% elif invalid_characters%}
       <div class="col-sm-12">
-      <p style="color: red;">Invalid characters found!</p>
+        <p style="color: red;">Invalid characters found!</p>
       </div>
       {% endif %}
       <div class="col-sm-12 mb-2">
-        <input type="text" placeholder="Enter Username" name="username" required>
+        <input type="text" placeholder="Enter Username" name="username" onkeyup="return forceLower(this);" required>
       </div>
       <div class="col-sm-12 mb-2">
         <input type="password" placeholder="Enter Password" name="password" required>
@@ -32,4 +32,9 @@
     </div>
   </form>
 </main>
+<script>
+  function forceLower(value) {
+    value.value = value.value.toLowerCase();
+  }
+</script>
 {% endblock %}
