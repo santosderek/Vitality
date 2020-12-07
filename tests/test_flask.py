@@ -1,5 +1,6 @@
 import pytest
 from flask import g, session, url_for
+from os import environ 
 from vitality import create_app
 from vitality.database import Database, WorkoutCreatorIdNotFoundError, password_sha256, InvalidCharactersException
 from vitality.trainee import Trainee
@@ -55,9 +56,10 @@ def login_as_testTrainer(client):
 
 @pytest.fixture
 def client():
+    environ['SECRET_KEY'] = 'aTestSecret'
     app = create_app()
     app.config['TESTING'] = True
-    app.secret_key = SECRET_KEY
+    app.secret_key = environ.get('SECRET_KEY')
     database = Database(MONGO_URI)
 
     def setup():
