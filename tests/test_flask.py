@@ -1,11 +1,11 @@
 import pytest
-import unittest
 from flask import g, session, url_for
 from vitality import create_app
 from vitality.database import Database, WorkoutCreatorIdNotFoundError, password_sha256, InvalidCharactersException
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
+from vitality.settings import MONGO_URI, SECRET_KEY
 
 
 test_trainee = Trainee(
@@ -57,7 +57,8 @@ def login_as_testTrainer(client):
 def client():
     app = create_app()
     app.config['TESTING'] = True
-    database = Database(app)
+    app.secret_key = SECRET_KEY
+    database = Database(MONGO_URI)
 
     def setup():
         """ Code run after client has been used """

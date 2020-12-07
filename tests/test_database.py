@@ -1,8 +1,5 @@
 import unittest
 from copy import deepcopy
-from flask import Flask
-from flask_pymongo import PyMongo
-from vitality import create_app
 from vitality.database import (
     Database,
     WorkoutCreatorIdNotFoundError,
@@ -12,12 +9,12 @@ from vitality.database import (
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
-from vitality.configuration import Configuration
-
+from vitality.settings import MONGO_URI
 
 class TestDatabase(unittest.TestCase):
+    
     # Creating database object
-    database = Database(create_app())
+    database = Database(MONGO_URI)
 
     # Creating new Trainee object
     test_trainee = Trainee(
@@ -63,16 +60,16 @@ class TestDatabase(unittest.TestCase):
 
     def tearDown(self):
         # Remove test Workout if found
-        self.database.mongo.db.workout.delete_many({'name': self.test_workout.name})
+        self.database.mongo.workout.delete_many({'name': self.test_workout.name})
 
         # Removing a test workout
-        self.database.mongo.db.workout.delete_many({'name': 'goingtoremove'})
+        self.database.mongo.workout.delete_many({'name': 'goingtoremove'})
 
         # Remove test Trainee if found
-        self.database.mongo.db.trainee.delete_many({'username': self.test_trainee.username})
+        self.database.mongo.trainee.delete_many({'username': self.test_trainee.username})
 
         # Remove test Trainer if found
-        self.database.mongo.db.trainer.delete_many({'username': self.test_trainer.username})
+        self.database.mongo.trainer.delete_many({'username': self.test_trainer.username})
 
     def test_password_sha256(self):
         password = 'asupersecretpassword'
@@ -715,13 +712,13 @@ class TestDatabase(unittest.TestCase):
                                               location="somewhere",
                                               phone=1234567890))
 
-            trainee1_id = str(self.database.mongo.db.trainee.find_one(
+            trainee1_id = str(self.database.mongo.trainee.find_one(
                 {'username': 'testTrainee1'})['_id'])
-            trainee2_id = str(self.database.mongo.db.trainee.find_one(
+            trainee2_id = str(self.database.mongo.trainee.find_one(
                 {'username': 'testTrainee2'})['_id'])
-            trainee3_id = str(self.database.mongo.db.trainee.find_one(
+            trainee3_id = str(self.database.mongo.trainee.find_one(
                 {'username': 'testTrainee3'})['_id'])
-            trainer_id = str(self.database.mongo.db.trainer.find_one(
+            trainer_id = str(self.database.mongo.trainer.find_one(
                 {'username': 'testTrainer1'})['_id'])
 
             assert self.database.get_trainer_by_username(
@@ -753,13 +750,13 @@ class TestDatabase(unittest.TestCase):
                 trainer_id).trainees) == 0
 
         finally:
-            self.database.mongo.db.trainee.delete_many(
+            self.database.mongo.trainee.delete_many(
                 {"username": "testTrainee1"})
-            self.database.mongo.db.trainee.delete_many(
+            self.database.mongo.trainee.delete_many(
                 {"username": "testTrainee2"})
-            self.database.mongo.db.trainee.delete_many(
+            self.database.mongo.trainee.delete_many(
                 {"username": "testTrainee3"})
-            self.database.mongo.db.trainer.delete_many(
+            self.database.mongo.trainer.delete_many(
                 {"username": "testTrainer1"})
 
     def test_remove_trainee(self):
@@ -791,13 +788,13 @@ class TestDatabase(unittest.TestCase):
                                               location="somewhere",
                                               phone=1234567890))
 
-            trainer1_id = str(self.database.mongo.db.trainer.find_one(
+            trainer1_id = str(self.database.mongo.trainer.find_one(
                 {'username': 'testTrainer1'})['_id'])
-            trainer2_id = str(self.database.mongo.db.trainer.find_one(
+            trainer2_id = str(self.database.mongo.trainer.find_one(
                 {'username': 'testTrainer2'})['_id'])
-            trainer3_id = str(self.database.mongo.db.trainer.find_one(
+            trainer3_id = str(self.database.mongo.trainer.find_one(
                 {'username': 'testTrainer3'})['_id'])
-            trainee_id = str(self.database.mongo.db.trainee.find_one(
+            trainee_id = str(self.database.mongo.trainee.find_one(
                 {'username': 'testTrainee1'})['_id'])
 
             assert self.database.get_trainee_by_username(
@@ -829,13 +826,13 @@ class TestDatabase(unittest.TestCase):
                 trainee_id).trainers) == 0
 
         finally:
-            self.database.mongo.db.trainer.delete_many(
+            self.database.mongo.trainer.delete_many(
                 {"username": "testTrainer1"})
-            self.database.mongo.db.trainer.delete_many(
+            self.database.mongo.trainer.delete_many(
                 {"username": "testTrainer2"})
-            self.database.mongo.db.trainer.delete_many(
+            self.database.mongo.trainer.delete_many(
                 {"username": "testTrainer3"})
-            self.database.mongo.db.trainee.delete_many(
+            self.database.mongo.trainee.delete_many(
                 {"username": "testTrainee1"})
 
     def test_get_all_workouts_by_creatorid(self):

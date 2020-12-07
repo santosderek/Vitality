@@ -7,7 +7,6 @@ from .database import (
     InvalidCharactersException,
     UserNotFoundError
 )
-from .configuration import Configuration
 from .workout import Workout
 from flask import (
     abort,
@@ -19,28 +18,24 @@ from flask import (
     session,
     g
 )
-from flask_pymongo import PyMongo
 from markupsafe import escape
 import re
-
+from .settings import SECRET_KEY, MONGO_URI
 
 def create_app():
     """Application factory for our flask web server"""
-    config = Configuration()
-    app = Flask(__name__, instance_relative_config=True)
-    app.secret_key = 'somethingverysecret'
-    app.config["MONGO_URI"] = config.get_local_uri()
+    app = Flask(__name__)
+    app.secret_key = SECRET_KEY
 
     alphaPattern = re.compile(r"^[a-zA-Z0-9\s]*$")
     numberPattern = re.compile(r"^[0-9]*$")
     stringPattern = re.compile(r"^[a-zA-Z]*$")
 
-
     @app.before_request
     def before_request():
         """Actions to take before each request"""
         if 'database' not in g:
-            g.database = Database(app)
+            g.database = Database(MONGO_URI)
 
         g.user = None
         if 'user_id' in session:
@@ -103,7 +98,7 @@ def create_app():
         """Sign up page for Vitality"""
         app.logger.info('Rendering Create User')
         if request.method == 'POST':
-           try:
+            try:
                 session.pop('user_id', None)
                 username = escape(request.form['username'])
                 if not alphaPattern.search(username):
@@ -165,13 +160,14 @@ def create_app():
                         return render_template("account/signup.html", creation_successful=True)
 
                     except UsernameTakenError as err:
-                        app.logger.debug("Username {} was taken.".format(new_user))
+                        app.logger.debug(
+                            "Username {} was taken.".format(new_user))
                         return render_template("account/signup.html", username_taken=True)
 
                 # If username and password failed, render error messsage
                 return render_template("account/signup.html", error_message=True)
-           except InvalidCharactersException as e:
-               return render_template("account/signup.html", invalid_characters=True), 400
+            except InvalidCharactersException as e:
+                return render_template("account/signup.html", invalid_characters=True), 400
         return render_template("account/signup.html")
 
     @app.route('/profile/<username>', methods=["GET"])
@@ -222,27 +218,32 @@ def create_app():
                     if username:
                         g.database.set_trainee_username(g.user._id, username)
                         if not alphaPattern.search(username):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     if password and re_password and password == re_password:
                         g.database.set_trainee_password(g.user._id, password)
                         if not alphaPattern.search(password):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     if location:
                         g.database.set_trainee_location(g.user._id, location)
                         if not alphaPattern.search(location):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     if phone:
                         g.database.set_trainee_phone(g.user._id, phone)
                         if not numberPattern.search(phone):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     if name:
                         g.database.set_trainee_name(g.user._id, name)
                         if not stringPattern.search(name):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     return redirect(url_for('usersettings'))
 
@@ -250,27 +251,32 @@ def create_app():
                     if username:
                         g.database.set_trainer_username(g.user._id, username)
                         if not alphaPattern.search(username):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     if password and re_password and password == re_password:
                         g.database.set_trainer_password(g.user._id, password)
                         if not alphaPattern.search(password):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     if location:
                         g.database.set_trainer_location(g.user._id, location)
                         if not alphaPattern.search(location):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     if phone:
                         g.database.set_trainer_phone(g.user._id, phone)
                         if not numberPattern.search(phone):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     if name:
                         g.database.set_trainer_name(g.user._id, name)
                         if not stringPattern.search(name):
-                            raise InvalidCharactersException("Invalid characters")
+                            raise InvalidCharactersException(
+                                "Invalid characters")
 
                     return redirect(url_for('usersettings'))
 
@@ -342,7 +348,8 @@ def create_app():
         peak_trainees = g.database.trainer_peak_trainees(g.user._id)
         return render_template("user/overview.html",
                                trainees=trainees,
-                               workouts=g.database.get_all_workouts_by_creatorid(g.user._id),
+                               workouts=g.database.get_all_workouts_by_creatorid(
+                                   g.user._id),
                                events=[],
                                peak_trainees=peak_trainees)
 
@@ -528,7 +535,7 @@ def create_app():
 
         if request.method == "POST":
 
-            try: 
+            try:
                 name = escape(request.form['name'])
                 about = escape(request.form['about'])
                 difficulty = escape(request.form['difficulty'])
@@ -541,10 +548,10 @@ def create_app():
                     about=about,
                     exp=0
                 ))
-                return render_template("workout/new_workout.html", workout_added = True)
+                return render_template("workout/new_workout.html", workout_added=True)
 
-            except WorkoutCreatorIdNotFoundError: 
-                return render_template("workout/new_workout.html", invalid_creatorid = True)
+            except WorkoutCreatorIdNotFoundError:
+                return render_template("workout/new_workout.html", invalid_creatorid=True)
 
         return render_template("workout/new_workout.html")
 
