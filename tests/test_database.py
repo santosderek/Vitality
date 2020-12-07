@@ -1,11 +1,7 @@
 import unittest
 from copy import deepcopy
-from vitality.database import (
-    Database,
-    WorkoutCreatorIdNotFoundError,
-    UsernameTakenError, 
-    password_sha256
-)
+from bson.objectid import ObjectId
+from vitality.database import *
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
@@ -19,7 +15,7 @@ class TestDatabase(unittest.TestCase):
     # Creating new Trainee object
     test_trainee = Trainee(
         _id=None,
-        username="testTrainee",
+        username="testtrainee",
         password="password",
         name="first last",
         location="Earth",
@@ -29,7 +25,7 @@ class TestDatabase(unittest.TestCase):
     # Creating new Trainer object
     test_trainer = Trainer(
         _id=None,
-        username="testTrainer",
+        username="testtrainer",
         password="password",
         name="first last",
         location="mars",
@@ -60,16 +56,32 @@ class TestDatabase(unittest.TestCase):
 
     def tearDown(self):
         # Remove test Workout if found
+<<<<<<< HEAD
         self.database.mongo.workout.delete_many({'name': self.test_workout.name})
+=======
+        self.database.mongo.db.workout.delete_many(
+            {'name': self.test_workout.name})
+>>>>>>> eb35ed7cfa1f07c84f6caa10621c024def97772d
 
         # Removing a test workout
         self.database.mongo.workout.delete_many({'name': 'goingtoremove'})
 
         # Remove test Trainee if found
+<<<<<<< HEAD
         self.database.mongo.trainee.delete_many({'username': self.test_trainee.username})
 
         # Remove test Trainer if found
         self.database.mongo.trainer.delete_many({'username': self.test_trainer.username})
+=======
+        self.database.mongo.db.trainee.delete_many({
+            'username': self.test_trainee.username
+        })
+
+        # Remove test Trainer if found
+        self.database.mongo.db.trainer.delete_many({
+            'username': self.test_trainer.username
+        })
+>>>>>>> eb35ed7cfa1f07c84f6caa10621c024def97772d
 
     def test_password_sha256(self):
         password = 'asupersecretpassword'
@@ -78,23 +90,61 @@ class TestDatabase(unittest.TestCase):
 
     """Trainee tests"""
 
+    def test_trainee_add_trainer(self):
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.trainee_add_trainer("123456789012345678901234",
+                                              trainer._id)
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.trainee_add_trainer(trainee._id,
+                                              "123456789012345678901234")
+
+        self.database.trainee_add_trainer(trainee._id, trainer._id)
+
+        assert ObjectId(trainer._id) in self.database.mongo.db.trainee.find_one({
+            '_id': ObjectId(trainee._id)
+        })['trainers']
+
+    def test_trainer_add_trainee(self):
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.trainer_add_trainee("123456789012345678901234",
+                                              trainee._id)
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.trainer_add_trainee(trainer._id,
+                                              "123456789012345678901234")
+
+        self.database.trainer_add_trainee(trainer._id, trainee._id)
+
+        assert ObjectId(trainee._id) in self.database.mongo.db.trainer.find_one({
+            '_id': ObjectId(trainer._id)
+        })['trainees']
+
     def test_add_trainee(self):
 
         # Raise exception if 'testTrainee' username found
         with self.assertRaises(UsernameTakenError):
             new_trainer = deepcopy(self.test_trainer)
-            new_trainer.username = "testTrainee"
+            new_trainer.username = "testtrainee"
             self.database.add_trainee(new_trainer)
 
         # Raise exception if 'testTrainer' username found
         with self.assertRaises(UsernameTakenError):
             new_trainer = deepcopy(self.test_trainer)
-            new_trainer.username = "testTrainer"
+            new_trainer.username = "testtrainer"
             self.database.add_trainee(new_trainer)
 
         # Copy test_trainer and change to unused trainer name
         new_trainee = deepcopy(self.test_trainee)
-        new_trainee.username = "testUsername"
+        new_trainee.username = "testusername"
 
         # Remove testUsername
         while self.database.get_trainee_by_username(new_trainee.username) is not None:
@@ -238,18 +288,18 @@ class TestDatabase(unittest.TestCase):
 
     def test_list_trainers_by_search(self):
         # Searching for testTrainer with input "testTrain"
-        found_trainers = self.database.list_trainers_by_search("testTrain")
+        found_trainers = self.database.list_trainers_by_search("testtrain")
         self.assertEqual(len(found_trainers), 1)
 
-        trainer = self.database.get_trainer_by_username("testTrainer")
+        trainer = self.database.get_trainer_by_username("testtrainer")
         self.assertEqual(found_trainers[0].as_dict(), trainer.as_dict())
 
     def test_list_trainees_by_search(self):
         # Searching for testTrainee with input "testTrain"
-        found_trainees = self.database.list_trainees_by_search("testTrain")
+        found_trainees = self.database.list_trainees_by_search("testtrain")
         self.assertEqual(len(found_trainees), 1)
 
-        trainee = self.database.get_trainee_by_username("testTrainee")
+        trainee = self.database.get_trainee_by_username("testtrainee")
         self.assertEqual(found_trainees[0].as_dict(), trainee.as_dict())
 
     """ Test trainer """
@@ -259,13 +309,13 @@ class TestDatabase(unittest.TestCase):
         # Raise exception if 'testTrainee' username found
         with self.assertRaises(UsernameTakenError):
             new_trainer = deepcopy(self.test_trainer)
-            new_trainer.username = "testTrainee"
+            new_trainer.username = "testtrainee"
             self.database.add_trainer(new_trainer)
 
         # Raise exception if 'testTrainer' username found
         with self.assertRaises(UsernameTakenError):
             new_trainer = deepcopy(self.test_trainer)
-            new_trainer.username = "testTrainer"
+            new_trainer.username = "testtrainer"
             self.database.add_trainer(new_trainer)
 
         # Copy test_trainer and change to unused trainer name
@@ -437,6 +487,7 @@ class TestDatabase(unittest.TestCase):
         # Get workout from database
         trainee = self.database.get_trainee_by_username(
             self.test_trainee.username)
+            
 
         # Get workout from database
         database_workout = self.database.get_workout_by_name(new_workout.name,
@@ -687,31 +738,32 @@ class TestDatabase(unittest.TestCase):
 
         try:
             self.database.add_trainee(Trainee(_id=None,
-                                              username="testTrainee1",
+                                              username="testtrainee1",
                                               password="pass",
                                               name="testTrainee1",
                                               location="somewhere",
                                               phone=1234567890))
             self.database.add_trainee(Trainee(_id=None,
-                                              username="testTrainee2",
+                                              username="testtrainee2",
                                               password="pass",
                                               name="testTrainee2",
                                               location="somewhere",
                                               phone=1234567890))
             self.database.add_trainee(Trainee(_id=None,
-                                              username="testTrainee3",
+                                              username="testtrainee3",
                                               password="pass",
                                               name="testTrainee3",
                                               location="somewhere",
                                               phone=1234567890))
 
             self.database.add_trainer(Trainer(_id=None,
-                                              username="testTrainer1",
+                                              username="testtrainer1",
                                               password="pass",
                                               name="testTrainer3",
                                               location="somewhere",
                                               phone=1234567890))
 
+<<<<<<< HEAD
             trainee1_id = str(self.database.mongo.trainee.find_one(
                 {'username': 'testTrainee1'})['_id'])
             trainee2_id = str(self.database.mongo.trainee.find_one(
@@ -720,15 +772,25 @@ class TestDatabase(unittest.TestCase):
                 {'username': 'testTrainee3'})['_id'])
             trainer_id = str(self.database.mongo.trainer.find_one(
                 {'username': 'testTrainer1'})['_id'])
+=======
+            trainee1_id = str(self.database.mongo.db.trainee.find_one(
+                {'username': 'testtrainee1'})['_id'])
+            trainee2_id = str(self.database.mongo.db.trainee.find_one(
+                {'username': 'testtrainee2'})['_id'])
+            trainee3_id = str(self.database.mongo.db.trainee.find_one(
+                {'username': 'testtrainee3'})['_id'])
+            trainer_id = str(self.database.mongo.db.trainer.find_one(
+                {'username': 'testtrainer1'})['_id'])
+>>>>>>> eb35ed7cfa1f07c84f6caa10621c024def97772d
 
             assert self.database.get_trainer_by_username(
-                "testTrainer1") is not None
+                "testtrainer1") is not None
             assert self.database.get_trainee_by_username(
-                "testTrainee1") is not None
+                "testtrainee1") is not None
             assert self.database.get_trainee_by_username(
-                "testTrainee2") is not None
+                "testtrainee2") is not None
             assert self.database.get_trainee_by_username(
-                "testTrainee3") is not None
+                "testtrainee3") is not None
 
             self.database.trainer_add_trainee(trainer_id, trainee1_id)
             self.database.trainer_add_trainee(trainer_id, trainee2_id)
@@ -750,6 +812,7 @@ class TestDatabase(unittest.TestCase):
                 trainer_id).trainees) == 0
 
         finally:
+<<<<<<< HEAD
             self.database.mongo.trainee.delete_many(
                 {"username": "testTrainee1"})
             self.database.mongo.trainee.delete_many(
@@ -757,37 +820,47 @@ class TestDatabase(unittest.TestCase):
             self.database.mongo.trainee.delete_many(
                 {"username": "testTrainee3"})
             self.database.mongo.trainer.delete_many(
+=======
+            self.database.mongo.db.trainee.delete_many(
+                {"username": "testtrainee1"})
+            self.database.mongo.db.trainee.delete_many(
+                {"username": "testtrainee2"})
+            self.database.mongo.db.trainee.delete_many(
+                {"username": "testtrainee3"})
+            self.database.mongo.db.trainer.delete_many(
+>>>>>>> eb35ed7cfa1f07c84f6caa10621c024def97772d
                 {"username": "testTrainer1"})
 
     def test_remove_trainee(self):
 
         try:
             self.database.add_trainer(Trainer(_id=None,
-                                              username="testTrainer1",
+                                              username="testtrainer1",
                                               password="pass",
                                               name="testTrainer1",
                                               location="somewhere",
                                               phone=1234567890))
             self.database.add_trainer(Trainer(_id=None,
-                                              username="testTrainer2",
+                                              username="testtrainer2",
                                               password="pass",
                                               name="testTrainer2",
                                               location="somewhere",
                                               phone=1234567890))
             self.database.add_trainer(Trainer(_id=None,
-                                              username="testTrainer3",
+                                              username="testtrainer3",
                                               password="pass",
                                               name="testTrainer3",
                                               location="somewhere",
                                               phone=1234567890))
 
             self.database.add_trainee(Trainee(_id=None,
-                                              username="testTrainee1",
+                                              username="testtrainee1",
                                               password="pass",
                                               name="testTrainer3",
                                               location="somewhere",
                                               phone=1234567890))
 
+<<<<<<< HEAD
             trainer1_id = str(self.database.mongo.trainer.find_one(
                 {'username': 'testTrainer1'})['_id'])
             trainer2_id = str(self.database.mongo.trainer.find_one(
@@ -796,15 +869,25 @@ class TestDatabase(unittest.TestCase):
                 {'username': 'testTrainer3'})['_id'])
             trainee_id = str(self.database.mongo.trainee.find_one(
                 {'username': 'testTrainee1'})['_id'])
+=======
+            trainer1_id = str(self.database.mongo.db.trainer.find_one(
+                {'username': 'testtrainer1'})['_id'])
+            trainer2_id = str(self.database.mongo.db.trainer.find_one(
+                {'username': 'testtrainer2'})['_id'])
+            trainer3_id = str(self.database.mongo.db.trainer.find_one(
+                {'username': 'testtrainer3'})['_id'])
+            trainee_id = str(self.database.mongo.db.trainee.find_one(
+                {'username': 'testtrainee1'})['_id'])
+>>>>>>> eb35ed7cfa1f07c84f6caa10621c024def97772d
 
             assert self.database.get_trainee_by_username(
-                "testTrainee1") is not None
+                "testtrainee1") is not None
             assert self.database.get_trainer_by_username(
-                "testTrainer1") is not None
+                "testtrainer1") is not None
             assert self.database.get_trainer_by_username(
-                "testTrainer2") is not None
+                "testtrainer2") is not None
             assert self.database.get_trainer_by_username(
-                "testTrainer3") is not None
+                "testtrainer3") is not None
 
             self.database.trainee_add_trainer(trainee_id, trainer1_id)
             self.database.trainee_add_trainer(trainee_id, trainer2_id)
@@ -826,6 +909,7 @@ class TestDatabase(unittest.TestCase):
                 trainee_id).trainers) == 0
 
         finally:
+<<<<<<< HEAD
             self.database.mongo.trainer.delete_many(
                 {"username": "testTrainer1"})
             self.database.mongo.trainer.delete_many(
@@ -834,18 +918,29 @@ class TestDatabase(unittest.TestCase):
                 {"username": "testTrainer3"})
             self.database.mongo.trainee.delete_many(
                 {"username": "testTrainee1"})
+=======
+            self.database.mongo.db.trainer.delete_many(
+                {"username": "testtrainer1"})
+            self.database.mongo.db.trainer.delete_many(
+                {"username": "testtrainer2"})
+            self.database.mongo.db.trainer.delete_many(
+                {"username": "testtrainer3"})
+            self.database.mongo.db.trainee.delete_many(
+                {"username": "testtrainee1"})
+>>>>>>> eb35ed7cfa1f07c84f6caa10621c024def97772d
 
     def test_get_all_workouts_by_creatorid(self):
 
-        # Checking if workout total is equal to 1        
-        trainee = self.database.get_trainee_by_username(self.test_trainee.username)
+        # Checking if workout total is equal to 1
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
         workouts = self.database.get_all_workouts_by_creatorid(trainee._id)
         assert len(workouts) == 1
 
         new_workout = Workout(
-            _id = None,
+            _id=None,
             creator_id=trainee._id,
-            name="goingtoremove", # tearDown removes all of these 
+            name="goingtoremove",  # tearDown removes all of these
             difficulty="novice",
             about="something something else",
             exp=0
@@ -855,3 +950,332 @@ class TestDatabase(unittest.TestCase):
         workouts = self.database.get_all_workouts_by_creatorid(trainee._id)
         assert len(workouts) == 2
 
+    """Invitation tests"""
+
+    def test_create_invitation(self):
+        """Testing invitation creation"""
+
+        def clean_up(user_one, user_two):
+            # Clean up
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_two._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_two._id)
+            })
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        clean_up(trainee, trainer)
+
+        invitation_id = self.database.create_invitation(trainee._id,
+                                                        trainer._id)
+        database_invitation = self.database.mongo.db.invitation.find_one({
+            'sender': ObjectId(trainee._id),
+            'recipient': ObjectId(trainer._id)
+        })
+
+        assert invitation_id is not None
+        assert database_invitation is not None
+        assert str(database_invitation['_id']) == str(invitation_id)
+        assert str(database_invitation['sender']) == trainee._id
+        assert str(database_invitation['recipient']) == trainer._id
+
+        # Check if non-existent user throws error
+        with self.assertRaises(UserNotFoundError):
+            self.database.create_invitation('000000000000000000000000',
+                                            trainer._id)
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.create_invitation(trainee._id,
+                                            '000000000000000000000000')
+
+        clean_up(trainee, trainer)
+
+    def test_delete_invitation(self):
+        """Testing invitation deletion"""
+        def clean_up(user_one, user_two):
+            # Clean up
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_two._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_two._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+        clean_up(trainee, trainer)
+
+        invitation = self.database.mongo.db.invitation.insert_one({
+            'sender': ObjectId(trainee._id),
+            'recipient': ObjectId(trainer._id)
+        })
+        self.database.delete_invitation(invitation.inserted_id)
+        database_invitation = self.database.mongo.db.invitation.find_one({
+            '_id': invitation.inserted_id
+        })
+        assert database_invitation is None
+
+        database_invitation = self.database.mongo.db.invitation.find_one({
+            'sender': trainee._id,
+            'recipient': trainer._id
+        })
+        assert database_invitation is None
+
+        clean_up(trainee, trainer)
+
+    def test_search_invitation(self):
+        """Testing invitation search"""
+
+        def clean_up(user_one, user_two):
+            # Clean up
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_two._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_two._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+        clean_up(trainee, trainer)
+
+        with self.assertRaises(InvitationNotFound):
+            self.database.search_invitation("000000000000000000000000")
+
+        invitation = self.database.mongo.db.invitation.insert_one({
+            'sender': ObjectId(trainee._id),
+            'recipient': ObjectId(trainer._id)
+        })
+        searched_invitation = self.database.search_invitation(
+            invitation.inserted_id)
+
+        assert searched_invitation._id == str(invitation.inserted_id)
+        assert searched_invitation.sender == str(trainee._id)
+        assert searched_invitation.recipient == str(trainer._id)
+
+        clean_up(trainee, trainer)
+
+    def test_search_all_user_invitations(self):
+        """Testing the search feature to get all sent and recieved invitations by a user."""
+
+        def clean_up(user_one, user_two):
+            # Clean up
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_two._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_two._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        clean_up(trainee, trainer)
+
+        invitation = self.database.mongo.db.invitation.insert_one({
+            'sender': ObjectId(trainee._id),
+            'recipient': ObjectId(trainer._id)
+        })
+
+        all_sent, all_recieved = self.database.search_all_user_invitations(
+            trainee._id)
+        assert len(all_sent) > 0
+        assert len(all_recieved) == 0
+
+        all_sent, all_recieved = self.database.search_all_user_invitations(
+            trainer._id)
+        assert len(all_recieved) > 0
+        assert len(all_sent) == 0
+
+        clean_up(trainee, trainer)
+
+    def test_accept_invitation(self):
+        """Checking to see that a user can accept a recieved invitation."""
+        def clean_up(user_one, user_two):
+            # Clean up
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_one._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'sender': ObjectId(user_two._id)
+            })
+            self.database.mongo.db.invitation.delete_many({
+                'recipient': ObjectId(user_two._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        try:
+
+            clean_up(trainee, trainer)
+
+            invitation = self.database.mongo.db.invitation.insert_one({
+                'sender': ObjectId(trainee._id),
+                'recipient': ObjectId(trainer._id)
+            })
+
+            with self.assertRaises(InvitationNotFound):
+                self.database.accept_invitation('000000000000000000000000',
+                                                str(trainee._id))
+
+            assert self.database.mongo.db.invitation.find_one({
+                '_id': ObjectId(invitation.inserted_id)
+            }) is not None
+
+            assert self.database.mongo.db.invitation.find_one({
+                'sender': ObjectId(trainee._id)
+            }) is not None
+
+            assert self.database.mongo.db.invitation.find_one({
+                'recipient': ObjectId(trainer._id)
+            }) is not None
+
+            self.database.accept_invitation(str(invitation.inserted_id),
+                                            str(trainer._id))
+
+            assert self.database.mongo.db.invitation.find_one({
+                '_id': invitation.inserted_id
+            }) is None
+
+            assert ObjectId(trainee._id) in self.database.mongo.db.trainer.find_one({
+                '_id': ObjectId(trainer._id)
+            })['trainees']
+
+            assert ObjectId(trainer._id) in self.database.mongo.db.trainee.find_one({
+                '_id': ObjectId(trainee._id)
+            })['trainers']
+
+            clean_up(trainee, trainer)
+
+            invitation = self.database.mongo.db.invitation.insert_one({
+                'sender': ObjectId(trainer._id),
+                'recipient': ObjectId(trainee._id)
+            })
+
+            with self.assertRaises(InvitationNotFound):
+                self.database.accept_invitation('000000000000000000000000',
+                                                str(trainer._id))
+
+            assert self.database.mongo.db.invitation.find_one({
+                '_id': ObjectId(invitation.inserted_id)
+            }) is not None
+
+            assert self.database.mongo.db.invitation.find_one({
+                'sender': ObjectId(trainer._id)
+            }) is not None
+
+            assert self.database.mongo.db.invitation.find_one({
+                'recipient': ObjectId(trainee._id)
+            }) is not None
+
+            self.database.accept_invitation(str(invitation.inserted_id),
+                                            str(trainee._id))
+
+            assert self.database.mongo.db.invitation.find_one({
+                '_id': invitation.inserted_id
+            }) is None
+
+            assert ObjectId(trainee._id) in self.database.mongo.db.trainer.find_one({
+                '_id': ObjectId(trainer._id)
+            })['trainees']
+
+            assert ObjectId(trainer._id) in self.database.mongo.db.trainee.find_one({
+                '_id': ObjectId(trainee._id)
+            })['trainers']
+
+        finally:
+            clean_up(trainee, trainer)
+
+    def test_trainee_remove_trainer(self):
+        """Tests to see if a trainee gets removed from a trainers list"""
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.trainee_remove_trainer("123456789012345678901234",
+                                                 trainer._id)
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.trainee_remove_trainer(trainee._id,
+                                                 "123456789012345678901234")
+
+        self.database.mongo.db.trainee.update_one(
+            {"_id": ObjectId(trainee._id)},
+            {
+                "$addToSet": {
+                    "trainers": ObjectId(trainer._id)
+                }
+            })
+
+        assert ObjectId(trainer._id) in self.database.mongo.db.trainee.find_one({
+            '_id': ObjectId(trainee._id)
+        })['trainers']
+
+        self.database.trainee_remove_trainer(trainee._id, trainer._id)
+
+        assert ObjectId(trainer._id) not in self.database.mongo.db.trainee.find_one({
+            '_id': ObjectId(trainee._id)
+        })['trainers']
+
+    def test_trainer_remove_trainee(self):
+        """Tests to see if a trainee gets removed from a trainers list"""
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.trainer_remove_trainee("123456789012345678901234",
+                                                 trainee._id)
+
+        with self.assertRaises(UserNotFoundError):
+            self.database.trainer_remove_trainee(trainer._id,
+                                                 "123456789012345678901234")
+
+        self.database.mongo.db.trainer.update_one(
+            {"_id": ObjectId(trainer._id)},
+            {
+                "$addToSet": {
+                    "trainees": ObjectId(trainee._id)
+                }
+            })
+
+        assert ObjectId(trainee._id) in self.database.mongo.db.trainer.find_one({
+            '_id': ObjectId(trainer._id)
+        })['trainees']
+
+        self.database.trainer_remove_trainee(trainer._id, trainee._id)
+
+        assert ObjectId(trainee._id) not in self.database.mongo.db.trainer.find_one({
+            '_id': ObjectId(trainer._id)
+        })['trainees']
