@@ -24,8 +24,6 @@ class TestEvent(unittest.TestCase):
             "title": "title",
             "description": "description"
         }
-        print(new_dict)
-        print(comp_dict)
         self.assertTrue(new_dict == comp_dict)
 
 
