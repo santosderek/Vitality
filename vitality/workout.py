@@ -8,6 +8,10 @@ class Workout:
         self.about = about
         self.exp = exp
 
+    def __repr__(self):
+        """Returns all attributes of the Workout class as a dictionary."""
+        return f'Workout({self._id}, {self.creator_id}, {self.name}, {self.difficulty}, {self.about}, {self.exp})'
+
     def as_dict(self):
         """Returns all attributes of the Workout class as a dictionary."""
         return dict(self.__dict__)
