@@ -613,9 +613,6 @@ def create_app():
         creator_id = str(escape(creator_id))
         workout_id = str(escape(workout_id))
 
-        print (creator_id)
-        print (workout_id)
-
         if (g.database.get_workout_by_name(workout_id, creator_id) is None):
             abort(404)
 

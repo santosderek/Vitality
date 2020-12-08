@@ -519,7 +519,6 @@ def test_signup(client):
         usertype="trainee"
     ), follow_redirects=True)
     assert returned_value.status_code == 200
-    print(returned_value.data)
     assert b'Account was created!' in returned_value.data
     assert b'Could not create account' not in returned_value.data
     assert b'Username was taken' not in returned_value.data
