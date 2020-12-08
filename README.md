@@ -39,11 +39,25 @@ Please look at the `requirements.txt` file found in the root of our repo for the
 
     4. Make sure Mongod service is running locally and reachable.
 
-    5. Double click `start_flask.bat` (windows) or `start_flask.sh` (linux/mac)
+    5. Copy `.env.example` to a `.env` file and update the variables within the file.
+        
+        1. An example would be: 
+        
+        ```
+        SECRET_KEY=ThisSecretKeyThatShouldntBeShown
+        FLASK_APP=vitality
+        FLASK_ENV=development
+        MONGO_URI=mongodb://localhost:27017
+        MONGO_DATABASE=flask
+        GOOGLE_CLIENT_ID=
+        GOOGLE_SECRET_ID=
+        ```
+
+    6. Double click `start_flask.bat` (windows) or `start_flask.sh` (linux/mac)
         1. Alternatively type `./start_flask.sh` (linux/mac)
         2. Or type `.\start_flask.bat` (windows)
 
-    6. Go to browser and type http://localhost:8080/
+    7. Go to browser and type http://localhost:8080/
    
 
 --- 

@@ -1,5 +1,6 @@
 flask
-requests
-Flask-PyMongo
 markupsafe
+pymongo
 pytest
+python-dotenv
+requests
