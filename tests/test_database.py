@@ -514,53 +514,39 @@ class TestDatabase(unittest.TestCase):
         self.database.remove_workout(database_workout._id)
 
     def test_set_workout_creator_id(self):
-        new_workout = deepcopy(self.test_workout)
 
-        # Get workout from database
-        trainee = self.database.get_trainee_by_username(
-            self.test_trainee.username)
+        try: 
+            new_workout = deepcopy(self.test_workout)
 
-        # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+            # Get trainee from database
+            trainee = self.database.get_trainee_by_username(
+                self.test_trainee.username)
 
-        # Get trainee from database
-        database_trainee = self.database.get_trainee_by_username(
-            self.test_trainee.username)
+            # Get trainer from database
+            trainer = self.database.get_trainer_by_username(
+                self.test_trainer.username)
 
-        # Get trainer from database
-        database_trainer = self.database.get_trainer_by_username(
-            self.test_trainer.username)
+            database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                                trainee._id)
+            assert database_workout is not None
 
-        # Need to pass in the mongo id
-        new_workout._id = database_workout._id
+            # Set to trainer id
+            self.database.set_workout_creator_id(database_workout._id,
+            trainer._id)
 
-        # Check if workouts are the same
-        self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
+            # Get back the new workout
+            database_workout = self.database.get_workout_by_name(new_workout.name,
+                                                                trainer._id)
+            assert database_workout is not None
 
-        # Make creator id == trainee id
-        new_workout.creator_id = database_trainee._id
-        self.database.set_workout_creator_id(
-            new_workout._id, database_trainee._id)
-
-        # Get workout from database
-        print (new_workout)
-        print (database_trainee)
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             database_trainee._id)
-
-        self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
-
-        # Make creator id == trainer id
-        new_workout.creator_id = database_trainer._id
-        self.database.set_workout_creator_id(
-            new_workout._id, database_trainer._id)
-
-        # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
-
-        self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
+            # Check that the creator_id is now changed 
+            assert database_workout.creator_id == trainer._id
+        
+        finally:
+            # Delete it
+            self.database.mongo.workout.delete_many({
+                '_id': ObjectId(database_workout._id)
+            })
 
     def test_set_workout_name(self):
         new_workout = deepcopy(self.test_workout)
@@ -918,7 +904,7 @@ class TestDatabase(unittest.TestCase):
                 'recipient': ObjectId(user_two._id)
             })
 
-        try: 
+        try:
             trainee = self.database.get_trainee_by_username('testtrainee')
             trainer = self.database.get_trainer_by_username('testtrainer')
 
@@ -945,7 +931,7 @@ class TestDatabase(unittest.TestCase):
             with self.assertRaises(UserNotFoundError):
                 self.database.create_invitation(trainee._id,
                                                 '000000000000000000000000')
-        finally: 
+        finally:
             clean_up(trainee, trainer)
 
     def test_delete_invitation(self):

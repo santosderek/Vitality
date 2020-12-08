@@ -421,7 +421,7 @@ class Database:
             {"_id": ObjectId(id)},
             {
                 "$set": {
-                    "creator_id": creator_id
+                    "creator_id": ObjectId(creator_id)
                 }
             })
 
