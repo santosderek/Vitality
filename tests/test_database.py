@@ -549,8 +549,10 @@ class TestDatabase(unittest.TestCase):
             new_workout._id, database_trainee._id)
 
         # Get workout from database
+        print (new_workout)
+        print (database_trainee)
         database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+                                                             database_trainee._id)
 
         self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
 

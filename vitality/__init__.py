@@ -614,9 +614,13 @@ def create_app():
         """Page that shows the workout details"""
         if not g.user:
             return redirect(url_for('login'))
-        creator_id = escape(creator_id)
-        workout_id = escape(workout_id)
-        if (g.database.get_workout_by_name(workout_id, creator_id) == None):
+        creator_id = str(escape(creator_id))
+        workout_id = str(escape(workout_id))
+
+        print (creator_id)
+        print (workout_id)
+
+        if (g.database.get_workout_by_name(workout_id, creator_id) is None):
             abort(404)
 
         return render_template("workout/workout.html", workoutInfo=g.database.get_workout_by_name(workout_id, creator_id))
@@ -635,7 +639,10 @@ def create_app():
         if not g.user:
             return redirect(url_for('login'))
 
-        return render_template("workout/workoutlist.html")
+        workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
+
+        return render_template("workout/workoutlist.html",
+                               workouts=workouts)
 
     """Invitation System"""
     @app.route('/invitations', methods=["GET"])
