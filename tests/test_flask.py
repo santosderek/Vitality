@@ -1,7 +1,7 @@
 from bson.objectid import ObjectId
 import pytest
 from flask import g, session, url_for
-from os import environ 
+from os import environ
 from vitality import create_app
 from vitality.database import Database, WorkoutCreatorIdNotFoundError, password_sha256, InvalidCharactersException
 from vitality.trainee import Trainee
@@ -96,6 +96,7 @@ def test_failed_login_username(client):
     assert b'Invalid characters found' in returned_value.data
     assert g.user is None
 
+
 def test_failed_login_username_uppercase(client):
     # Testing the failed login page
     returned_value = client.post('/login', data=dict(
@@ -105,6 +106,7 @@ def test_failed_login_username_uppercase(client):
     assert returned_value.status_code == 400
     assert b'Invalid characters found' in returned_value.data
     assert g.user is None
+
 
 def test_failed_login_password(client):
     # Testing the failed login page
@@ -132,6 +134,7 @@ def test_failed_signup_username(client):
     assert b'Invalid characters found' in returned_value.data
     assert g.user is None
 
+
 def test_failed_signup_username_uppercase(client):
     # Testing the failed signup page
     returned_value = client.post('/signup', data=dict(
@@ -146,6 +149,7 @@ def test_failed_signup_username_uppercase(client):
     assert returned_value.status_code == 400
     assert b'Invalid characters found' in returned_value.data
     assert g.user is None
+
 
 def test_failed_signup_password(client):
     # Testing the failed signup page
@@ -519,7 +523,6 @@ def test_signup(client):
         usertype="trainee"
     ), follow_redirects=True)
     assert returned_value.status_code == 200
-    print(returned_value.data)
     assert b'Account was created!' in returned_value.data
     assert b'Could not create account' not in returned_value.data
     assert b'Username was taken' not in returned_value.data
@@ -1344,34 +1347,37 @@ def test_workout(client):
     assert returned_value.status_code == 200
     assert b'login' in returned_value.data
     assert g.user is None
-    
-    trainee = g.database.get_trainee_by_username('testtrainee')
 
+    trainee = g.database.get_trainee_by_username('testtrainee')
     trainer = g.database.get_trainer_by_username('testtrainer')
 
     workoutTest = Workout(
-    _id=None,
-    creator_id= trainer._id,
-    name= "testWorkout",
-    difficulty= "easy",
-    about= "2 Pushups, 1 Jumping Jack",
-    exp= "1000"
+        _id=None,
+        creator_id=trainer._id,
+        name="testWorkout",
+        difficulty="easy",
+        about="2 Pushups, 1 Jumping Jack",
+        exp="1000"
     )
 
     g.database.add_workout(workoutTest)
-    database_workout = g.database.get_workout_by_name(workoutTest.name, trainer._id)
+    database_workout = g.database.get_workout_by_name(
+        workoutTest.name, trainer._id)
 
     login_as_testTrainer(client)
-    returned_value = client.get(f'/workout/{trainer._id}/{database_workout.name}', follow_redirects=True)
+    returned_value = client.get(
+        f'/workout/{trainer._id}/{database_workout.name}', follow_redirects=True)
     assert returned_value.status_code == 200
-    assert bytes("{}".format(database_workout.name), "utf-8") in returned_value.data
-    assert bytes("{}".format(database_workout.difficulty), "utf-8") in returned_value.data
-    assert bytes("{}".format(database_workout.about), "utf-8") in returned_value.data
-    assert bytes("{}".format(database_workout.exp), "utf-8") in returned_value.data
+    assert bytes("{}".format(database_workout.name),
+                 "utf-8") in returned_value.data
+    assert bytes("{}".format(database_workout.difficulty),
+                 "utf-8") in returned_value.data
+    assert bytes("{}".format(database_workout.about),
+                 "utf-8") in returned_value.data
+    assert bytes("{}".format(database_workout.exp),
+                 "utf-8") in returned_value.data
 
     g.database.remove_workout(database_workout._id)
-
-
 
 
 def test_workout_overview(client):
@@ -1401,22 +1407,55 @@ def test_workout_overview(client):
     assert b'Search for workout routine.' in returned_value.data
     assert b'Your created workouts.' in returned_value.data
 
-@pytest.mark.skip
+
 def test_workout_list(client):
     """Testing the workout list page"""
 
-    # Not logged in
-    returned_value = client.get('/workout_list', follow_redirects=True)
-    assert returned_value.status_code == 200
+    try:
+        # Not logged in
+        returned_value = client.get('/workout_list', follow_redirects=True)
+        assert returned_value.status_code == 200
+        assert b'login' in returned_value.data
+        assert g.user is None
 
-    # Login as Trainee
-    login_as_testTrainee(client)
+        login_as_testTrainer(client)
+        returned_value = client.get('/workout_list', follow_redirects=True)
+        assert returned_value.status_code == 200
+        assert b'You have no created workouts' in returned_value.data
+        assert type(g.user) is Trainer
 
-    returned_value = client.get('/workout_list', follow_redirects=True)
-    assert returned_value.status_code == 200
+        login_as_testTrainee(client)
+        trainee = g.database.get_trainee_by_username(test_trainee.username)
+        workout = g.database.add_workout(Workout(
+            _id=None,
+            creator_id=trainee._id,
+            name="testWorkout",
+            difficulty="expert",
+            about="This is an about",
+            exp=12345
+        ))
 
-    # TODO: need to test post requests
+        database_workout = g.database.mongo.workout.find_one({
+            'creator_id': ObjectId(trainee._id),
+            'name': "testWorkout"
+        })
+        returned_value = client.get('/workout_list', follow_redirects=True)
+        assert returned_value.status_code == 200
+        assert bytes('{}'.format(database_workout['name']),
+                     'utf-8') in returned_value.data
+        assert type(g.user) is Trainee
 
+    finally:
+        database_workout = g.database.mongo.workout.find_one({
+            'creator_id': ObjectId(trainee._id),
+            'name': "testWorkout"
+        })
+        if database_workout is not None: 
+            trainee = g.database.get_trainee_by_username(test_trainee.username)
+            g.database.mongo.workout.delete_many({
+                'name': "testWorkout",
+                'creator_id': ObjectId(trainee._id)
+            })
 
 def test_delete_user(client):
     """Testing the delete user route"""
@@ -1546,7 +1585,7 @@ def test_invitations(client):
 
     login_as_testTrainee(client)
 
-    try: 
+    try:
 
         trainee = g.database.get_trainee_by_username('testtrainee')
         trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1559,12 +1598,13 @@ def test_invitations(client):
         assert returned_value.status_code == 200
         assert type(g.user) is Trainee
         assert bytes('{}'.format(invitation.inserted_id),
-                    'utf-8') in returned_value.data
+                     'utf-8') in returned_value.data
     finally:
         g.database.mongo.invitation.delete_many({
-                    'sender': ObjectId(trainer._id),
-                    'recipient': ObjectId(trainee._id)
-                })
+            'sender': ObjectId(trainer._id),
+            'recipient': ObjectId(trainee._id)
+        })
+
 
 def test_accept_invitation(client):
     returned_value = client.post('/accept_invitation',
@@ -1586,44 +1626,43 @@ def test_accept_invitation(client):
         })
 
         returned_value = client.post('/accept_invitation',
-                                    data={
-                                        'confirmation': 'false',
-                                        'invitation_id': '000000000000000000000000'
-                                        },
-                                    follow_redirects=True)
+                                     data={
+                                         'confirmation': 'false',
+                                         'invitation_id': '000000000000000000000000'
+                                     },
+                                     follow_redirects=True)
         assert returned_value.status_code == 500
         assert type(g.user) is Trainee
 
         returned_value = client.post('/accept_invitation',
-                                    data={
-                                        'confirmation': 'true',
-                                        'invitation_id': str('000000000000000000000000')
-                                        },
-                                    follow_redirects=True)
+                                     data={
+                                         'confirmation': 'true',
+                                         'invitation_id': str('000000000000000000000000')
+                                     },
+                                     follow_redirects=True)
 
         assert returned_value.status_code == 500
-        
+
         returned_value = client.post('/accept_invitation',
-                                    data={
-                                        'confirmation': 'true',
-                                        'invitation_id': str(invitation.inserted_id)
-                                        },
-                                    follow_redirects=True)
+                                     data={
+                                         'confirmation': 'true',
+                                         'invitation_id': str(invitation.inserted_id)
+                                     },
+                                     follow_redirects=True)
         assert returned_value.status_code == 204
         assert type(g.user) is Trainee
         assert g.database.mongo.invitation.find_one({
-                    'recipient': ObjectId(trainer._id)
-                }) is None
+            'recipient': ObjectId(trainer._id)
+        }) is None
         assert ObjectId(trainer._id) in g.database.mongo.trainee.find_one({
-                    '_id': ObjectId(trainee._id)
-                })['trainers']
+            '_id': ObjectId(trainee._id)
+        })['trainers']
         assert ObjectId(trainee._id) in g.database.mongo.trainer.find_one({
-                    '_id': ObjectId(trainer._id)
-                })['trainees']
+            '_id': ObjectId(trainer._id)
+        })['trainees']
 
     finally:
         g.database.mongo.invitation.delete_many({
-                    'sender': ObjectId(trainer._id),
-                    'recipient': ObjectId(trainee._id)
-                })
-    
+            'sender': ObjectId(trainer._id),
+            'recipient': ObjectId(trainee._id)
+        })

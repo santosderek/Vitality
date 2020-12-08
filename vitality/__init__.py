@@ -605,17 +605,20 @@ def create_app():
 
         return render_template("workout/search.html")
 
-    @app.route('/workout/<creator_id>/<workout_id>', methods=["GET"])
-    def workout(creator_id: str, workout_id: str):
+    @app.route('/workout/<creator_id>/<workout_name>', methods=["GET"])
+    def workout(creator_id: str, workout_name: str):
         """Page that shows the workout details"""
         if not g.user:
             return redirect(url_for('login'))
-        creator_id = escape(creator_id)
-        workout_id = escape(workout_id)
-        if (g.database.get_workout_by_name(workout_id, creator_id) == None):
+        creator_id = str(escape(creator_id))
+        workout_name = str(escape(workout_name))
+
+        # workout = g.database.get_workout_by_id(workout_name)
+
+        if (g.database.get_workout_by_name(workout_name, creator_id) is None):
             abort(404)
 
-        return render_template("workout/workout.html", workoutInfo=g.database.get_workout_by_name(workout_id, creator_id))
+        return render_template("workout/workout.html", workoutInfo=g.database.get_workout_by_name(workout_name, creator_id))
 
     @app.route('/workout_overview', methods=["GET"])
     def workout_overview():
@@ -631,7 +634,10 @@ def create_app():
         if not g.user:
             return redirect(url_for('login'))
 
-        return render_template("workout/workoutlist.html")
+        workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
+
+        return render_template("workout/workoutlist.html",
+                               workouts=workouts)
 
     """Invitation System"""
     @app.route('/invitations', methods=["GET"])
