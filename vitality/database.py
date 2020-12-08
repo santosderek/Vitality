@@ -407,7 +407,7 @@ class Database:
 
     def get_workout_by_name(self, name: str, creator_id: str):
         """Returns the Workout class found by the workout's name."""
-        found_workout = self.mongo.db.workout.find_one({
+        found_workout = self.mongo.workout.find_one({
             "creator_id": ObjectId(creator_id),
             "name": name
         })
