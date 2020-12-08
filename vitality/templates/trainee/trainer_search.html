@@ -41,7 +41,7 @@
                                     {% if trainer._id in trainer_id_list %}
                                     <a class="btn mb-1 col-sm-12" id="add" style="pointer-events: none; background-color: grey;">Already Added!</a>
                                     {% else %}
-                                    <a class="btn mb-1 col-sm-12" id="add"
+                                    <a class="btn mb-1 col-sm-12" id="add_{{trainer._id}}"
                                         onclick="add_trainer('{{ trainer._id }}')">Add</a>
                                     {% endif %}
 
@@ -59,16 +59,16 @@
 <script>
     function add_trainer (trainer_id) {
         $.post("{{ url_for("add_trainer") }}", {"trainer_id": trainer_id}, function (data, status) {
-            $("#add").text("Trainer Added!");
-            $("#add").css("background-color", "grey");
-            $('#add').prop('disabled', true);
+            $(`#add_${trainer_id}`).text("Trainer Added!");
+            $(`#add_${trainer_id}`).css("background-color", "grey");
+            $(`#add_${trainer_id}`).prop('disabled', true);
         })
             .fail(function () {
-                $("#add").text("Could not add!");
+                $(`#add_${trainer_id}`).text("Could not add!");
                 var timeoutID = window.setTimeout(function () {
-                    $("#add").css("background-color", "grey");
-                    $("#add").text("Add");
-                    $('#add').prop('disabled', false);
+                    $(`#add_${trainer_id}`).css("background-color", "grey");
+                    $(`#add_${trainer_id}`).text("Add");
+                    $(`#add_${trainer_id}`).prop('disabled', false);
                 }, 2 * 1000);
             });
     };
