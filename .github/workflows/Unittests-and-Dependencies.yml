@@ -60,6 +60,7 @@ jobs:
   run-ansible:
     needs: [ pytest, docker-build-test ]
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/master' }}
     steps: 
       -
           name: Checkout
@@ -67,7 +68,6 @@ jobs:
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
-        if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/master' }}
         with:
           playbook: UpdateVitality.yml
           directory: ansible/
