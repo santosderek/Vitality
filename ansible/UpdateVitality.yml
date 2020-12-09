@@ -16,4 +16,4 @@
         project_src: /home/derek/webservices
         pull: yes
         remove_orphans: yes
-        project_name: Vitality
+        services: vitality
