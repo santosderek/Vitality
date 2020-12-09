@@ -1,0 +1,7 @@
+roles:
+  - name: santosderek.users
+    src: santosderek.users
+
+collections:
+  - name: community.general.docker_compose
+    version: 0.0.2
