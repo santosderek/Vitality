@@ -67,6 +67,12 @@ jobs:
           name: Checkout
           uses: actions/checkout@v2
 
+      - name: Install community.general.docker_compose
+        run: |
+          apt install python3-pip
+          pip3 install docker
+          ansible-galaxy collection install community.general
+
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
