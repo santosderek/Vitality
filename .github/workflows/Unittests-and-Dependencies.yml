@@ -77,26 +77,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install docker
 
-      - name: Play Ansible Playbook
-        uses: arillso/action.playbook@master
-        with:
-          playbook: ansible/UpdateVitality.yml
-          inventory: ansible/inventory.yml
-          galaxy_file: ansible/requirements.yml
-          private_key: ${{secrets.GITHUBSSHPRIVKEY}}
-        env:
-          ANSIBLE_DEPRECATION_WARNINGS: 'false'
-
-      # - name: Install community.general.docker_compose
-      #   run: |
-      #     ansible-galaxy collection install community.general
-
-      # - name: Run playbook
-      #   uses: dawidd6/action-ansible-playbook@v2
-      #   with:
-      #     playbook: UpdateVitality.yml
-      #     directory: ansible/
-      #     private_key: ${{secrets.GITHUBSSHPRIVKEY}}
-      #     inventory: |
-      #       [ocean]
-      #       vitality.santosderek.com
+  lintAnsible:
+    runs-on: ubuntu-latest
+    needs: [ pytest, docker-build-test ]
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v2
+    - name: Lint Ansible Playbook
+      uses: ansible/ansible-lint-action@master
+      with:
+        targets: "ansible/UpdateVitality.yml"
+        
+  deployAnsible:
+    needs: build
+    runs-on: ubuntu-latest
+    needs: [ pytest, docker-build-test, lintAnsible]
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+    - uses: actions/checkout@v1
+    - uses: ./.github/actions/ansible
+      with: 
+        playbook: playbook.yml
+        inventory: localhost
