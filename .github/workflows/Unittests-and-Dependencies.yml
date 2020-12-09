@@ -69,7 +69,7 @@ jobs:
 
       - name: Install community.general.docker_compose
         run: |
-          apt install python3-pip
+          apt install python3-pip -y
           pip3 install docker
           ansible-galaxy collection install community.general
 
