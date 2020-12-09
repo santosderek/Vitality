@@ -56,18 +56,3 @@ jobs:
           name: Building the docker container
           run: |
             docker build .
-            
-  run-ansible:
-    needs: [ pytest, docker-build-test ]
-    runs-on: ubuntu-latest
-    steps: 
-      - name: Run playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        with:
-          playbook: UpdateVitality.yml
-          directory: ./ansible/
-          key: ${{secrets.GITHUBSSHPRIVKEY}}
-          inventory: |
-            [ocean]
-            vitality.santosderek.com
