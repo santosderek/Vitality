@@ -1,33 +1,37 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row"> 
-    <h1> {{ workoutInfo.name }} </h1><br><br>
-    <div class = "col-sm-12">
+<div class="row">
+    <div class="col-sm-12">
+        <h1> {{ workoutInfo.name }} </h1><br><br>
+    </div>
+    <div class="col-sm-12">
+        <form action={{ url_for('profile', username=g.user.username)}} method="POST">
         <p><b>Difficulty: </b>{{ workoutInfo.difficulty }}</p><br>
         <p id="workoutExp"><b>Experience Points: </b>{{ workoutInfo.exp }}</p><br>
         <p><b>Workout Details: </b>{{ workoutInfo.about }}</p>
-        {% if workoutInfo.is_complete == false and workoutInfo.exp == 1000 %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="POST">
-        <button class="text-center mt-1" type="submit" name="xp" id="xp1" value="1000">Complete</button>
+            <button class="text-center mt-1" type="submit" id="completed"
+                onclick="submitted()">
+                Complete
+            </button>
         </form>
-        {% elif workoutInfo.is_complete == false and workoutInfo.exp == 2000 %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="POST">
-        <button class="text-center mt-1" type="submit" name="xp" id="xp2" value="2000">Complete</button>
-        </form>
-        {% elif workoutInfo.is_complete == false and workoutInfo.exp == 3000 %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="POST">
-        <button class="text-center mt-1" type="submit" name="xp" id="xp3" value="3000">Complete</button>
-        </form>
-        {% elif workoutInfo.is_complete == false and workoutInfo.exp == 5000 %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="POST">
-        <button class="text-center mt-1" type="submit" name="xp" id="xp4" value="5000">Complete</button>
-        </form>
-        {% else %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="GET">
-        <button class="text-center mt-1" type="submit" name="completed" id="completed" value="completed">Completed</button>
-        </form>
-        {% endif %}
     </div>
 </div>
+
+<script>
+    window.addEventListener(
+        'load',
+        function () {
+            if (workout_info.is_complete == true) {
+                submitted(); 
+            }
+        },
+        false);
+
+    function submitted(username, workout_name) {
+        $("#completed").disable();
+        $("#completed").text = "Completed";
+    }
+
+</script>
 {% endblock %}

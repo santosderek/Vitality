@@ -680,6 +680,12 @@ def create_app():
         creator_id = str(escape(creator_id))
         workout_name = str(escape(workout_name))
 
+
+
+        # Check creator_id and workout name, then update the workout to be completed in a POST req
+
+
+
         if (g.database.get_workout_by_name(workout_name, creator_id) is None):
             abort(404)
 
