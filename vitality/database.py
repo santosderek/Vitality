@@ -395,14 +395,13 @@ class Database:
             return self.workout_dict_to_class(found_workout)
         return None
 
-    
     def get_workout_by_creatorid(self, creator_id: str):
         """Returns the Workout class found by the workout's id."""
-        found_workout = self.mongo.workout.find_one({"creator_id": ObjectId(creator_id)})
+        found_workout = self.mongo.workout.find_one(
+            {"creator_id": ObjectId(creator_id)})
         if found_workout:
             return self.workout_dict_to_class(found_workout)
         return None
-
 
     def get_workout_by_attribute(self, **kwargs):
         """
@@ -627,9 +626,11 @@ class UserNotFoundError(ValueError):
     """If a username was taken within the database class"""
     pass
 
+
 class WorkoutNotFound(ValueError):
     """If a username was taken within the database class"""
     pass
+
 
 class WorkoutCreatorIdNotFoundError(AttributeError):
     """Error for when Workout creator id is missing"""
