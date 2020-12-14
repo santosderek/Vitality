@@ -299,40 +299,29 @@ def create_app():
                     raise InvalidCharactersException("Invalid characters")
 
                 if g.database.get_trainee_by_id(g.user._id) is not None:
-
                     if username:
                         g.database.set_trainee_username(g.user._id, username)
-
                     if password and re_password and password == re_password:
                         g.database.set_trainee_password(g.user._id, password)
-
                     if location:
                         g.database.set_trainee_location(g.user._id, location)
-
                     if phone:
                         g.database.set_trainee_phone(g.user._id, phone)
-
                     if name:
                         g.database.set_trainee_name(g.user._id, name)
-
                     return redirect(url_for('usersettings'))
 
                 elif g.database.get_trainer_by_id(g.user._id) is not None:
                     if username:
                         g.database.set_trainer_username(g.user._id, username)
-
                     if password and re_password and password == re_password:
                         g.database.set_trainer_password(g.user._id, password)
-
                     if location:
                         g.database.set_trainer_location(g.user._id, location)
-
                     if phone:
                         g.database.set_trainer_phone(g.user._id, phone)
-
                     if name:
                         g.database.set_trainer_name(g.user._id, name)
-
                     return redirect(url_for('usersettings'))
 
             except InvalidCharactersException as e:
@@ -678,11 +667,10 @@ def create_app():
         """Page to search for a workout"""
         if not g.user:
             return redirect(url_for('login'))
-        workout_1 = g.database.get_workout_by_only_name("curls")
-        workout_2 = g.database.get_workout_by_only_name("russian twists")
-        workout_3 = g.database.get_workout_by_only_name("burpees")
-        workout_4 = g.database.get_workout_by_only_name("20lb plate pullups")
-        return render_template("workout/search.html", workout_1=workout_1, workout_2=workout_2, workout_3=workout_3, workout_4=workout_4)
+        default_vitality_user = g.database.get_trainer_by_username("vitality")
+        default_workouts = g.database.get_all_workouts_by_creatorid(
+            default_vitality_user._id)
+        return render_template("workout/search.html", default_workouts=default_workouts)
 
     @app.route('/workout/<creator_id>/<workout_name>', methods=["GET"])
     def workout(creator_id: str, workout_name: str):
