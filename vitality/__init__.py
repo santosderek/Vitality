@@ -10,7 +10,13 @@ from .database import (
     IncorrectRecipientID,
     InvitationNotFound
 )
-from .workout import Workout
+from .workout import (
+    Workout,
+    DEFAULT_EASY_EXP,
+    DEFAULT_MEDIUM_EXP,
+    DEFAULT_HARD_EXP,
+    DEFAULT_INSANE_EXP
+)
 from flask import (
     abort,
     Flask,
@@ -169,7 +175,7 @@ def create_app():
                     except UsernameTakenError as err:
                         app.logger.debug(f"Username {username} was taken.")
                         return render_template("account/signup.html", username_taken=True)
-                        
+
                 # If username and password failed, render error messsage
                 return render_template("account/signup.html", error_message=True)
             except InvalidCharactersException as e:
@@ -591,30 +597,17 @@ def create_app():
                 about = escape(request.form['about'])
                 difficulty = escape(request.form['difficulty'])
 
-                gainedExp = 0
-                if difficulty == "easy":
-                    gainedExp = 1000
-                elif difficulty == "medium":
-                    gainedExp = 2000
-                elif difficulty == "hard":
-                    gainedExp = 3000
-                elif difficulty == "insane":
-                    gainedExp = 5000
-
                 g.database.add_workout(Workout(
                     _id=None,
                     creator_id=g.user._id,
                     name=name,
                     difficulty=difficulty,
                     about=about,
-                    exp=gainedExp,
                     is_complete=False
                 ))
                 return render_template("workout/new_workout.html", workout_added=True)
-
             except WorkoutCreatorIdNotFoundError:
                 return render_template("workout/new_workout.html", invalid_creatorid=True)
-
         return render_template("workout/new_workout.html")
 
     @app.route('/search_workout', methods=["GET"])
