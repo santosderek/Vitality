@@ -403,7 +403,7 @@ class Database:
             return self.workout_dict_to_class(found_workout)
         return None
 
-    def get_workout_by_attribute(self, **kwargs):
+    def get_workout_by_attributes(self, **kwargs):
         """
         Returns a single workout based on the keyword arguments passed to the function.
         Each key represents the attribute to append to the find function.

@@ -1,3 +1,5 @@
+from collections import defaultdict
+from werkzeug.exceptions import default_exceptions
 from .trainee import Trainee
 from .trainer import Trainer
 from .database import (
@@ -31,12 +33,73 @@ from markupsafe import escape
 import re
 from .settings import SECRET_KEY, MONGO_URI
 
+DEFAULT_VITALITY_PASSWORD = "DefaultVitalityTrainerPassword"
+
+
+def populate_database_defaults():
+    """Creates the default trainer and workouts for the application."""
+    default_database = Database(MONGO_URI)
+
+    if not database.get_trainer_by_username():
+        # Default Vitality User
+        trainer = Trainer(
+            _id=None,
+            username="vitality",
+            password=DEFAULT_VITALITY_PASSWORD
+        )
+        default_database.add_trainer(trainer)
+    default_trainer = default_database.get_trainer_by_username("vitality")
+
+    # Default Workouts
+    default_workouts = [
+        Workout(
+            _id=None,
+            creator_id=default_trainer._id,
+            name="curls",
+            difficulty="easy",
+            about="An exercise to workout your biceps.",
+            is_complete=False
+        ),
+        Workout(
+            _id=None,
+            creator_id=default_trainer._id,
+            name="Russian Twists",
+            difficulty="medium",
+            about="An exercise to workout your abs.",
+            is_complete=False
+        ),
+        Workout(
+            _id=None,
+            creator_id=default_trainer._id,
+            name="burpees",
+            difficulty="hard",
+            about="An exercise to workout your stamina.",
+            is_complete=False
+        ),
+        Workout(
+            _id=None,
+            creator_id=default_trainer._id,
+            name="20lb plate pullups",
+            difficulty="insane",
+            about="An exercise to workout your lats, biceps, deltoids.",
+            is_complete=False
+        )
+    ]
+    for workout in default_workouts:
+        database_workout = default_database.get_workout_by_attributes(workout.name,
+                                                                      workout.creator_id)
+        if database_workout is not None:
+            default_database.add_workout(workout)
+
 
 def create_app():
     """Application factory for our flask web server"""
     app = Flask(__name__)
     app.secret_key = SECRET_KEY
 
+    populate_database_defaults()
+
+    # Input Validation
     alphaPattern = re.compile(r"^[a-zA-Z0-9\s]*$")
     numberPattern = re.compile(r"^[0-9]*$")
     stringPattern = re.compile(r"^[a-zA-Z]*$")
