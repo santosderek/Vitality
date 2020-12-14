@@ -25,6 +25,7 @@ from markupsafe import escape
 import re
 from .settings import SECRET_KEY, MONGO_URI
 
+
 def create_app():
     """Application factory for our flask web server"""
     app = Flask(__name__)
@@ -156,54 +157,46 @@ def create_app():
                                 password=password,
                                 name=name,
                                 location=location,
-                                phone=phone)
+                                phone=phone,
+                                exp=0)
 
                             g.database.add_trainer(new_user)
 
                         else:
                             return render_template("account/signup.html", error_message=True)
-
                         # If username and password successful
                         return render_template("account/signup.html", creation_successful=True)
-
                     except UsernameTakenError as err:
-                        app.logger.debug(
-                            "Username {} was taken.".format(new_user))
+                        app.logger.debug(f"Username {username} was taken.")
                         return render_template("account/signup.html", username_taken=True)
-
+                        
                 # If username and password failed, render error messsage
                 return render_template("account/signup.html", error_message=True)
             except InvalidCharactersException as e:
-                return render_template("account/signup.html", invalid_characters    =True), 400
+                return render_template("account/signup.html", invalid_characters=True), 400
         return render_template("account/signup.html")
 
-    @app.route('/profile/<username>', methods=["POST"])
+    @app.route('/profile/<username>', methods=["GET", "POST"])
     def profile(username: str):
         """Profile page for a given username"""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
-        app.logger.info('Rendering Profile')
+
         username = escape(username)
-        xp = int(escape(request.form['xp']))
-        addedexp = xp + g.user.exp
-        renderexp = g.database.set_trainee_exp(username, addedexp)
-        g_workouts = g.database.get_workout_by_creatorid_and_exp(xp, str(g.user._id))
-        set_status = g.database.set_workout_status(g_workouts.name, True)
         user = g.database.get_trainer_by_username(username) \
             or g.database.get_trainee_by_username(username)
-        return render_template("account/profile.html", user=user, renderexp=renderexp, rendercomplete=set_status)
 
-    @app.route('/profile/<username>', methods=["GET"])
-    def profile_get(username: str):
-        """Profile page for a given username"""
-        if not g.user:
-            app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'))
-        app.logger.info('Rendering Profile')
-        username = escape(username)
-        user = g.database.get_trainer_by_username(username) \
-               or g.database.get_trainee_by_username(username)
+        if request.method == "POST":
+
+            app.logger.info('Rendering Profile')
+            xp = int(escape(request.form['xp']))
+            addedexp = xp + g.user.exp
+            renderexp = g.database.set_trainee_exp(username, addedexp)
+            g_workouts = g.database.get_workout_by_creatorid_and_exp(xp,
+                                                                     str(g.user._id))
+            set_status = g.database.set_workout_status(g_workouts.name, True)
+            return render_template("account/profile.html", user=user, renderexp=renderexp, rendercomplete=set_status)
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
@@ -614,8 +607,8 @@ def create_app():
                     name=name,
                     difficulty=difficulty,
                     about=about,
-                    exp= gainedExp,
-                    is_complete= False
+                    exp=gainedExp,
+                    is_complete=False
                 ))
                 return render_template("workout/new_workout.html", workout_added=True)
 
@@ -633,7 +626,7 @@ def create_app():
         workout_2 = g.database.get_workout_by_only_name("russian twists")
         workout_3 = g.database.get_workout_by_only_name("burpees")
         workout_4 = g.database.get_workout_by_only_name("20lb plate pullups")
-        return render_template("workout/search.html", workout_1 = workout_1, workout_2 = workout_2, workout_3 = workout_3, workout_4 = workout_4)
+        return render_template("workout/search.html", workout_1=workout_1, workout_2=workout_2, workout_3=workout_3, workout_4=workout_4)
 
     @app.route('/workout/<creator_id>/<workout_name>', methods=["GET"])
     def workout(creator_id: str, workout_name: str):

@@ -395,6 +395,27 @@ class Database:
             return self.workout_dict_to_class(found_workout)
         return None
 
+    
+    def get_workout_by_creatorid(self, creator_id: str):
+        """Returns the Workout class found by the workout's id."""
+        found_workout = self.mongo.workout.find_one({"creator_id": ObjectId(creator_id)})
+        if found_workout:
+            return self.workout_dict_to_class(found_workout)
+        return None
+
+
+    def get_workout_by_attribute(self, **kwargs):
+        """
+        Returns a single workout based on the keyword arguments passed to the function.
+        Each key represents the attribute to append to the find function.
+        If a workout with the passed key value pairs are not found, then we raise a WorkoutNotFound
+        error. 
+        """
+        found_workout = self.mongo.workout.find_one(**kwargs)
+        if found_workout:
+            return self.workout_dict_to_class(found_workout)
+        raise WorkoutNotFound("Workout with key/value pairs not found.")
+
     def get_all_workouts_by_creatorid(self, creator_id: str):
         """Returns the Workout class found by the workout's id."""
         found_workouts = self.mongo.workout.find(
@@ -404,50 +425,6 @@ class Database:
             for workout in found_workouts:
                 workouts.append(self.workout_dict_to_class(workout))
         return workouts
-
-    def get_workout_by_creatorid(self, creator_id: str):
-        """Returns the Workout class found by the workout's id."""
-        found_workout = self.mongo.workout.find_one({"creator_id": ObjectId(creator_id)})
-        if found_workout:
-            return self.workout_dict_to_class(found_workout)
-        return None
-
-    def get_workout_by_creatorid_and_exp(self, exp: int, creator_id: str):
-        found_workout = self.mongo.workout.find_one({
-            "creator_id": ObjectId(creator_id),
-            "exp": exp
-        })
-        if found_workout:
-            return self.workout_dict_to_class(found_workout)
-        return None
-
-    def get_workout_by_name(self, name: str, creator_id: str):
-        """Returns the Workout class found by the workout's name."""
-        found_workout = self.mongo.workout.find_one({
-            "creator_id": ObjectId(creator_id),
-            "name": name
-        })
-        if found_workout:
-            return self.workout_dict_to_class(found_workout)
-        return None
-
-    def get_workout_by_only_name(self, name: str):
-        """Returns the Workout class found by the workout's name."""
-        found_workout = self.mongo.workout.find_one({
-            "name": name
-        })
-        if found_workout:
-            return self.workout_dict_to_class(found_workout)
-        return None
-
-    def get_workout_by_exp(self, exp: int):
-        """Returns the Workout class found by the workout's name."""
-        found_workout = self.mongo.workout.find_one({
-            "exp": exp
-        })
-        if found_workout:
-            return self.workout_dict_to_class(found_workout)
-        return None
 
     def set_workout_creator_id(self, id: str, creator_id: str):
         """Updates a workout's creator id given a workout id."""
@@ -650,6 +627,9 @@ class UserNotFoundError(ValueError):
     """If a username was taken within the database class"""
     pass
 
+class WorkoutNotFound(ValueError):
+    """If a username was taken within the database class"""
+    pass
 
 class WorkoutCreatorIdNotFoundError(AttributeError):
     """Error for when Workout creator id is missing"""
