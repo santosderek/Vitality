@@ -685,11 +685,11 @@ def create_app():
         # Check creator_id and workout name, then update the workout to be completed in a POST req
 
 
-
-        if (g.database.get_workout_by_name(workout_name, creator_id) is None):
+        workout_info = g.database.get_workout_by_name(workout_name, creator_id)
+        if workout_info is None:
             abort(404)
 
-        return render_template("workout/workout.html", workoutInfo=g.database.get_workout_by_name(workout_name, creator_id))
+        return render_template("workout/workout.html", workout_info=workout_info)
 
     @app.route('/workout_overview', methods=["GET"])
     def workout_overview():
