@@ -3,15 +3,17 @@
 {% block content %}
 <div class="row">
     <div class="col-sm-12">
-        <h1> {{ workoutInfo.name }} </h1><br><br>
+        <h1> {{ workout_info.name }} </h1><br><br>
     </div>
     <div class="col-sm-12">
-        <form action={{ url_for('profile', username=g.user.username)}} method="POST">
-        <p><b>Difficulty: </b>{{ workoutInfo.difficulty }}</p><br>
-        <p id="workoutExp"><b>Experience Points: </b>{{ workoutInfo.exp }}</p><br>
-        <p><b>Workout Details: </b>{{ workoutInfo.about }}</p>
-            <button class="text-center mt-1" type="submit" id="completed"
-                onclick="submitted()">
+        <form action={{ url_for('workout', creator_id=g.user._id, workout_name=workout_info.name )}} method="POST">
+            <p><b>Difficulty: </b>{{ workout_info.difficulty }}</p>
+            <br>
+            <p id="workoutExp"><b>Experience Points: </b>{{ workout_info.exp }}</p>
+            <br>
+            <p><b>Workout Details: </b>{{ workout_info.about }}</p>
+            <input type="hidden" name="completed" value="true" />
+            <button class="text-center mt-1" type="submit" id="completed_button" onclick="submitted()">
                 Complete
             </button>
         </form>
@@ -19,19 +21,19 @@
 </div>
 
 <script>
+    function submitted(username, workout_name) {
+        $("#completed_button").disable();
+        $("#completed_button").text = "Workout Completed!";
+    }
+
     window.addEventListener(
         'load',
         function () {
             if (workout_info.is_complete == true) {
-                submitted(); 
+                submitted();
             }
         },
         false);
-
-    function submitted(username, workout_name) {
-        $("#completed").disable();
-        $("#completed").text = "Completed";
-    }
 
 </script>
 {% endblock %}

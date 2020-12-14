@@ -8,6 +8,8 @@ from markupsafe import escape
 import re
 import hashlib
 
+from vitality import workout
+
 
 def password_sha256(password: str):
     return hashlib.sha256(escape(password).encode()).hexdigest()
@@ -137,6 +139,19 @@ class Database:
         trainee_dict.pop('_id', None)
         trainee_dict['password'] = password_sha256(trainee.password)
         self.mongo.trainee.insert_one(trainee_dict)
+
+    def add_trainee_experience(self, trainee_id: str, value: int):
+
+        self.mongo.trainee.update(
+            {
+                '_id': ObjectId(trainee_id)
+            },
+            {
+                '$inc': {
+                    'exp': int(value)
+                }
+            }
+        )
 
     def remove_trainee(self, id: str):
         """Deletes a trainee by trainee id."""
@@ -364,6 +379,19 @@ class Database:
         trainer_dict['password'] = password_sha256(trainer.password)
         self.mongo.trainer.insert_one(trainer_dict)
 
+    def add_trainer_experience(self, trainer_id: str, value: int):
+
+        self.mongo.trainer.update(
+            {
+                '_id': ObjectId(trainer_id)
+            },
+            {
+                '$inc': {
+                    'exp': int(value)
+                }
+            }
+        )
+
     def remove_trainer(self, id: str):
         """Deletes a trainer by trainer id."""
         self.mongo.trainer.delete_one({"_id": ObjectId(id)})
@@ -465,33 +493,21 @@ class Database:
                 }
             })
 
-    def set_workout_exp(self, id: str, exp: int):
-        """Updates a workout's experience points given a workout id."""
+    def set_workout_status(self, creator_id: str, name: str, is_complete: bool):
         self.mongo.workout.update_one(
-            {"_id": ObjectId(id)},
             {
-                "$set": {
-                    "exp": exp
-                }
-            })
-
-    def set_trainee_exp(self, username: str, exp: int):
-        self.mongo.trainee.update_one(
-            {"username": username},
-            {
-                "$set": {
-                    "exp": exp
-                }
-            })
-
-    def set_workout_status(self, name: str, is_complete: bool):
-        self.mongo.workout.update_one(
-            {"name": name},
+                'creator_id': creator_id,
+                "name": name
+            },
             {
                 "$set": {
                     "is_complete": is_complete
                 }
             })
+
+    
+
+    
 
     def remove_workout(self, id: str):
         """Deletes a workout by workout id."""

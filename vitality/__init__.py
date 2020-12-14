@@ -649,6 +649,8 @@ def create_app():
                 about = escape(request.form['about'])
                 difficulty = escape(request.form['difficulty'])
 
+                check if workout name is taken
+
                 g.database.add_workout(Workout(
                     _id=None,
                     creator_id=g.user._id,
@@ -672,7 +674,7 @@ def create_app():
             default_vitality_user._id)
         return render_template("workout/search.html", default_workouts=default_workouts)
 
-    @app.route('/workout/<creator_id>/<workout_name>', methods=["GET"])
+    @app.route('/workout/<creator_id>/<workout_name>', methods=["GET", "POST"])
     def workout(creator_id: str, workout_name: str):
         """Page that shows the workout details"""
         if not g.user:
@@ -680,14 +682,34 @@ def create_app():
         creator_id = str(escape(creator_id))
         workout_name = str(escape(workout_name))
 
-
-
-        # Check creator_id and workout name, then update the workout to be completed in a POST req
-
-
         workout_info = g.database.get_workout_by_name(workout_name, creator_id)
         if workout_info is None:
             abort(404)
+
+        # Check creator_id and workout name, then update the workout to be completed in a POST req
+        if request.method == "POST":
+            completed = str(escape(request.form['completed']))
+
+            if completed != 'true':
+                abort(400)
+
+            exp_value = 0
+            if workout_info.difficulty == 'easy':
+                exp_value = DEFAULT_EASY_EXP
+            elif workout_info.difficulty == 'medium':
+                exp_value = DEFAULT_MEDIUM_EXP
+            elif workout_info.difficulty == 'hard':
+                exp_value = DEFAULT_HARD_EXP
+            elif workout_info.difficulty == 'insane':
+                exp_value = DEFAULT_INSANE_EXP
+
+            if type(g.user) == Trainer:
+                g.database.add_trainer_experience(g.user._id, exp_value)
+            if type(g.user) == Trainee:
+                g.database.add_trainee_experience(g.user._id, exp_value)
+
+            g.database.set_workout_status(g.user._id, workout_name, True)
+            workout_info = g.database.get_workout_by_name(workout_name, creator_id)
 
         return render_template("workout/workout.html", workout_info=workout_info)
 
