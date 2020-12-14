@@ -17,6 +17,10 @@
         <h3>Invalid creator id! Your account somehow doesn't exist!</h3> 
         {% endif %}
 
+        {% if workout_name_invalid %}
+        <h3>Workout name already exists under your account! Please rename.</h3> 
+        {% endif %}
+
         <form class="d-block mt-1 text-center" action="/new_workout" method="POST">
             <div class="form-group">
                 <label for="difficulty">Difficulty</label>

@@ -649,7 +649,12 @@ def create_app():
                 about = escape(request.form['about'])
                 difficulty = escape(request.form['difficulty'])
 
-                check if workout name is taken
+                existing_workout = g.database.get_workout_by_attribtues(
+                    creator_id=g.user._id,
+                    name=name)
+
+                if existing_workout is not None:
+                    return render_template("workout/new_workout.html", workout_name_invalid=True)
 
                 g.database.add_workout(Workout(
                     _id=None,
@@ -709,7 +714,8 @@ def create_app():
                 g.database.add_trainee_experience(g.user._id, exp_value)
 
             g.database.set_workout_status(g.user._id, workout_name, True)
-            workout_info = g.database.get_workout_by_name(workout_name, creator_id)
+            workout_info = g.database.get_workout_by_name(
+                workout_name, creator_id)
 
         return render_template("workout/workout.html", workout_info=workout_info)
 

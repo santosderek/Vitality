@@ -438,10 +438,16 @@ class Database:
         If a workout with the passed key value pairs are not found, then we raise a WorkoutNotFound
         error. 
         """
-        found_workout = self.mongo.workout.find_one(**kwargs)
+        if 'creator_id' in kwargs: 
+            kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
+        if '_id' in kwargs: 
+            kwargs['_id'] = ObjectId(kwargs['_id'])
+            
+        found_workout = self.mongo.workout.find_one({**kwargs})
         if found_workout:
             return self.workout_dict_to_class(found_workout)
-        raise WorkoutNotFound("Workout with key/value pairs not found.")
+        else: 
+            raise WorkoutNotFound("Workout with key/value pairs not found.")
 
     def get_all_workouts_by_creatorid(self, creator_id: str):
         """Returns the Workout class found by the workout's id."""
@@ -505,10 +511,6 @@ class Database:
                 }
             })
 
-    
-
-    
-
     def remove_workout(self, id: str):
         """Deletes a workout by workout id."""
         self.mongo.workout.delete_one({"_id": ObjectId(id)})
@@ -522,7 +524,6 @@ class Database:
             'name': workout.name,
             "difficulty": workout.difficulty,
             "about": workout.about,
-            "exp": workout.exp,
             "is_complete": workout.is_complete})
 
     """Invitation"""
