@@ -405,11 +405,45 @@ class Database:
                 workouts.append(self.workout_dict_to_class(workout))
         return workouts
 
+    def get_workout_by_creatorid(self, creator_id: str):
+        """Returns the Workout class found by the workout's id."""
+        found_workout = self.mongo.workout.find_one({"creator_id": ObjectId(creator_id)})
+        if found_workout:
+            return self.workout_dict_to_class(found_workout)
+        return None
+
+    def get_workout_by_creatorid_and_exp(self, exp: int, creator_id: str):
+        found_workout = self.mongo.workout.find_one({
+            "creator_id": ObjectId(creator_id),
+            "exp": exp
+        })
+        if found_workout:
+            return self.workout_dict_to_class(found_workout)
+        return None
+
     def get_workout_by_name(self, name: str, creator_id: str):
         """Returns the Workout class found by the workout's name."""
         found_workout = self.mongo.workout.find_one({
             "creator_id": ObjectId(creator_id),
             "name": name
+        })
+        if found_workout:
+            return self.workout_dict_to_class(found_workout)
+        return None
+
+    def get_workout_by_only_name(self, name: str):
+        """Returns the Workout class found by the workout's name."""
+        found_workout = self.mongo.workout.find_one({
+            "name": name
+        })
+        if found_workout:
+            return self.workout_dict_to_class(found_workout)
+        return None
+
+    def get_workout_by_exp(self, exp: int):
+        """Returns the Workout class found by the workout's name."""
+        found_workout = self.mongo.workout.find_one({
+            "exp": exp
         })
         if found_workout:
             return self.workout_dict_to_class(found_workout)
@@ -455,13 +489,31 @@ class Database:
                 }
             })
 
-    def set_workout_exp(self, id: str, exp: str):
+    def set_workout_exp(self, id: str, exp: int):
         """Updates a workout's experience points given a workout id."""
         self.mongo.workout.update_one(
             {"_id": ObjectId(id)},
             {
                 "$set": {
                     "exp": exp
+                }
+            })
+
+    def set_trainee_exp(self, username: str, exp: int):
+        self.mongo.trainee.update_one(
+            {"username": username},
+            {
+                "$set": {
+                    "exp": exp
+                }
+            })
+
+    def set_workout_status(self, name: str, is_complete: bool):
+        self.mongo.workout.update_one(
+            {"name": name},
+            {
+                "$set": {
+                    "is_complete": is_complete
                 }
             })
 
@@ -478,7 +530,8 @@ class Database:
             'name': workout.name,
             "difficulty": workout.difficulty,
             "about": workout.about,
-            "exp": workout.exp})
+            "exp": workout.exp,
+            "is_complete": workout.is_complete})
 
     """Invitation"""
 

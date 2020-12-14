@@ -40,7 +40,8 @@ class TestDatabase(unittest.TestCase):
         name="testing",
         difficulty="easy",
         about="workout",
-        exp=10)
+        exp=10,
+        is_complete=False)
 
     def setUp(self):
         self.tearDown()

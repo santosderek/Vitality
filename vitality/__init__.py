@@ -144,7 +144,8 @@ def create_app():
                                 password=password,
                                 name=name,
                                 location=location,
-                                phone=phone)
+                                phone=phone,
+                                exp=0)
 
                             g.database.add_trainee(new_user)
 
@@ -173,20 +174,36 @@ def create_app():
                 # If username and password failed, render error messsage
                 return render_template("account/signup.html", error_message=True)
             except InvalidCharactersException as e:
-                return render_template("account/signup.html", invalid_characters=True), 400
+                return render_template("account/signup.html", invalid_characters    =True), 400
         return render_template("account/signup.html")
 
-    @app.route('/profile/<username>', methods=["GET"])
+    @app.route('/profile/<username>', methods=["POST"])
     def profile(username: str):
         """Profile page for a given username"""
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
+        app.logger.info('Rendering Profile')
+        username = escape(username)
+        xp = int(escape(request.form['xp']))
+        addedexp = xp + g.user.exp
+        renderexp = g.database.set_trainee_exp(username, addedexp)
+        g_workouts = g.database.get_workout_by_creatorid_and_exp(xp, str(g.user._id))
+        set_status = g.database.set_workout_status(g_workouts.name, True)
+        user = g.database.get_trainer_by_username(username) \
+            or g.database.get_trainee_by_username(username)
+        return render_template("account/profile.html", user=user, renderexp=renderexp, rendercomplete=set_status)
 
+    @app.route('/profile/<username>', methods=["GET"])
+    def profile_get(username: str):
+        """Profile page for a given username"""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
         app.logger.info('Rendering Profile')
         username = escape(username)
         user = g.database.get_trainer_by_username(username) \
-            or g.database.get_trainee_by_username(username)
+               or g.database.get_trainee_by_username(username)
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
@@ -576,11 +593,20 @@ def create_app():
             return redirect(url_for('login'))
 
         if request.method == "POST":
-
             try:
                 name = escape(request.form['name'])
                 about = escape(request.form['about'])
                 difficulty = escape(request.form['difficulty'])
+
+                gainedExp = 0
+                if difficulty == "easy":
+                    gainedExp = 1000
+                elif difficulty == "medium":
+                    gainedExp = 2000
+                elif difficulty == "hard":
+                    gainedExp = 3000
+                elif difficulty == "insane":
+                    gainedExp = 5000
 
                 g.database.add_workout(Workout(
                     _id=None,
@@ -588,7 +614,8 @@ def create_app():
                     name=name,
                     difficulty=difficulty,
                     about=about,
-                    exp=0
+                    exp= gainedExp,
+                    is_complete= False
                 ))
                 return render_template("workout/new_workout.html", workout_added=True)
 
@@ -602,8 +629,11 @@ def create_app():
         """Page to search for a workout"""
         if not g.user:
             return redirect(url_for('login'))
-
-        return render_template("workout/search.html")
+        workout_1 = g.database.get_workout_by_only_name("curls")
+        workout_2 = g.database.get_workout_by_only_name("russian twists")
+        workout_3 = g.database.get_workout_by_only_name("burpees")
+        workout_4 = g.database.get_workout_by_only_name("20lb plate pullups")
+        return render_template("workout/search.html", workout_1 = workout_1, workout_2 = workout_2, workout_3 = workout_3, workout_4 = workout_4)
 
     @app.route('/workout/<creator_id>/<workout_name>', methods=["GET"])
     def workout(creator_id: str, workout_name: str):
@@ -612,8 +642,6 @@ def create_app():
             return redirect(url_for('login'))
         creator_id = str(escape(creator_id))
         workout_name = str(escape(workout_name))
-
-        # workout = g.database.get_workout_by_id(workout_name)
 
         if (g.database.get_workout_by_name(workout_name, creator_id) is None):
             abort(404)

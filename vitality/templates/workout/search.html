@@ -14,6 +14,44 @@
     <div class="col">
         <h2>Take control.</h2>
         <h1>Your next workout is just a click away.</h1>
+         {% if workout_1%}
+        <br>
+        <h3>Sample Workouts</h3>
+        <br>
+        <table style="width:100%" id="defaultTable" class="defaultTable">
+            <tr>
+                <th>Name</th>
+                <th>Difficulty</th>
+                <th>About</th>
+                <th>Exp</th>
+            </tr>
+            <tr>
+                <td>{{workout_1.name}}</td>
+                <td>{{workout_1.difficulty}}</td>
+                <td>{{workout_1.about}}</td>
+                <td>{{workout_1.exp}}</td>
+            </tr>
+            <tr>
+                <td>{{workout_2.name}}</td>
+                <td>{{workout_2.difficulty}}</td>
+                <td>{{workout_2.about}}</td>
+                <td>{{workout_2.exp}}</td>
+            </tr>
+            <tr>
+                <td>{{workout_3.name}}</td>
+                <td>{{workout_3.difficulty}}</td>
+                <td>{{workout_3.about}}</td>
+                <td>{{workout_3.exp}}</td>
+            </tr>
+            <tr>
+                <td>{{workout_4.name}}</td>
+                <td>{{workout_4.difficulty}}</td>
+                <td>{{workout_4.about}}</td>
+                <td>{{workout_4.exp}}</td>
+            </tr>
+        </table>
+        <br>
+            {% endif%}
         <form action="search.html">
             <input type="text" placeholder="Search.." name="search">
             <button type="submit"><i class="material-icons">search</i></button>

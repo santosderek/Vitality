@@ -10,7 +10,8 @@ def test_as_dict():
         name="Workout 1",
         difficulty="easy",
         about="An about section",
-        exp=123
+        exp=123,
+        is_complete=False
     )
 
     new_dict = workout.as_dict()
@@ -20,7 +21,8 @@ def test_as_dict():
         name="Workout 1",
         difficulty="easy",
         about="An about section",
-        exp=123
+        exp=123,
+        is_complete=False
     )
 
     assert new_dict == comp_dict
@@ -33,7 +35,8 @@ def test_initalization():
         name="Workout 1",
         difficulty="easy",
         about="An about section",
-        exp=123
+        exp=123,
+        is_complete=False
     )
 
     assert workout._id == "000000000000000000000001"
@@ -42,6 +45,7 @@ def test_initalization():
     assert workout.difficulty == "easy"
     assert workout.about == "An about section"
     assert workout.exp == 123
+    assert workout.is_complete == False
 
 
 def test_repr():
@@ -51,11 +55,12 @@ def test_repr():
         name="Workout 1",
         difficulty="easy",
         about="An about section",
-        exp=123
+        exp=123,
+        is_complete=False
     )
 
     assert repr(workout) \
-        == "Workout(000000000000000000000001, 000000000000000000000002, Workout 1, easy, An about section, 123)"
+        == "Workout(000000000000000000000001, 000000000000000000000002, Workout 1, easy, An about section, 123, False)"
 
 
 if __name__ == '__main__':
