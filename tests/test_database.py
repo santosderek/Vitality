@@ -874,6 +874,28 @@ class TestDatabase(unittest.TestCase):
         workouts = self.database.get_all_workouts_by_creatorid(trainee._id)
         assert len(workouts) == 2
 
+    def test_set_workout_status(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+            })
+        
+        assert workout is not None
+        assert workout['is_complete'] is False
+
+
+        self.database.set_workout_status(trainee._id, workout.name, True)
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+            })
+        assert workout is not None
+        assert workout['is_complete'] is True
+        
+
     """Invitation tests"""
 
     def test_create_invitation(self):
