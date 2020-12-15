@@ -5,7 +5,7 @@ from .trainer import Trainer
 from .database import (
     Database,
     UsernameTakenError,
-    WorkoutCreatorIdNotFoundError,
+    WorkoutCreatorIdNotFoundError, WorkoutNotFound,
     password_sha256,
     InvalidCharactersException,
     UserNotFoundError,
@@ -40,7 +40,7 @@ def populate_database_defaults():
     """Creates the default trainer and workouts for the application."""
     default_database = Database(MONGO_URI)
 
-    if not database.get_trainer_by_username():
+    if not default_database.get_trainer_by_username("vitality"):
         # Default Vitality User
         trainer = Trainer(
             _id=None,
@@ -86,9 +86,10 @@ def populate_database_defaults():
         )
     ]
     for workout in default_workouts:
-        database_workout = default_database.get_workout_by_attributes(workout.name,
-                                                                      workout.creator_id)
-        if database_workout is not None:
+        try:
+            default_database.get_workout_by_attributes(name=workout.name,
+                                                       creator_id=workout.creator_id)
+        except WorkoutNotFound:
             default_database.add_workout(workout)
 
 
@@ -644,18 +645,18 @@ def create_app():
             return redirect(url_for('login'))
 
         if request.method == "POST":
+            name = escape(request.form['name'])
+            about = escape(request.form['about'])
+            difficulty = escape(request.form['difficulty'])
             try:
-                name = escape(request.form['name'])
-                about = escape(request.form['about'])
-                difficulty = escape(request.form['difficulty'])
-
-                existing_workout = g.database.get_workout_by_attribtues(
+                existing_workout = g.database.get_workout_by_attributes(
                     creator_id=g.user._id,
                     name=name)
 
-                if existing_workout is not None:
-                    return render_template("workout/new_workout.html", workout_name_invalid=True)
-
+                app.logger.debug("Workout already exists.")
+                return render_template("workout/new_workout.html", workout_name_invalid=True)
+            except WorkoutNotFound:
+                app.logger.debug("Adding new workout.")
                 g.database.add_workout(Workout(
                     _id=None,
                     creator_id=g.user._id,
@@ -666,6 +667,7 @@ def create_app():
                 ))
                 return render_template("workout/new_workout.html", workout_added=True)
             except WorkoutCreatorIdNotFoundError:
+                app.logger.debug("Creator Id could not be found.")
                 return render_template("workout/new_workout.html", invalid_creatorid=True)
         return render_template("workout/new_workout.html")
 
@@ -687,8 +689,11 @@ def create_app():
         creator_id = str(escape(creator_id))
         workout_name = str(escape(workout_name))
 
-        workout_info = g.database.get_workout_by_name(workout_name, creator_id)
-        if workout_info is None:
+        try:
+            workout_info = g.database.get_workout_by_attributes(name=workout_name,
+                                                                creator_id=creator_id)
+        except WorkoutNotFound:
+            app.logger.debug('Workout could not be found!')
             abort(404)
 
         # Check creator_id and workout name, then update the workout to be completed in a POST req
