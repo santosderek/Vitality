@@ -246,7 +246,7 @@ def create_app():
                 return render_template("account/signup.html", invalid_characters=True), 400
         return render_template("account/signup.html")
 
-    @app.route('/profile/<username>', methods=["GET", "POST"])
+    @app.route('/profile/<username>', methods=["GET"])
     def profile(username: str):
         """Profile page for a given username"""
         if not g.user:
@@ -257,16 +257,6 @@ def create_app():
         user = g.database.get_trainer_by_username(username) \
             or g.database.get_trainee_by_username(username)
 
-        if request.method == "POST":
-
-            app.logger.info('Rendering Profile')
-            xp = int(escape(request.form['xp']))
-            addedexp = xp + g.user.exp
-            renderexp = g.database.set_trainee_exp(username, addedexp)
-            g_workouts = g.database.get_workout_by_creatorid_and_exp(xp,
-                                                                     str(g.user._id))
-            set_status = g.database.set_workout_status(g_workouts.name, True)
-            return render_template("account/profile.html", user=user, renderexp=renderexp, rendercomplete=set_status)
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
