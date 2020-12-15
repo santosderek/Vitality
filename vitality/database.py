@@ -423,14 +423,6 @@ class Database:
             return self.workout_dict_to_class(found_workout)
         return None
 
-    def get_workout_by_creatorid(self, creator_id: str):
-        """Returns the Workout class found by the workout's id."""
-        found_workout = self.mongo.workout.find_one(
-            {"creator_id": ObjectId(creator_id)})
-        if found_workout:
-            return self.workout_dict_to_class(found_workout)
-        return None
-
     def get_workout_by_attributes(self, **kwargs):
         """
         Returns a single workout based on the keyword arguments passed to the function.

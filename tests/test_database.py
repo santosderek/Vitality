@@ -528,6 +528,24 @@ class TestDatabase(unittest.TestCase):
         # Check if equal
         self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
 
+    def test_get_workout_by_attributes(self):
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+
+        workout = self.database.get_workout_by_attributes(creator_id=trainee['_id'],
+                                                          about='workout',
+                                                          name='testing')
+        assert workout is not None
+        assert workout.creator_id == str(trainee['_id'])
+        assert workout.about == 'workout'
+        assert workout.name == 'testing'
+
+        with self.assertRaises(WorkoutNotFound):
+            self.database.get_workout_by_attributes(about='not a workout at all',
+                                                    name='nope not a name')
+
     def test_get_workout_class_by_id(self):
         new_workout = deepcopy(self.test_workout)
 
