@@ -1,3 +1,4 @@
+from tests import test_trainee
 import unittest
 from copy import deepcopy
 from bson.objectid import ObjectId
@@ -254,6 +255,34 @@ class TestDatabase(unittest.TestCase):
         self.database.remove_trainee(db_user._id)
         self.assertTrue(
             self.database.get_trainee_by_id(db_user._id) is None)
+
+    def test_add_trainee_experience(self):
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+        assert trainee['exp'] == 0
+
+        self.database.add_trainee_experience(str(trainee['_id']), 10)
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+        assert trainee['exp'] == 10
+
+        self.database.add_trainee_experience(str(trainee['_id']), 20)
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+        assert trainee['exp'] == 30
+
+        self.database.add_trainee_experience(str(trainee['_id']), 30)
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+        assert trainee['exp'] == 60
 
     def test_set_trainee_name(self):
         new_trainee = deepcopy(self.test_trainee)
@@ -663,7 +692,7 @@ class TestDatabase(unittest.TestCase):
 
         with self.assertRaises(WorkoutNotFound):
             self.database.get_workout_by_attributes(name=new_workout.name,
-                                                                    creator_id=trainee._id)
+                                                    creator_id=trainee._id)
 
     def test_add_workout(self):
         new_trainee = self.database.get_trainee_by_username(
@@ -881,20 +910,18 @@ class TestDatabase(unittest.TestCase):
         workout = self.database.mongo.workout.find_one({
             'name': "testing",
             'creator_id': ObjectId(trainee._id)
-            })
-        
+        })
+
         assert workout is not None
         assert workout['is_complete'] is False
-
 
         self.database.set_workout_status(trainee._id, workout['name'], True)
         workout = self.database.mongo.workout.find_one({
             'name': "testing",
             'creator_id': ObjectId(trainee._id)
-            })
+        })
         assert workout is not None
         assert workout['is_complete'] is True
-        
 
     """Invitation tests"""
 

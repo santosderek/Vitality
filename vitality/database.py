@@ -142,7 +142,7 @@ class Database:
 
     def add_trainee_experience(self, trainee_id: str, value: int):
 
-        self.mongo.trainee.update(
+        self.mongo.trainee.update_one(
             {
                 '_id': ObjectId(trainee_id)
             },
@@ -381,7 +381,7 @@ class Database:
 
     def add_trainer_experience(self, trainer_id: str, value: int):
 
-        self.mongo.trainer.update(
+        self.mongo.trainer.update_one(
             {
                 '_id': ObjectId(trainer_id)
             },

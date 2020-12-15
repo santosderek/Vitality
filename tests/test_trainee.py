@@ -15,7 +15,7 @@ def test_as_dict():
         body_fat="fat",
         height="7",
         weight="100",
-        exp="12345",
+        exp=12345,
         goal_weight="95",
         goal_body_fat="notfat",
         trainers=[
@@ -35,7 +35,7 @@ def test_as_dict():
         body_fat="fat",
         height="7",
         weight="100",
-        exp="12345",
+        exp=12345,
         goal_weight="95",
         goal_body_fat="notfat",
         trainers=[
@@ -58,7 +58,7 @@ def test_initalization():
         body_fat="fat",
         height="7",
         weight="100",
-        exp="12345",
+        exp=12345,
         goal_weight="95",
         goal_body_fat="notfat",
         trainers=[
@@ -76,7 +76,7 @@ def test_initalization():
     assert trainee.body_fat == "fat"
     assert trainee.height == "7"
     assert trainee.weight == "100"
-    assert trainee.exp == "12345"
+    assert trainee.exp == 12345
     assert trainee.goal_weight == "95"
     assert trainee.goal_body_fat == "notfat"
     assert trainee.trainers == ["000000000000000000000002"]
