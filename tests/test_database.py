@@ -323,6 +323,34 @@ class TestDatabase(unittest.TestCase):
 
     """ Test trainer """
 
+    def test_add_trainer_experience(self):
+        trainer = self.database.mongo.trainer.find_one({
+            'username': self.test_trainer.username
+        })
+        assert trainer is not None
+        assert trainer['exp'] == 0
+
+        self.database.add_trainer_experience(str(trainer['_id']), 10)
+        trainer = self.database.mongo.trainer.find_one({
+            'username': self.test_trainer.username
+        })
+        assert trainer is not None
+        assert trainer['exp'] == 10
+
+        self.database.add_trainer_experience(str(trainer['_id']), 20)
+        trainer = self.database.mongo.trainer.find_one({
+            'username': self.test_trainer.username
+        })
+        assert trainer is not None
+        assert trainer['exp'] == 30
+
+        self.database.add_trainer_experience(str(trainer['_id']), 30)
+        trainer = self.database.mongo.trainer.find_one({
+            'username': self.test_trainer.username
+        })
+        assert trainer is not None
+        assert trainer['exp'] == 60
+
     def test_add_trainer(self):
 
         # Raise exception if 'testTrainee' username found
