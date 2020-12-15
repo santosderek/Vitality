@@ -546,6 +546,10 @@ class TestDatabase(unittest.TestCase):
             self.database.get_workout_by_attributes(about='not a workout at all',
                                                     name='nope not a name')
 
+        workout = self.database.get_workout_by_attributes(_id=str(workout._id))
+        assert workout is not None
+        
+
     def test_get_workout_class_by_id(self):
         new_workout = deepcopy(self.test_workout)
 
