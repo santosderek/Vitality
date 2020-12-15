@@ -887,7 +887,7 @@ class TestDatabase(unittest.TestCase):
         assert workout['is_complete'] is False
 
 
-        self.database.set_workout_status(trainee._id, workout.name, True)
+        self.database.set_workout_status(trainee._id, workout['name'], True)
         workout = self.database.mongo.workout.find_one({
             'name': "testing",
             'creator_id': ObjectId(trainee._id)

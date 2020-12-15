@@ -502,7 +502,7 @@ class Database:
     def set_workout_status(self, creator_id: str, name: str, is_complete: bool):
         self.mongo.workout.update_one(
             {
-                'creator_id': creator_id,
+                'creator_id': ObjectId(creator_id),
                 "name": name
             },
             {
