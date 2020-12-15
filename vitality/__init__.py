@@ -240,7 +240,7 @@ def create_app():
                         app.logger.debug(f"Username {username} was taken.")
                         return render_template("account/signup.html", username_taken=True)
 
-                # If username and password failed, render error messsage
+                # If username and password failed, render error message
                 return render_template("account/signup.html", error_message=True)
             except InvalidCharactersException as e:
                 return render_template("account/signup.html", invalid_characters=True), 400
