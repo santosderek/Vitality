@@ -65,7 +65,7 @@
                 .done(() => {
                     $(`#button_${user_id}`).text("Removed!");
                     $(`#button_${user_id}`).css("background-color", "grey");
-                    $(`#button_${user_id}`).prop('disabled', false);
+                    $(`#button_${user_id}`).prop('disabled', true);
                 })
                 .fail(() => {
                     $(`#button_${user_id}`).text("Could not accept the invitation!");

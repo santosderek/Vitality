@@ -3,6 +3,7 @@ import pytest
 from flask import g, session, url_for
 from os import environ
 from vitality import create_app
+from vitality import database
 from vitality.database import Database, WorkoutCreatorIdNotFoundError, password_sha256, InvalidCharactersException
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
@@ -1215,10 +1216,9 @@ def test_new_workout(client):
 
     # Adding a workout as a trainer
 
-    while g.database.get_workout_by_name("workout_test_one", g.user._id):
-        workout = g.database.get_workout_by_name("workout_test_one",
-                                                 g.user._id)
-        g.database.remove_workout(workout._id)
+    g.database.mongo.workout.delete_many({
+        'creator_id': g.user._id
+    })
 
     # With difficulty = novice
     new_workout = Workout(
@@ -1226,8 +1226,7 @@ def test_new_workout(client):
         creator_id=g.user._id,
         difficulty="novice",
         name="workout_test_one",
-        about="This is a super cool description of what the workout is...\nwoo!",
-        exp=0
+        about="This is a super cool description of what the workout is...\nwoo!"
     )
 
     returned_value = client.post('/new_workout', data=dict(
@@ -1236,10 +1235,18 @@ def test_new_workout(client):
         about=new_workout.about
     ), follow_redirects=True)
     assert b'Workout has been added!' in returned_value.data
-    database_workout = g.database.get_workout_by_name("workout_test_one",
-                                                      g.user._id)
+    database_workout = g.database.get_workout_by_attributes(name="workout_test_one",
+                                                            creator_id=g.user._id)
     new_workout._id = database_workout._id
     assert database_workout.as_dict() == new_workout.as_dict()
+
+    returned_value = client.post('/new_workout', data=dict(
+        difficulty=new_workout.difficulty,
+        name=new_workout.name,
+        about=new_workout.about
+    ), follow_redirects=True)
+    assert returned_value.status_code == 400
+    assert b'Workout name already exists under your account!' in returned_value.data
 
     g.database.remove_workout(new_workout._id)
 
@@ -1249,8 +1256,7 @@ def test_new_workout(client):
         creator_id=g.user._id,
         difficulty="intermediate",
         name="workout_test_one",
-        about="This is a super cool description of what the workout is...\nwoo!",
-        exp=0
+        about="This is a super cool description of what the workout is...\nwoo!"
     )
 
     returned_value = client.post('/new_workout', data=dict(
@@ -1259,8 +1265,8 @@ def test_new_workout(client):
         about=new_workout.about
     ), follow_redirects=True)
     assert b'Workout has been added!' in returned_value.data
-    database_workout = g.database.get_workout_by_name("workout_test_one",
-                                                      g.user._id)
+    database_workout = g.database.get_workout_by_attributes(name="workout_test_one",
+                                                            creator_id=g.user._id)
     new_workout._id = database_workout._id
     assert database_workout.as_dict() == new_workout.as_dict()
 
@@ -1272,8 +1278,7 @@ def test_new_workout(client):
         creator_id=g.user._id,
         difficulty="experienced",
         name="workout_test_one",
-        about="This is a super cool description of what the workout is...\nwoo!",
-        exp=0
+        about="This is a super cool description of what the workout is...\nwoo!"
     )
 
     returned_value = client.post('/new_workout', data=dict(
@@ -1282,8 +1287,8 @@ def test_new_workout(client):
         about=new_workout.about
     ), follow_redirects=True)
     assert b'Workout has been added!' in returned_value.data
-    database_workout = g.database.get_workout_by_name("workout_test_one",
-                                                      g.user._id)
+    database_workout = g.database.get_workout_by_attributes(name="workout_test_one",
+                                                            creator_id=g.user._id)
     new_workout._id = database_workout._id
     assert database_workout.as_dict() == new_workout.as_dict()
 
@@ -1295,8 +1300,7 @@ def test_new_workout(client):
         creator_id=g.user._id,
         difficulty="superstar",
         name="workout_test_one",
-        about="This is a super cool description of what the workout is...\nwoo!",
-        exp=0
+        about="This is a super cool description of what the workout is...\nwoo!"
     )
 
     returned_value = client.post('/new_workout', data=dict(
@@ -1305,8 +1309,8 @@ def test_new_workout(client):
         about=new_workout.about
     ), follow_redirects=True)
     assert b'Workout has been added!' in returned_value.data
-    database_workout = g.database.get_workout_by_name("workout_test_one",
-                                                      g.user._id)
+    database_workout = g.database.get_workout_by_attributes(name="workout_test_one",
+                                                            creator_id=g.user._id)
     new_workout._id = database_workout._id
     assert database_workout.as_dict() == new_workout.as_dict()
     g.database.remove_workout(new_workout._id)
@@ -1356,17 +1360,16 @@ def test_workout(client):
         creator_id=trainer._id,
         name="testWorkout",
         difficulty="easy",
-        about="2 Pushups, 1 Jumping Jack",
-        exp="1000"
+        about="2 Pushups, 1 Jumping Jack"
     )
 
     g.database.add_workout(workoutTest)
-    database_workout = g.database.get_workout_by_name(
-        workoutTest.name, trainer._id)
+    database_workout = g.database.get_workout_by_attributes(name=workoutTest.name,
+                                                            creator_id=trainer._id)
 
     login_as_testTrainer(client)
-    returned_value = client.get(
-        f'/workout/{trainer._id}/{database_workout.name}', follow_redirects=True)
+    returned_value = client.get(f'/workout/{trainer._id}/{database_workout.name}',
+                                follow_redirects=True)
     assert returned_value.status_code == 200
     assert bytes("{}".format(database_workout.name),
                  "utf-8") in returned_value.data
@@ -1374,11 +1377,191 @@ def test_workout(client):
                  "utf-8") in returned_value.data
     assert bytes("{}".format(database_workout.about),
                  "utf-8") in returned_value.data
-    assert bytes("{}".format(database_workout.exp),
-                 "utf-8") in returned_value.data
+
+    
+    returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
+                                data=dict(
+                                    completed='false',
+                                ),
+                                follow_redirects=True)
+    assert returned_value.status_code == 400
+
+    # Complete an Easy workout
+    returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
+                                data=dict(
+                                    completed='true',
+                                ),
+                                follow_redirects=True)
+    trainer = g.database.get_trainer_by_username('testtrainer')
+    database_workout = g.database.get_workout_by_attributes(name=workoutTest.name,
+                                                            creator_id=trainer._id)
+    assert returned_value.status_code == 200
+    assert trainer is not None
+    assert trainer.exp > 0
+    assert database_workout.is_complete is True
+    g.database.mongo.trainer.update_one(
+            {"_id": ObjectId(trainer._id)},
+            {
+                "$set": {
+                    "exp": 0
+                }
+            })
+    g.database.mongo.workout.update_one(
+            {"_id": ObjectId(database_workout._id)},
+            {
+                "$set": {
+                    "is_complete": False
+                }
+            })
+
+    # Complete an Medium workout
+    g.database.mongo.workout.update_one(
+            {"_id": ObjectId(database_workout._id)},
+            {
+                "$set": {
+                    "difficulty": "medium"
+                }
+            })
+    returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
+                                data=dict(
+                                    completed='true',
+                                ),
+                                follow_redirects=True)
+    trainer = g.database.get_trainer_by_username('testtrainer')
+    database_workout = g.database.get_workout_by_attributes(name=workoutTest.name,
+                                                            creator_id=trainer._id)
+    assert returned_value.status_code == 200
+    assert trainer is not None
+    assert trainer.exp > 0
+    assert database_workout.is_complete is True
+    g.database.mongo.trainer.update_one(
+            {"_id": ObjectId(trainer._id)},
+            {
+                "$set": {
+                    "exp": 0
+                }
+            })
+    g.database.mongo.workout.update_one(
+            {"_id": ObjectId(database_workout._id)},
+            {
+                "$set": {
+                    "is_complete": False
+                }
+            })
+
+    
+
+    # Complete an Hard workout
+    g.database.mongo.workout.update_one(
+            {"_id": ObjectId(database_workout._id)},
+            {
+                "$set": {
+                    "difficulty": "hard"
+                }
+            })
+    returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
+                                data=dict(
+                                    completed='true',
+                                ),
+                                follow_redirects=True)
+    trainer = g.database.get_trainer_by_username('testtrainer')
+    database_workout = g.database.get_workout_by_attributes(name=workoutTest.name,
+                                                            creator_id=trainer._id)
+    assert returned_value.status_code == 200
+    assert trainer is not None
+    assert trainer.exp > 0
+    assert database_workout.is_complete is True
+    g.database.mongo.trainer.update_one(
+            {"_id": ObjectId(trainer._id)},
+            {
+                "$set": {
+                    "exp": 0
+                }
+            })
+    g.database.mongo.workout.update_one(
+            {"_id": ObjectId(database_workout._id)},
+            {
+                "$set": {
+                    "is_complete": False
+                }
+            })
+
+    
+    # Complete an insane workout
+    g.database.mongo.workout.update_one(
+            {"_id": ObjectId(database_workout._id)},
+            {
+                "$set": {
+                    "difficulty": "insane"
+                }
+            })
+    returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
+                                data=dict(
+                                    completed='true',
+                                ),
+                                follow_redirects=True)
+    trainer = g.database.get_trainer_by_username('testtrainer')
+    database_workout = g.database.get_workout_by_attributes(name=workoutTest.name,
+                                                            creator_id=trainer._id)
+    assert returned_value.status_code == 200
+    assert trainer is not None
+    assert trainer.exp > 0
+    assert database_workout.is_complete is True
+    g.database.mongo.trainer.update_one(
+            {"_id": ObjectId(trainer._id)},
+            {
+                "$set": {
+                    "exp": 0
+                }
+            })
+    g.database.mongo.workout.update_one(
+            {"_id": ObjectId(database_workout._id)},
+            {
+                "$set": {
+                    "is_complete": False
+                }
+            })
+
+    # Test if trainee can complete a workout
+    login_as_testTrainee(client)
+    workoutTest.creator_id = trainee._id
+    g.database.add_workout(workoutTest)
+
+    returned_value = client.post(f'/workout/{trainee._id}/{database_workout.name}',
+                                data=dict(
+                                    completed='true',
+                                ),
+                                follow_redirects=True)
+    trainee = g.database.get_trainee_by_username('testtrainee')
+    database_workout = g.database.get_workout_by_attributes(name=workoutTest.name,
+                                                            creator_id=trainee._id)
+    assert returned_value.status_code == 200
+    assert trainee is not None
+    assert trainee.exp > 0
+    assert database_workout.is_complete is True
+    g.database.mongo.trainee.update_one(
+            {"_id": ObjectId(trainee._id)},
+            {
+                "$set": {
+                    "exp": 0
+                }
+            })
+    g.database.mongo.workout.update_one(
+            {"_id": ObjectId(database_workout._id)},
+            {
+                "$set": {
+                    "is_complete": False
+                }
+            })
 
     g.database.remove_workout(database_workout._id)
+    returned_value = client.get(f'/workout/{trainer._id}/zebra',
+                                follow_redirects=True)
+    assert returned_value.status_code == 404
 
+
+
+    
 
 def test_workout_overview(client):
     """Testing the workout overview page"""
@@ -1431,8 +1614,7 @@ def test_workout_list(client):
             creator_id=trainee._id,
             name="testWorkout",
             difficulty="expert",
-            about="This is an about",
-            exp=12345
+            about="This is an about"
         ))
 
         database_workout = g.database.mongo.workout.find_one({
@@ -1450,12 +1632,13 @@ def test_workout_list(client):
             'creator_id': ObjectId(trainee._id),
             'name': "testWorkout"
         })
-        if database_workout is not None: 
+        if database_workout is not None:
             trainee = g.database.get_trainee_by_username(test_trainee.username)
             g.database.mongo.workout.delete_many({
                 'name': "testWorkout",
                 'creator_id': ObjectId(trainee._id)
             })
+
 
 def test_delete_user(client):
     """Testing the delete user route"""

@@ -17,14 +17,18 @@
         <h3>Invalid creator id! Your account somehow doesn't exist!</h3> 
         {% endif %}
 
+        {% if workout_name_invalid %}
+        <h3>Workout name already exists under your account! Please rename.</h3> 
+        {% endif %}
+
         <form class="d-block mt-1 text-center" action="/new_workout" method="POST">
             <div class="form-group">
                 <label for="difficulty">Difficulty</label>
                 <select class="text-center mt-1" id="difficulty" name="difficulty">
-                    <option value="novice">Novice</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="experienced">Experienced</option>
-                    <option value="superstar">Superstar</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                    <option value="insane">Insane</option>
                 </select>
             </div>
             <div class="form-group">

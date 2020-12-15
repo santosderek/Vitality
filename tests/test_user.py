@@ -15,7 +15,7 @@ def test_as_dict():
         body_fat="fat",
         height="7",
         weight="100",
-        exp="12345",
+        exp=12345,
         goal_weight="95",
         goal_body_fat="notfat"
     )
@@ -32,7 +32,7 @@ def test_as_dict():
         body_fat="fat",
         height="7",
         weight="100",
-        exp="12345",
+        exp=12345,
         goal_weight="95",
         goal_body_fat="notfat"
     )
@@ -67,7 +67,7 @@ def test_initalization():
     assert user.body_fat == "fat"
     assert user.height == "7"
     assert user.weight == "100"
-    assert user.exp == "12345"
+    assert user.exp == 12345
     assert user.goal_weight == "95"
     assert user.goal_body_fat == "notfat"
 

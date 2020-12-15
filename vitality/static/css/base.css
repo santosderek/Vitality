@@ -84,3 +84,7 @@ button:hover, .button_title:hover {
     width: 90%;
     margin: auto;
 }
+table, th, td {
+  border: 1px solid white;
+  color: white; 
+}
