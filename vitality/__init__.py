@@ -644,7 +644,7 @@ def create_app():
                     name=name)
 
                 app.logger.debug("Workout already exists.")
-                return render_template("workout/new_workout.html", workout_name_invalid=True)
+                return render_template("workout/new_workout.html", workout_name_invalid=True), 400
             except WorkoutNotFound:
                 app.logger.debug("Adding new workout.")
                 g.database.add_workout(Workout(
@@ -709,8 +709,8 @@ def create_app():
                 g.database.add_trainee_experience(g.user._id, exp_value)
 
             g.database.set_workout_status(g.user._id, workout_name, True)
-            workout_info = g.database.get_workout_by_name(
-                workout_name, creator_id)
+            workout_info = g.database.get_workout_by_attributes(name=workout_name,
+                                                                creator_id=creator_id)
 
         return render_template("workout/workout.html", workout_info=workout_info)
 
