@@ -6,10 +6,10 @@
         <h1> {{ workout_info.name }} </h1><br><br>
     </div>
     <div class="col-sm-12">
-        <form action={{ url_for('workout', creator_id=g.user._id, workout_name=workout_info.name )}} method="POST">
+        <form action="{{ url_for('workout', creator_id=g.user._id, workout_name=workout_info.name )}}" method="POST">
             <p><b>Difficulty: </b>{{ workout_info.difficulty }}</p>
             <br>
-            <p id="workoutExp"><b>Experience Points: </b>{{ workout_info.exp }}</p>
+            <p id="workoutExp"><b>Experience Points: </b>{{ exp }}</p>
             <br>
             <p><b>Workout Details: </b>{{ workout_info.about }}</p>
             <input type="hidden" name="completed" value="true" />
@@ -22,15 +22,37 @@
 
 <script>
     function submitted(username, workout_name) {
-        $("#completed_button").disable();
-        $("#completed_button").text = "Workout Completed!";
+
+        $("#completed_button").text("Workout Completed!");
+        $("#completed_button").prop('disabled', true);
+        $("#completed_button").css("background-color", "grey");
+
+        $.post('{{ url_for("workout", creator_id=g.user._id, workout_name=workout_info.name) }}', {
+            'completed': 'true'
+        })
+            .done(() => {
+                $("#completed_button").text("Workout Completed!");
+                $("#completed_button").prop('disabled', true);
+                $("#completed_button").css("background-color", "grey");
+            })
+            .fail(() => {
+                $("#completed_button").text("Could not complete!");
+                    window.setTimeout(function () {
+                        $("#completed_button").css("background-color", "#8492A6");
+                        $("#completed_button").text("Complete");
+                        $("#completed_button").prop('disabled', false);
+                    }, 2 * 1000);
+
+            });
     }
 
     window.addEventListener(
         'load',
         function () {
-            if (workout_info.is_complete == true) {
-                submitted();
+            if ('{{workout_info.is_complete}}'.toLowerCase() == 'true') {
+                $("#completed_button").text("Workout Completed!");
+                $("#completed_button").prop('disabled', true);
+                $("#completed_button").css("background-color", "grey");
             }
         },
         false);

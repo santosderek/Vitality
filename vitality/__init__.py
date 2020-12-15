@@ -682,6 +682,23 @@ def create_app():
         try:
             workout_info = g.database.get_workout_by_attributes(name=workout_name,
                                                                 creator_id=creator_id)
+            exp_value = 0
+            if workout_info.difficulty == 'easy':
+                exp_value = DEFAULT_EASY_EXP
+                app.logger.debug('Set exp equal to DEFAULT_EASY_EXP')
+
+            elif workout_info.difficulty == 'medium':
+                exp_value = DEFAULT_MEDIUM_EXP
+                app.logger.debug('Set exp equal to DEFAULT_MEDIUM_EXP')
+
+            elif workout_info.difficulty == 'hard':
+                exp_value = DEFAULT_HARD_EXP
+                app.logger.debug('Set exp equal to DEFAULT_HARD_EXP')
+
+            elif workout_info.difficulty == 'insane':
+                exp_value = DEFAULT_INSANE_EXP
+                app.logger.debug('Set exp equal to DEFAULT_INSANE_EXP')
+
         except WorkoutNotFound:
             app.logger.debug('Workout could not be found!')
             abort(404)
@@ -692,27 +709,17 @@ def create_app():
 
             if completed != 'true':
                 abort(400)
-
-            exp_value = 0
-            if workout_info.difficulty == 'easy':
-                exp_value = DEFAULT_EASY_EXP
-            elif workout_info.difficulty == 'medium':
-                exp_value = DEFAULT_MEDIUM_EXP
-            elif workout_info.difficulty == 'hard':
-                exp_value = DEFAULT_HARD_EXP
-            elif workout_info.difficulty == 'insane':
-                exp_value = DEFAULT_INSANE_EXP
-
-            if type(g.user) == Trainer:
+            app.logger.debug('heyyy')
+            if type(g.user) is Trainer:
                 g.database.add_trainer_experience(g.user._id, exp_value)
-            if type(g.user) == Trainee:
+            if type(g.user) is Trainee:
                 g.database.add_trainee_experience(g.user._id, exp_value)
 
             g.database.set_workout_status(g.user._id, workout_name, True)
             workout_info = g.database.get_workout_by_attributes(name=workout_name,
                                                                 creator_id=creator_id)
 
-        return render_template("workout/workout.html", workout_info=workout_info)
+        return render_template("workout/workout.html", workout_info=workout_info, exp=exp_value)
 
     @app.route('/workout_overview', methods=["GET"])
     def workout_overview():
