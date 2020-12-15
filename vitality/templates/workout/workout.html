@@ -1,33 +1,59 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row"> 
-    <h1> {{ workoutInfo.name }} </h1><br><br>
-    <div class = "col-sm-12">
-        <p><b>Difficulty: </b>{{ workoutInfo.difficulty }}</p><br>
-        <p id="workoutExp"><b>Experience Points: </b>{{ workoutInfo.exp }}</p><br>
-        <p><b>Workout Details: </b>{{ workoutInfo.about }}</p>
-        {% if workoutInfo.is_complete == false and workoutInfo.exp == 1000 %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="POST">
-        <button class="text-center mt-1" type="submit" name="xp" id="xp1" value="1000">Complete</button>
-        </form>
-        {% elif workoutInfo.is_complete == false and workoutInfo.exp == 2000 %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="POST">
-        <button class="text-center mt-1" type="submit" name="xp" id="xp2" value="2000">Complete</button>
-        </form>
-        {% elif workoutInfo.is_complete == false and workoutInfo.exp == 3000 %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="POST">
-        <button class="text-center mt-1" type="submit" name="xp" id="xp3" value="3000">Complete</button>
-        </form>
-        {% elif workoutInfo.is_complete == false and workoutInfo.exp == 5000 %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="POST">
-        <button class="text-center mt-1" type="submit" name="xp" id="xp4" value="5000">Complete</button>
-        </form>
-        {% else %}
-        <form action= {{ url_for('profile', username=g.user.username)}} method="GET">
-        <button class="text-center mt-1" type="submit" name="completed" id="completed" value="completed">Completed</button>
-        </form>
-        {% endif %}
+<div class="row">
+    <div class="col-sm-12">
+        <h1> {{ workout_info.name }} </h1><br><br>
+    </div>
+    <div class="col-sm-12">
+        <p><b>Difficulty: </b>{{ workout_info.difficulty }}</p>
+        <br>
+        <p id="workoutExp"><b>Experience Points: </b>{{ exp }}</p>
+        <br>
+        <p><b>Workout Details: </b>{{ workout_info.about }}</p>
+        <input type="hidden" name="completed" value="true" />
+        <button class="text-center mt-1" type="submit" id="completed_button" onclick="submitted()">
+            Complete
+        </button>
     </div>
 </div>
+
+<script>
+    function submitted(username, workout_name) {
+
+        $("#completed_button").text("Workout Completed!");
+        $("#completed_button").prop('disabled', true);
+        $("#completed_button").css("background-color", "grey");
+
+        $.post('{{ url_for("workout", creator_id=g.user._id, workout_name=workout_info.name) }}', {
+            'completed': 'true'
+        })
+            .done(() => {
+                $("#completed_button").text("Workout Completed!");
+                $("#completed_button").prop('disabled', true);
+                $("#completed_button").css("background-color", "grey");
+            })
+            .fail(() => {
+                $("#completed_button").text("Could not complete!");
+                window.setTimeout(function () {
+                    $("#completed_button").css("background-color", "#8492A6");
+                    $("#completed_button").text("Complete");
+                    $("#completed_button").prop('disabled', false);
+                }, 2 * 1000);
+
+            });
+    }
+
+    window.addEventListener(
+        'load',
+        function () {
+            if ('{{workout_info.is_complete}}'.toLowerCase() == 'true') {
+                $("#completed_button").text("Workout Completed!");
+                $("#completed_button").prop('disabled', true);
+                $("#completed_button").css("background-color", "grey");
+            }
+        },
+        false);
+
+</script>
 {% endblock %}

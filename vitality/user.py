@@ -5,29 +5,29 @@ class User:
                  password: str,
                  name: str = None,
                  location: str = None,
-                 phone: int = None,
+                 phone: str = None,
                  body_type: str = None,
                  body_fat: str = None,
                  height: str = None,
                  weight: str = None,
-                 exp: str = None,
+                 exp: int = 0,
                  goal_weight: str = None,
                  goal_body_fat: str = None):
         """Constructor for Trainee class."""
 
-        self._id = _id
-        self.username = username
-        self.password = password
-        self.name = name
-        self.location = location
-        self.phone = phone
-        self.body_type = body_type
-        self.body_fat = body_fat
-        self.height = height
-        self.weight = weight
-        self.exp = exp
-        self.goal_weight = goal_weight
-        self.goal_body_fat = goal_body_fat
+        self._id = str(_id)
+        self.username = str(username)
+        self.password = str(password)
+        self.name = str(name)
+        self.location = str(location)
+        self.phone = str(phone)
+        self.body_type = str(body_type)
+        self.body_fat = str(body_fat)
+        self.height = str(height)
+        self.weight = str(weight)
+        self.exp = int(exp) if exp is not None else 0
+        self.goal_weight = str(goal_weight)
+        self.goal_body_fat = str(goal_body_fat)
 
     def as_dict(self):
         """Returns all attributes of the Trainee class as a dictionary."""
