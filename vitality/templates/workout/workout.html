@@ -6,17 +6,15 @@
         <h1> {{ workout_info.name }} </h1><br><br>
     </div>
     <div class="col-sm-12">
-        <form action="{{ url_for('workout', creator_id=g.user._id, workout_name=workout_info.name )}}" method="POST">
-            <p><b>Difficulty: </b>{{ workout_info.difficulty }}</p>
-            <br>
-            <p id="workoutExp"><b>Experience Points: </b>{{ exp }}</p>
-            <br>
-            <p><b>Workout Details: </b>{{ workout_info.about }}</p>
-            <input type="hidden" name="completed" value="true" />
-            <button class="text-center mt-1" type="submit" id="completed_button" onclick="submitted()">
-                Complete
-            </button>
-        </form>
+        <p><b>Difficulty: </b>{{ workout_info.difficulty }}</p>
+        <br>
+        <p id="workoutExp"><b>Experience Points: </b>{{ exp }}</p>
+        <br>
+        <p><b>Workout Details: </b>{{ workout_info.about }}</p>
+        <input type="hidden" name="completed" value="true" />
+        <button class="text-center mt-1" type="submit" id="completed_button" onclick="submitted()">
+            Complete
+        </button>
     </div>
 </div>
 
@@ -37,11 +35,11 @@
             })
             .fail(() => {
                 $("#completed_button").text("Could not complete!");
-                    window.setTimeout(function () {
-                        $("#completed_button").css("background-color", "#8492A6");
-                        $("#completed_button").text("Complete");
-                        $("#completed_button").prop('disabled', false);
-                    }, 2 * 1000);
+                window.setTimeout(function () {
+                    $("#completed_button").css("background-color", "#8492A6");
+                    $("#completed_button").text("Complete");
+                    $("#completed_button").prop('disabled', false);
+                }, 2 * 1000);
 
             });
     }
