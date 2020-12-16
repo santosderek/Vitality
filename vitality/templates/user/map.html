@@ -1,0 +1,105 @@
+<style>
+    #map {
+        height: 500px;
+        width: 100%;
+    }
+</style>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO-g-4D9U2--jzyTPvNwOlsd_zu56ebdo&callback=initMap&libraries=places&v=weekly"
+  defer
+></script>
+
+<div class="search-card" id="search-card">
+    <div>
+        <div id="title">Enter your location</div>
+    </div>
+    <div id="inputContainer">
+        <input id="locInput" type="text" placeholder="example: Charlotte" />
+    </div>
+</div>
+<div id="map"></div>
+<div id="info-window-content">
+    <img src="" width="16" height="16" id="place-icon" />
+    <span  id="place-name" class="title"></span><br />
+    <span id="place-address"></span>
+</div>
+
+<script>
+    function initMap() {
+        var userLat = parseFloat($("#userLat").val());
+        var userLng = parseFloat($("#userLng").val());
+
+        console.log(userLat + " " + userLng);
+        
+        if((userLng == null || userLat == null)) {
+            userLat = 35.2270869;
+            userLng = -80.8431267;
+        }
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: userLat, lng: userLng },
+            zoom: 13,
+        });
+        new google.maps.Marker({
+            position: map.center,
+            map
+        })
+        
+        const card = document.getElementById("search-card");
+        const input = document.getElementById("locInput");
+        const autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.bindTo("bounds", map);
+        autocomplete.setFields(["address_components", "geometry", "icon", "name"])
+        const infowindow = new google.maps.InfoWindow();
+        const infowindowContent = document.getElementById("info-window-content");
+        infowindow.setContent(infowindowContent);
+        const marker = new google.maps.Marker({
+            map,
+            anchorPoint: new google.maps.Point(0, -29),
+        });
+        autocomplete.addListener("place_changed", () => {
+            infowindow.close();
+            marker.setVisible(false);
+            const place = autocomplete.getPlace();
+
+            if (!place.geometry) {
+                window.alert("No details available for input '" + place.name + "'");
+                return;
+            }
+
+            if (place.geometry.viewport) {
+                map.fitBounds(place.geometry.viewport);
+            } else {
+                map.setCenter(place.geometry.viewport);
+                map.setZoom(17);
+            }
+            marker.setPosition(place.geometry.location);
+            marker.setVisible(true);
+            let address = "";
+            
+            if (place.address_components) {
+                address = [
+                    (place.address_components[0] &&
+                    place.address_components[0].short_name) ||
+                    "",
+                    (place.address_components[1] &&
+                      place.address_components[1].short_name) ||
+                        "",
+                    (place.address_components[2] &&
+                      place.address_components[2].short_name) ||
+                        "",
+                    ].join(" ");
+            }
+            var searchLat = parseFloat(place.geometry.location.lat());
+            var searchLng = parseFloat(place.geometry.location.lng());
+            $("#lat").val(searchLat);
+            $("#lng").val(searchLng);
+            infowindowContent.children["place-icon"].src = place.icon;
+            infowindowContent.children["place-name"].textContent = place.name;
+            infowindowContent.children["place-address"].textContent = address;
+            infowindow.open(map, marker);
+        })
+    }
+</script>

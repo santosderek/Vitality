@@ -25,6 +25,10 @@ class Database:
         trainee_dict['_id'] = str(trainee_dict['_id'])
         trainee_dict['trainers'] = [str(trainer_id)
                                     for trainer_id in trainee_dict['trainers']]
+        print(trainee_dict)
+        trainee_dict['lng'] = trainee_dict['location']['coordinates'][0]
+        trainee_dict['lat'] = trainee_dict['location']['coordinates'][1]
+        trainee_dict.pop("location")
         # WARNING: Removed converting trainers to classes due to unintended recursion
         return Trainee(**trainee_dict)
 
@@ -79,16 +83,6 @@ class Database:
                 }
             })
 
-    def set_trainee_location(self, id: str, location: str):
-        """Updates a trainee's location given a user id."""
-        self.mongo.trainee.update_one(
-            {"_id": ObjectId(id)},
-            {
-                "$set": {
-                    "location": location
-                }
-            })
-
     def set_trainee_phone(self, id: str, phone: int):
         """Updates a trainee's phone number given a user id."""
         self.mongo.trainee.update_one(
@@ -108,6 +102,34 @@ class Database:
                     "name": name
                 }
             })
+
+    def set_coords(self, id: str, lng: float, lat: float):
+        """Updates a user's coordinates """
+        if self.get_trainer_by_id(id) is None:
+            self.mongo.trainee.update_one(
+                {"_id": ObjectId(id)},
+                {
+                    "$set": {
+                        "location": {
+                            "type": "Point",
+                            "coordinates": [lng, lat]
+                        }
+                    }
+                }
+            )
+
+        if self.get_trainee_by_id(id) is None:
+            self.mongo.trainer.update_one(
+                {"_id": ObjectId(id)},
+                {
+                    "$set": {
+                        "location": {
+                            "type": "Point",
+                            "coordinates": [lng, lat]
+                        }
+                    }
+                }
+            )
 
     def trainee_add_trainer(self, trainee_id: str, trainer_id: str):
         """Add trainer object id to trainee's trainer list"""
@@ -183,6 +205,9 @@ class Database:
         trainer_dict['_id'] = str(trainer_dict['_id'])
         trainer_dict['trainees'] = [str(trainee_id)
                                     for trainee_id in trainer_dict['trainees']]
+        trainer_dict['lng'] = trainer_dict['location']['coordinates'][0]
+        trainer_dict['lat'] = trainer_dict['location']['coordinates'][1]
+        trainer_dict.pop("location")
         # WARNING: Removed converting trainees to classes due to unintended recursion
         return Trainer(**trainer_dict)
 
@@ -281,16 +306,6 @@ class Database:
             {
                 "$set": {
                     "password": password_sha256(password)
-                }
-            })
-
-    def set_trainer_location(self, id: str, location: str):
-        """Updates a trainer's location given a trainer id."""
-        self.mongo.trainer.update_one(
-            {"_id": ObjectId(id)},
-            {
-                "$set": {
-                    "location": location
                 }
             })
 
