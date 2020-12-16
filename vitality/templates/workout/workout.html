@@ -19,12 +19,7 @@
 </div>
 
 <script>
-    function submitted(username, workout_name) {
-
-        $("#completed_button").text("Workout Completed!");
-        $("#completed_button").prop('disabled', true);
-        $("#completed_button").css("background-color", "grey");
-
+    function submitted() {
         $.post('{{ url_for("workout", creator_id=g.user._id, workout_name=workout_info.name) }}', {
             'completed': 'true'
         })
@@ -35,6 +30,8 @@
             })
             .fail(() => {
                 $("#completed_button").text("Could not complete!");
+                $("#completed_button").prop('disabled', true);
+                $("#completed_button").css("background-color", "red");
                 window.setTimeout(function () {
                     $("#completed_button").css("background-color", "#8492A6");
                     $("#completed_button").text("Complete");
