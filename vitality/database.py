@@ -205,9 +205,10 @@ class Database:
         trainer_dict['_id'] = str(trainer_dict['_id'])
         trainer_dict['trainees'] = [str(trainee_id)
                                     for trainee_id in trainer_dict['trainees']]
-        trainer_dict['lng'] = trainer_dict['location']['coordinates'][0]
-        trainer_dict['lat'] = trainer_dict['location']['coordinates'][1]
-        trainer_dict.pop("location")
+        if 'location' in trainer_dict: 
+            trainer_dict['lng'] = trainer_dict['location']['coordinates'][0]
+            trainer_dict['lat'] = trainer_dict['location']['coordinates'][1]
+            trainer_dict.pop("location")
         # WARNING: Removed converting trainees to classes due to unintended recursion
         return Trainer(**trainer_dict)
 
