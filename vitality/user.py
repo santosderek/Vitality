@@ -12,8 +12,8 @@ class User:
                  exp: str = None,
                  goal_weight: str = None,
                  goal_body_fat: str = None,
-                 lng: float = None,
-                 lat: float = None):
+                 lng: float = 0,
+                 lat: float = 0):
         """Constructor for Trainee class."""
 
         self._id = _id
