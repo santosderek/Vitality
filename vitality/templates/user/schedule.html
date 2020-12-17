@@ -9,7 +9,17 @@
 
 
     <div class="col text-center darkbg" id="contentblock">
-        <p>Schedule...</p>
+        <div>
+
+            <div class="col-sm-3 col-md-3 card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">{{event.title}}</h5>
+                    <p class="card-text">{{event.description}}</p>
+                    <a href="{{url_for('event', creator_username=event.username, event_title=event.title)}}" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

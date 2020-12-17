@@ -634,6 +634,8 @@ class Database:
 
         event_dict = event.as_dict()
         event_dict.pop('_id')
+        event_dict['creator_id'] = ObjectId(event_dict['creator_id'])
+        event_dict['participant_id'] = ObjectId(event_dict['participant_id'])
         self.mongo.event.insert_one(event_dict)
 
     def delete_event(self, event_id: str, creator_id: str):
@@ -649,6 +651,9 @@ class Database:
 
         if 'creator_id' in kwargs:
             kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
+        
+        if 'participant_id' in kwargs:
+            kwargs['participant_id'] = ObjectId(kwargs['participant_id'])
 
         if 'date' in kwargs:
             kwargs['date'] = str(kwargs['date'])
@@ -659,20 +664,44 @@ class Database:
             raise EventNotFound
 
         returned_value['date'] = datetime.fromisoformat(returned_value['date'])
+        returned_value['_id'] = str(returned_value['_id'])
+        returned_value['creator_id'] = str(returned_value['creator_id'])
+        returned_value['participant_id'] = str(returned_value['participant_id'])
         return Event(**returned_value)
 
-    def list_events_from_creator_id(self, creator_id: str):
+    def list_events_from_user_id(self, user_id: str):
+        """Returns the created and invited events"""
+        # Get created events as Event objects
         created_events = self.mongo.event.find({
-            'creator_id': ObjectId(creator_id)
+            'creator_id': ObjectId(user_id)
         })
 
-        if returned_value is None or len(returned_value) == 0:
+        if created_events is None or len(created_events) == 0:
             raise EventNotFound("No events from creator")
-        
 
-        for event in returned_value:
-            assert False
-        
+        created_event_classes = []
+        for event in created_events:
+            event['_id'] = str(event['_id'])
+            event['creator_id'] = str(event['creator_id'])
+            event['participant_id'] = str(event['participant_id'])
+            created_event_classes.append(Event(**event))
+
+        # Get recieved events as Event objects
+        recieved_events = self.mongo.event.find({
+            'participant': ObjectId(user_id)
+        })
+
+        if recieved_events is None or len(recieved_events) == 0:
+            raise EventNotFound("No events from creator")
+
+        recieved_event_classes = []
+        for event in recieved_events:
+            event['_id'] = str(event['_id'])
+            event['creator_id'] = str(event['creator_id'])
+            event['participant_id'] = str(event['participant_id'])
+            recieved_event_classes.append(Event(**event))
+
+        return created_event_classes, recieved_event_classes
 
 
 class EventNotFound(ValueError):
