@@ -18,6 +18,10 @@
         $.ajax({
             type: "POST",
             url: "{{ url_for('nearby_trainers') }}",
+            data: {
+                'lat': {{g.user.lat}},
+                'lng': {{g.user.lng}}
+            },
             dataType: "json",
             success: function(data) {
                 for(var i = 0; i < data.length; i++){

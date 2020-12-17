@@ -537,7 +537,7 @@ def create_app():
                 }
             json_trainers.append(json_trainer)
         
-            return json_trainers, 200
+            return str(json_trainers), 200
         
 
         return render_template("trainee/nearby_trainers.html")
