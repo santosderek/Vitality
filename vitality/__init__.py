@@ -723,10 +723,6 @@ def create_app():
             reps = str(escape(request.form['reps']))
             miles = str(escape(request.form['miles']))
             category = str(escape(request.form['category']))
-            print(total_time)
-            print(reps)
-            print(miles)
-            print(category)
             if completed != 'true':
                 abort(400)
             app.logger.debug('heyyy')

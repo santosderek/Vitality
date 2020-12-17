@@ -14,9 +14,9 @@
         <br>
         {% if workout_info.is_complete == False %}
         <label for="total_time"><b>Input total time</b></label>
-        <input type="text" id="total_time" name="total_time" required>
+        <input type="text" id="total_time" name="total_time" required/>
         <label for="reps"><b>Input total reps</b></label>
-        <input type="text" id="reps" name="reps">
+        <input type="text" id="reps" name="reps" required/>
         <label for="miles"><b>(Optional) Input total miles</b></label>
         <input type="text" id="miles" name="miles">
 
@@ -49,30 +49,34 @@
         reps = $("#reps").val();
         miles = $("#miles").val();
         category = $("#category").val();
-        $("#completed_button").text("Workout Completed!");
-        $("#completed_button").prop('disabled', true);
-        $("#completed_button").css("background-color", "grey");
+        if(!total_time || !reps) {
+            alert('You must fill out the total time and reps field.');
+            location.reload();
+        }else{
+            $("#completed_button").text("Workout Completed!");
+            $("#completed_button").prop('disabled', true);
+            $("#completed_button").css("background-color", "grey");
 
-        $.post('{{ url_for("workout", creator_id=g.user._id, workout_name=workout_info.name) }}', {
-            'completed': 'true', total_time:total_time, reps:reps, miles:miles, category:category
-        })
-            .done(() => {
-                $("#completed_button").text("Workout Completed!");
-                $("#completed_button").prop('disabled', true);
-                $("#completed_button").css("background-color", "grey");
-                location.reload();
+            $.post('{{ url_for("workout", creator_id=g.user._id, workout_name=workout_info.name) }}', {
+                'completed': 'true', total_time:total_time, reps:reps, miles:miles, category:category
             })
-            .fail(() => {
-                $("#completed_button").text("Could not complete!");
-                window.setTimeout(function () {
-                    $("#completed_button").css("background-color", "#8492A6");
-                    $("#completed_button").text("Complete");
-                    $("#completed_button").prop('disabled', false);
-                }, 2 * 1000);
+                .done(() => {
+                    $("#completed_button").text("Workout Completed!");
+                    $("#completed_button").prop('disabled', true);
+                    $("#completed_button").css("background-color", "grey");
+                    location.reload();
+                })
+                .fail(() => {
+                    $("#completed_button").text("Could not complete!");
+                    window.setTimeout(function () {
+                        $("#completed_button").css("background-color", "#8492A6");
+                        $("#completed_button").text("Complete");
+                        $("#completed_button").prop('disabled', false);
+                    }, 2 * 1000);
 
-            });
+                });
+        }
     }
-
     window.addEventListener(
         'load',
         function () {

@@ -1422,6 +1422,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='false',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     assert returned_value.status_code == 400
@@ -1430,6 +1434,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1465,6 +1473,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1502,6 +1514,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1538,6 +1554,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1570,6 +1590,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainee._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainee = g.database.get_trainee_by_username('testtrainee')
