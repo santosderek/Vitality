@@ -649,6 +649,9 @@ class Database:
 
         if 'creator_id' in kwargs:
             kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
+        
+        if 'date' in kwargs:
+            kwargs['date'] = str(kwargs['date'])
 
         returned_value = self.mongo.event.find_one(kwargs)
 
