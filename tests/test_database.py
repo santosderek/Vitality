@@ -41,7 +41,11 @@ class TestDatabase(unittest.TestCase):
         name="testing",
         difficulty="easy",
         about="workout",
-        is_complete=False)
+        is_complete=False,
+        total_time="20 minutes",
+        reps="10",
+        miles="2",
+        category="cardio")
 
     def setUp(self):
         self.tearDown()
