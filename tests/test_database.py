@@ -977,6 +977,86 @@ class TestDatabase(unittest.TestCase):
         assert workout is not None
         assert workout['is_complete'] is True
 
+    def test_set_workout_total_time(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['total_time'] == "20 minutes"
+
+        self.database.set_workout_total_time(trainee._id, workout['name'], "10")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['total_time'] =="10"
+
+    def test_set_workout_reps(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['reps'] == "10"
+
+        self.database.set_workout_reps(trainee._id, workout['name'], "5")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['reps'] == "5"
+
+    def test_set_workout_miles(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['miles'] == "2"
+
+        self.database.set_workout_miles(trainee._id, workout['name'], "5")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['miles'] == "5"
+
+    def test_set_workout_category(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['category'] == "cardio"
+
+        self.database.set_workout_category(trainee._id, workout['name'], "Abs")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['category'] == "Abs"
+
     """Invitation tests"""
 
     def test_create_invitation(self):
