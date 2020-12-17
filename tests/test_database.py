@@ -1320,6 +1320,12 @@ class TestDatabase(unittest.TestCase):
             'creator_id': ObjectId(trainer._id)
         })
 
+        event = Event(
+            '_id' = None,
+            'creator_id': Object(trainee._id),
+            'date': datetime()
+        )
+
     def test_remove_event(self):
         assert False
 

@@ -16,7 +16,7 @@ class TestEvent(unittest.TestCase):
 
         assert event._id == "0"
         assert event.creator_id == "1"
-        assert event.date == '2020-03-06 00:00:00'
+        assert str(event.date) == '2020-03-06 00:00:00'
         assert event.title == "title"
         assert event.description == "description"
 
