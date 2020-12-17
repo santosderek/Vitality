@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    {% include "sidebar.html" ignore missing %}
+
+
+    <div class="col text-center darkbg" id="contentblock">
+        {% if invalid_participant %}
+        <div class="col-sm-12">
+            <h3>Invalid Participant!</h3>
+        </div>
+        {%endif %}
+        {% if success %}
+        <div class="col-sm-12">
+            <h3>Created Event!</h3>
+        </div>
+        {%endif %}
+        <div class="col-sm-12">
+            <h3>Add an event!</h3>
+        </div>
+        <div class="col-sm-12 w-50">
+            <form action="{{url_for('add_event')}}" method="POST">
+                <input class="col-sm-12" placeholder="Event Title" name="title" required />
+                <input class="col-sm-12" placeholder="Add a Description" name="description" required />
+                <input class="col-sm-12" type="date" name="date" required />
+                <input class="col-sm-12" type="time" name="time" required />
+                <label class="col-sm-12" for="participant_id">Participant:</label>
+
+                <select class="col-sm-12" name="participant_id">
+                    {%if list_of_added|length == 0 %}
+                    <option value="0000000000000000">No Added Participants!</option>
+                    {% else %}
+                    {% for participant in list_of_added %}
+                    <option value="{{participant._id}}">{{participant.username}}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+                <button type="submit">Create</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

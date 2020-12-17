@@ -9,16 +9,47 @@
 
 
     <div class="col text-center darkbg" id="contentblock">
-        <div>
+        <div class="col-sm-12 text-center pt-4 pb-4">
+            <a class="button_title" href="{{ url_for('add_event') }}" role="button">Add Event</a>
+        </div>
+        <div class="col-sm-12">
+            <h3>Created Events</h3>
+        </div>
 
-            <div class="col-sm-3 col-md-3 card" style="width: 18rem;">
-                <div class="card-body">
-                    <h5 class="card-title">{{event.title}}</h5>
-                    <p class="card-text">{{event.description}}</p>
-                    <a href="{{url_for('event', creator_username=event.username, event_title=event.title)}}" class="btn btn-primary">Go somewhere</a>
-                </div>
+        {% if created_events|length == 0 %}
+        <div class="col-sm-12">
+            <p style="color: white;">No Events!</p>
+        </div>
+        {% endif %}
+        {% for event in created_events %}
+        <div class="col-sm-3 col-md-3 card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{event.title}}</h5>
+                <p class="card-text">{{event.description}}</p>
+                <a href="{{url_for('event', creator_id=event.username, event_title=event.title)}}"
+                    class="btn btn-primary">View</a>
             </div>
         </div>
+        {% endfor %}
+        <div class="col-sm-12">
+            <h3>Recieved Events</h3>
+        </div>
+
+        {% if created_events|length == 0 %}
+        <div class="col-sm-12">
+            <p style="color: white;">No Events!</p>
+        </div>
+        {% endif %}
+        {% for event in recieved_events %}
+        <div class="col-sm-3 col-md-3 card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{event.title}}</h5>
+                <p class="card-text">{{event.description}}</p>
+                <a href="{{url_for('event', creator_id=event.creator_id, event_title=event.title)}}"
+                    class="btn btn-primary">View</a>
+            </div>
+        </div>
+        {% endfor %}
 
     </div>
 </div>

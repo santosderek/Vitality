@@ -123,10 +123,8 @@
         </div>
 
         <div class="row schedule pt-3 pb-3">
-            <div class="col-sm-6 text-center">
+            <div class="col-sm-12 text-center">
                 <a class="button_title" href="{{ url_for('add_event') }}" role="button">Add Event</a>
-            </div>
-            <div class="col-sm-6 text-center">
                 <a class="button_title" href="{{ url_for('schedule') }}" role="button">Schedule</a>
             </div>
             {% if events|length < 1 %}

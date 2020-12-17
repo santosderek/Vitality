@@ -728,9 +728,6 @@ class Database:
             'creator_id': ObjectId(user_id)
         })
 
-        if created_events is None or len(created_events) == 0:
-            raise EventNotFound("No events from creator")
-
         created_event_classes = []
         for event in created_events:
             event['_id'] = str(event['_id'])
@@ -742,9 +739,6 @@ class Database:
         recieved_events = self.mongo.event.find({
             'participant': ObjectId(user_id)
         })
-
-        if recieved_events is None or len(recieved_events) == 0:
-            raise EventNotFound("No events from creator")
 
         recieved_event_classes = []
         for event in recieved_events:

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    {% include "sidebar.html" ignore missing %}
+
+
+    <div class="col text-center darkbg" id="contentblock">
+        <div class="col-sm-12">
+            <h3>{{event.title}}</h3>
+            <p>Creator: {{creator.username}}</p>
+            <p>Participant: {{participant.username}}</p>
+            <p>Description: {{event.description}}</p>
+            <p>Date: {{event.date}}</p>
+            <p>{{event.description}}</p>
+        </div>
+
+
+    </div>
+</div>
+{% endblock %}
