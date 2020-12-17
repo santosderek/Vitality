@@ -520,8 +520,8 @@ def create_app():
         if type(g.user) is not Trainee:
             abort(403)
 
-        lat = escape(request.form['lat'])
-        lng = escape(request.form['lng'])
+        lat = escape(g.user.lat)
+        lng = escape(g.user.lng)
 
         return render_template("trainee/nearby_trainers.html")
 
