@@ -11,22 +11,36 @@
   defer
 ></script>
 
-<div class="search-card" id="search-card">
-    <div>
-        <div id="title">Enter your location</div>
-    </div>
-    <div id="inputContainer">
-        <input id="locInput" type="text" placeholder="example: Charlotte" />
-    </div>
-</div>
 <div id="map"></div>
-<div id="info-window-content">
-    <img src="" width="16" height="16" id="place-icon" />
-    <span  id="place-name" class="title"></span><br />
-    <span id="place-address"></span>
-</div>
 
 <script>
+    window.addEventListener('load', function(){
+        $.ajax({
+            type: "POST",
+            url: "{{ url_for('nearby_trainers') }}",
+            dataType: "json",
+            success: function(data) {
+                for(var i = 0; i < data.length; i++){
+                    var latlng = new google.maps.LatLng(data[i].lat, data[i].lng);
+                    const trainerMarker = new google.maps.Marker({
+                        map,
+                        anchorPoint: new google.maps.Point(0, -29),
+                        position: latlng
+                    });
+                    const trainerInfowindow = new google.maps.InfoWindow();
+                    trainerInfowindow.setContent(data[i].username);
+                    trainerInfowindow.open(map, marker);
+                    trainerMarker.addListener("click", () => {
+                        trainerInfowindow.open(map, marker);
+                    });
+                }
+            },
+            error: function() {
+                $("#map").innerHTML = "Error: Map could not be displayed";
+            }
+        })
+    });
+    
     function initMap() {
         var userLat = parseFloat($("#userLat").val());
         var userLng = parseFloat($("#userLng").val());
@@ -41,62 +55,14 @@
             zoom: 13,
         });
         
-        const card = document.getElementById("search-card");
-        const input = document.getElementById("locInput");
-        const autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.bindTo("bounds", map);
-        autocomplete.setFields(["address_components", "geometry", "icon", "name"])
         const infowindow = new google.maps.InfoWindow();
-        const infowindowContent = document.getElementById("info-window-content");
-        infowindow.setContent(infowindowContent);
+        infowindow.setContent("Your location");
         const marker = new google.maps.Marker({
             map,
             anchorPoint: new google.maps.Point(0, -29),
             position: map.center
         });
-        
-        autocomplete.addListener("place_changed", () => {
-            infowindow.close();
-            marker.setVisible(false);
-            const place = autocomplete.getPlace();
-
-            if (!place.geometry) {
-                window.alert("No details available for input '" + place.name + "'");
-                return;
-            }
-
-            if (place.geometry.viewport) {
-                map.fitBounds(place.geometry.viewport);
-            } else {
-                map.setCenter(place.geometry.viewport);
-                map.setZoom(17);
-            }
-            marker.setPosition(place.geometry.location);
-            marker.setVisible(true);
-            let address = "";
-            
-            if (place.address_components) {
-                address = [
-                    (place.address_components[0] &&
-                    place.address_components[0].short_name) ||
-                    "",
-                    (place.address_components[1] &&
-                      place.address_components[1].short_name) ||
-                        "",
-                    (place.address_components[2] &&
-                      place.address_components[2].short_name) ||
-                        "",
-                    ].join(" ");
-            }
-            var searchLat = parseFloat(place.geometry.location.lat());
-            var searchLng = parseFloat(place.geometry.location.lng());
-            $("#lat").val(searchLat);
-            $("#lng").val(searchLng);
-            infowindowContent.children["place-icon"].src = place.icon;
-            infowindowContent.children["place-name"].textContent = place.name;
-            infowindowContent.children["place-address"].textContent = address;
-            infowindow.open(map, marker);
-        })
+        infowindow.open(map, marker);
         marker.addListener("click", () => {
             infowindow.open(map, marker);
         });

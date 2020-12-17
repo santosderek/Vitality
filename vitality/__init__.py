@@ -130,8 +130,9 @@ def create_app():
                 if not stringPattern.search(usertype):
                     raise InvalidCharactersException("Invalid characters")
 
-                lat = escape(request.form['lat'])
-                lng = escape(request.form['lng'])
+                lat = float(escape(request.form['lat']))
+
+                lng = float(escape(request.form['lng']))
 
                 if username and password == re_password:
                     try:
@@ -216,8 +217,8 @@ def create_app():
                 phone = escape(request.form['phone'])
                 if not numberPattern.search(phone):
                     raise InvalidCharactersException("Invalid characters")
-                lat = escape(request.form['lat'])
-                lng = escape(request.form['lng'])
+                lat = float(escape(request.form['lat']))
+                lng = float(escape(request.form['lng']))
 
                 if g.database.get_trainee_by_id(g.user._id) is not None:
 
@@ -510,7 +511,7 @@ def create_app():
 
         return render_template("trainee/trainer_search.html")
 
-    @app.route('/nearby_trainers', methods=["GET"])
+    @app.route('/nearby_trainers', methods=["GET", "POST"])
     def nearby_trainers():
         """Page for trainees to see nearby trainers on a map"""
         if not g.user:
@@ -520,8 +521,24 @@ def create_app():
         if type(g.user) is not Trainee:
             abort(403)
 
-        lat = escape(g.user.lat)
-        lng = escape(g.user.lng)
+        if(request.method == "POST"):
+            lat = float(escape(request.form['lng']))
+            lng = float(escape(request.form['lat']))
+
+            trainers = g.database.find_trainers_near_user(lng, lat)
+
+            json_trainers = []
+
+            for trainer in trainers:
+                json_trainer = {
+                    'username': trainer.username,
+                    'lng': trainer.lng,
+                    'lat': trainer.lat
+                }
+            json_trainers.append(json_trainer)
+        
+            return json_trainers, 200
+        
 
         return render_template("trainee/nearby_trainers.html")
 

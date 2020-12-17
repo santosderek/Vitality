@@ -17,6 +17,8 @@ class Database:
     def __init__(self, uri):
         """Constructor for Database class."""
         self.mongo = MongoClient(uri)['flaskDatabase']
+        self.mongo.trainee.create_index([('location', "2dsphere")], name='trainee_search_index', default_language='english')
+        self.mongo.trainer.create_index([('location', "2dsphere")], name='trainer_search_index', default_language='english')
 
     """ Trainee Functions """
 
@@ -161,8 +163,8 @@ class Database:
         trainee_dict['location'] = {
             'type': 'Point',
             'coordinates': [
-                trainee_dict['lat'],
-                trainee_dict['lng']
+                trainee_dict['lng'],
+                trainee_dict['lat']
             ]
         }
         trainee_dict.pop('lat')
@@ -298,6 +300,28 @@ class Database:
                 trainees.append(self.trainee_dict_to_class(trainee))
 
         return trainees
+
+    def find_trainers_near_user(self, lng, lat, min=0, max=80500):
+        """Return a list of trainers based on the user's location"""
+        returned_list = self.mongo.trainer.find({
+            location: {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [float(lng), float(lat)]
+                    },
+                    "$maxDistance": max,
+                    "$minDistance": min
+                }
+            }
+        })
+
+        trainer_list = []
+        for trainer in returned_list:
+            trainer_object = self.trainer_dict_to_class(trainer)
+            trainer_list.append(trainer_object)
+        
+        return trainer_list
 
     def set_trainer_username(self, id: str, username: str):
         """Updates a trainer's username given a trainer id."""

@@ -1,14 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
     <div>
         <h1>Find Trainers Near You</h1>
-        <input type="hidden" id="lat" name="lat" value="0">
-        <input type="hidden" id="lng" name="lng" value="0">
-        <input type="hidden" id="userLat" name="userLat" value="{{g.user.lat}}">
-        <input type="hidden" id="userLng" name="userLng" value="{{g.user.lng}}">
+        <form action="nearby_trainers.html" method="POST" >
+            <input type="hidden" id="lat" name="lat" value="{{g.user.lat}}">
+            <input type="hidden" id="lng" name="lng" value="{{g.user.lng}}">
+            <input type="hidden" id="userLat" name="userLat" value="{{g.user.lat}}">
+            <input type="hidden" id="userLng" name="userLng" value="{{g.user.lng}}">
+            <input type="submit" value="Search">
+        </form>
+        <br>
     </div>
 
-    {% include "user/map.html" ignore missing %}
+    {% include "user/find_trainer_map.html" ignore missing %}
 
 {% endblock %}
