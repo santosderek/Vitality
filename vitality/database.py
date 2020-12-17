@@ -158,6 +158,15 @@ class Database:
         trainee_dict = trainee.as_dict()
         trainee_dict.pop('_id', None)
         trainee_dict['password'] = password_sha256(trainee.password)
+        trainee_dict['location'] = {
+            'type': 'Point',
+            'coordinates': [
+                trainee_dict['lat'],
+                trainee_dict['lng']
+            ]
+        }
+        trainee_dict.pop('lat')
+        trainee_dict.pop('lng')
         self.mongo.trainee.insert_one(trainee_dict)
 
     def remove_trainee(self, id: str):
@@ -378,6 +387,15 @@ class Database:
         trainer_dict = trainer.as_dict()
         trainer_dict.pop('_id', None)
         trainer_dict['password'] = password_sha256(trainer.password)
+        trainer_dict['location'] = {
+            'type': 'Point',
+            'coordinates': [
+                trainer_dict['lng'],
+                trainer_dict['lat']
+            ]
+        }
+        trainer_dict.pop('lng')
+        trainer_dict.pop('lat')
         self.mongo.trainer.insert_one(trainer_dict)
 
     def remove_trainer(self, id: str):
