@@ -1345,8 +1345,30 @@ class TestDatabase(unittest.TestCase):
             assert database_event['date'] == str(event.date)
             assert database_event['title'] == event.title
             assert database_event['description'] == event.description
-        finally:
+
             clean_up(trainee, trainer)
+
+            event = Event(
+                _id=None,
+                creator_id=ObjectId(trainer._id),
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc'
+            )
+
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainer._id)
+            })
+
+            assert database_event['title'] == event.title
+            assert str(database_event['creator_id']) == str(event.creator_id)
+            assert database_event['date'] == str(event.date)
+            assert database_event['title'] == event.title
+            assert database_event['description'] == event.description
+        finally:
+            clean_up(trainer, trainer)
 
     def test_remove_event(self):
         assert False
