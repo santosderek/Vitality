@@ -649,20 +649,30 @@ class Database:
 
         if 'creator_id' in kwargs:
             kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
-        
+
         if 'date' in kwargs:
             kwargs['date'] = str(kwargs['date'])
 
         returned_value = self.mongo.event.find_one(kwargs)
 
-        if returned_value is None: 
+        if returned_value is None:
             raise EventNotFound
-        
+
         returned_value['date'] = datetime.fromisoformat(returned_value['date'])
         return Event(**returned_value)
 
-    def list_events(self):
-        pass
+    def list_events_from_creator_id(self, creator_id: str):
+        created_events = self.mongo.event.find({
+            'creator_id': ObjectId(creator_id)
+        })
+
+        if returned_value is None or len(returned_value) == 0:
+            raise EventNotFound("No events from creator")
+        
+
+        for event in returned_value:
+            assert False
+        
 
 
 class EventNotFound(ValueError):
