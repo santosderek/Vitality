@@ -15,39 +15,50 @@
 
 <script>
     window.addEventListener('load', function(){
-        $.ajax({
+        $("#trainerSearch").submit(function(event){
+            console.log("sending request");
+            event.preventDefault();
+            $.ajax({
             type: "POST",
-            url: "{{ url_for('nearby_trainers') }}",
+            url: "{{ url_for("nearby_trainers") }}",
             data: {
                 'lat': {{g.user.lat}},
                 'lng': {{g.user.lng}}
             },
             dataType: "json",
             success: function(data) {
-                for(var i = 0; i < data.length; i++){
-                    var latlng = new google.maps.LatLng(data[i].lat, data[i].lng);
-                    const trainerMarker = new google.maps.Marker({
+                console.log("creating markers");
+                var markers = [];
+                var infowindows = [];
+                var latlng;
+                var i;
+                console.log(data);
+
+                for(i = 0; i < data.length; i++){
+                    console.log("creating one marker");
+                    latlng = new google.maps.LatLng(float(data[i].lat), float(data[i].lng));
+                    markers[i] = new google.maps.Marker({
                         map,
                         anchorPoint: new google.maps.Point(0, -29),
                         position: latlng
                     });
-                    const trainerInfowindow = new google.maps.InfoWindow();
-                    trainerInfowindow.setContent(data[i].username);
-                    trainerInfowindow.open(map, marker);
-                    trainerMarker.addListener("click", () => {
-                        trainerInfowindow.open(map, marker);
+                    infowindows[i] = new google.maps.InfoWindow();
+                    infowindows[i].setContent(data[i].username);
+                    markers[i].addListener("click", () => {
+                        infowindows[i].open(map, marker);
                     });
                 }
             },
             error: function() {
                 $("#map").innerHTML = "Error: Map could not be displayed";
             }
-        })
+        });
     });
+});
     
     function initMap() {
-        var userLat = parseFloat($("#userLat").val());
-        var userLng = parseFloat($("#userLng").val());
+        var userLat = parseFloat($("#lat").val());
+        var userLng = parseFloat($("#lng").val());
         
         if((userLng == null || userLat == null)) {
             userLat = 35.2270869;
@@ -56,7 +67,7 @@
 
         const map = new google.maps.Map(document.getElementById("map"), {
             center: { lat: userLat, lng: userLng },
-            zoom: 13,
+            zoom: 12,
         });
         
         const infowindow = new google.maps.InfoWindow();

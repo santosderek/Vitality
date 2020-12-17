@@ -535,7 +535,7 @@ def create_app():
                     'lng': trainer.lng,
                     'lat': trainer.lat
                 }
-            json_trainers.append(json_trainer)
+                json_trainers.append(json_trainer)
         
             return str(json_trainers), 200
         
