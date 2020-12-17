@@ -481,6 +481,54 @@ class Database:
                 }
             })
 
+    def set_workout_total_time(self, creator_id: str, name: str, total_time: str):
+        """Updates a workout's total time given a workout id."""
+        self.mongo.workout.update_one(
+            {"creator_id": ObjectId(creator_id),
+             "name": name
+             },
+            {
+                "$set": {
+                    "total_time": total_time
+                }
+            })
+
+    def set_workout_reps(self, creator_id: str, name: str, reps: str):
+        """Updates a workout's reps given a workout id."""
+        self.mongo.workout.update_one(
+            {"creator_id": ObjectId(creator_id),
+             "name": name
+             },
+            {
+                "$set": {
+                    "reps": reps
+                }
+            })
+
+    def set_workout_miles(self, creator_id: str, name: str, miles: str):
+        """Updates a workout's miles given a workout id."""
+        self.mongo.workout.update_one(
+            {"creator_id": ObjectId(creator_id),
+             "name": name
+             },
+            {
+                "$set": {
+                    "miles": miles
+                }
+            })
+
+    def set_workout_category(self, creator_id: str, name: str, category: str):
+        """Updates a workout's category given a workout id."""
+        self.mongo.workout.update_one(
+            {"creator_id": ObjectId(creator_id),
+             "name": name
+             },
+            {
+                "$set": {
+                    "category": category
+                }
+            })
+
     def set_workout_about(self, id: str, about: str):
         """Updates a workout's about information given a workout id."""
         self.mongo.workout.update_one(
@@ -516,7 +564,11 @@ class Database:
             'name': workout.name,
             "difficulty": workout.difficulty,
             "about": workout.about,
-            "is_complete": workout.is_complete})
+            "is_complete": workout.is_complete,
+            "total_time": workout.total_time,
+            "reps": workout.reps,
+            "miles": workout.miles,
+            "category": workout.category})
 
     """Invitation"""
 

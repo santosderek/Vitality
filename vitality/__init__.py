@@ -644,6 +644,10 @@ def create_app():
             name = escape(request.form['name'])
             about = escape(request.form['about'])
             difficulty = escape(request.form['difficulty'])
+            total_time = escape(request.form['total_time'])
+            reps = escape(request.form['reps'])
+            miles = escape(request.form['miles'])
+            category = escape(request.form['category'])
             try:
                 existing_workout = g.database.get_workout_by_attributes(
                     creator_id=g.user._id,
@@ -659,7 +663,11 @@ def create_app():
                     name=name,
                     difficulty=difficulty,
                     about=about,
-                    is_complete=False
+                    is_complete=False,
+                    total_time=total_time,
+                    reps=reps,
+                    miles=miles,
+                    category=category
                 ))
                 return render_template("workout/new_workout.html", workout_added=True)
             except WorkoutCreatorIdNotFoundError:
@@ -717,7 +725,10 @@ def create_app():
         # Check creator_id and workout name, then update the workout to be completed in a POST req
         if request.method == "POST":
             completed = str(escape(request.form['completed']))
-
+            total_time = str(escape(request.form['total_time']))
+            reps = str(escape(request.form['reps']))
+            miles = str(escape(request.form['miles']))
+            category = str(escape(request.form['category']))
             if completed != 'true':
                 abort(400)
             app.logger.debug('heyyy')
@@ -725,7 +736,10 @@ def create_app():
                 g.database.add_trainer_experience(g.user._id, exp_value)
             if type(g.user) is Trainee:
                 g.database.add_trainee_experience(g.user._id, exp_value)
-
+            g.database.set_workout_total_time(g.user._id, workout_name, total_time)
+            g.database.set_workout_reps(g.user._id, workout_name, reps)
+            g.database.set_workout_miles(g.user._id, workout_name, miles)
+            g.database.set_workout_category(g.user._id, workout_name, category)
             g.database.set_workout_status(g.user._id, workout_name, True)
             workout_info = g.database.get_workout_by_attributes(name=workout_name,
                                                                 creator_id=creator_id)

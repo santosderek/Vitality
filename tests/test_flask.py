@@ -1231,13 +1231,21 @@ def test_new_workout(client):
         creator_id=g.user._id,
         difficulty="novice",
         name="workout_test_one",
-        about="This is a super cool description of what the workout is...\nwoo!"
+        about="This is a super cool description of what the workout is...\nwoo!",
+        total_time="20",
+        reps="10",
+        miles="2",
+        category="Cardio"
     )
 
     returned_value = client.post('/new_workout', data=dict(
         difficulty=new_workout.difficulty,
         name=new_workout.name,
-        about=new_workout.about
+        about=new_workout.about,
+        total_time=new_workout.total_time,
+        reps=new_workout.reps,
+        miles=new_workout.miles,
+        category=new_workout.category
     ), follow_redirects=True)
     assert b'Workout has been added!' in returned_value.data
     database_workout = g.database.get_workout_by_attributes(name="workout_test_one",
@@ -1248,7 +1256,11 @@ def test_new_workout(client):
     returned_value = client.post('/new_workout', data=dict(
         difficulty=new_workout.difficulty,
         name=new_workout.name,
-        about=new_workout.about
+        about=new_workout.about,
+        total_time=new_workout.total_time,
+        reps=new_workout.reps,
+        miles=new_workout.miles,
+        category=new_workout.category
     ), follow_redirects=True)
     assert returned_value.status_code == 400
     assert b'Workout name already exists under your account!' in returned_value.data
@@ -1261,13 +1273,21 @@ def test_new_workout(client):
         creator_id=g.user._id,
         difficulty="intermediate",
         name="workout_test_one",
-        about="This is a super cool description of what the workout is...\nwoo!"
+        about="This is a super cool description of what the workout is...\nwoo!",
+        total_time="20",
+        reps="10",
+        miles="2",
+        category="Cardio"
     )
 
     returned_value = client.post('/new_workout', data=dict(
         difficulty=new_workout.difficulty,
         name=new_workout.name,
-        about=new_workout.about
+        about=new_workout.about,
+        total_time=new_workout.total_time,
+        reps=new_workout.reps,
+        miles=new_workout.miles,
+        category=new_workout.category
     ), follow_redirects=True)
     assert b'Workout has been added!' in returned_value.data
     database_workout = g.database.get_workout_by_attributes(name="workout_test_one",
@@ -1283,13 +1303,21 @@ def test_new_workout(client):
         creator_id=g.user._id,
         difficulty="experienced",
         name="workout_test_one",
-        about="This is a super cool description of what the workout is...\nwoo!"
+        about="This is a super cool description of what the workout is...\nwoo!",
+        total_time="20",
+        reps="10",
+        miles="2",
+        category="Cardio"
     )
 
     returned_value = client.post('/new_workout', data=dict(
         difficulty=new_workout.difficulty,
         name=new_workout.name,
-        about=new_workout.about
+        about=new_workout.about,
+        total_time=new_workout.total_time,
+        reps=new_workout.reps,
+        miles=new_workout.miles,
+        category=new_workout.category
     ), follow_redirects=True)
     assert b'Workout has been added!' in returned_value.data
     database_workout = g.database.get_workout_by_attributes(name="workout_test_one",
@@ -1305,13 +1333,21 @@ def test_new_workout(client):
         creator_id=g.user._id,
         difficulty="superstar",
         name="workout_test_one",
-        about="This is a super cool description of what the workout is...\nwoo!"
+        about="This is a super cool description of what the workout is...\nwoo!",
+        total_time="20",
+        reps="10",
+        miles="2",
+        category="Cardio"
     )
 
     returned_value = client.post('/new_workout', data=dict(
         difficulty=new_workout.difficulty,
         name=new_workout.name,
-        about=new_workout.about
+        about=new_workout.about,
+        total_time=new_workout.total_time,
+        reps=new_workout.reps,
+        miles=new_workout.miles,
+        category=new_workout.category
     ), follow_redirects=True)
     assert b'Workout has been added!' in returned_value.data
     database_workout = g.database.get_workout_by_attributes(name="workout_test_one",
@@ -1365,7 +1401,11 @@ def test_workout(client):
         creator_id=trainer._id,
         name="testWorkout",
         difficulty="easy",
-        about="2 Pushups, 1 Jumping Jack"
+        about="2 Pushups, 1 Jumping Jack",
+        total_time="20",
+        reps="10",
+        miles="2",
+        category="Cardio"
     )
 
     g.database.add_workout(workoutTest)
@@ -1387,6 +1427,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='false',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     assert returned_value.status_code == 400
@@ -1395,6 +1439,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1430,6 +1478,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1467,6 +1519,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1503,6 +1559,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainer._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainer = g.database.get_trainer_by_username('testtrainer')
@@ -1535,6 +1595,10 @@ def test_workout(client):
     returned_value = client.post(f'/workout/{trainee._id}/{database_workout.name}',
                                 data=dict(
                                     completed='true',
+                                    total_time='20',
+                                    reps='10',
+                                    miles='2',
+                                    category='Cardio'
                                 ),
                                 follow_redirects=True)
     trainee = g.database.get_trainee_by_username('testtrainee')
@@ -1619,7 +1683,11 @@ def test_workout_list(client):
             creator_id=trainee._id,
             name="testWorkout",
             difficulty="expert",
-            about="This is an about"
+            about="This is an about",
+            total_time="20",
+            reps="10",
+            miles="2",
+            category="Cardio"
         ))
 
         database_workout = g.database.mongo.workout.find_one({
