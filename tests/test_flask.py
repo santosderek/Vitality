@@ -421,6 +421,11 @@ def test_home(client):
     returned_value = client.get('/', follow_redirects=True)
     assert returned_value.status_code == 200
 
+def test_features(client):
+    """Testing the home page"""
+    returned_value = client.get('/features', follow_redirects=True)
+    assert returned_value.status_code == 200
+
 
 def test_login(client):
     """Testing the login page"""

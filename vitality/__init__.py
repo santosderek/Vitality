@@ -126,6 +126,12 @@ def create_app():
         """The home page of Vitality"""
         app.logger.info('Rendering home')
         return render_template("home.html")
+    
+    @app.route('/features', methods=["GET"])
+    def features():
+        """The features page of Vitality"""
+        app.logger.info('Rendering features page')
+        return render_template("features.html")
 
     """Account Management"""
 
