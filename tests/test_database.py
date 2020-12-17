@@ -548,7 +548,6 @@ class TestDatabase(unittest.TestCase):
 
         workout = self.database.get_workout_by_attributes(_id=str(workout._id))
         assert workout is not None
-        
 
     def test_get_workout_class_by_id(self):
         new_workout = deepcopy(self.test_workout)
@@ -1306,3 +1305,23 @@ class TestDatabase(unittest.TestCase):
         assert ObjectId(trainee._id) not in self.database.mongo.trainer.find_one({
             '_id': ObjectId(trainer._id)
         })['trainees']
+
+    def test_create_event(self):
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        self.mongo.event.delete_many({
+            'title': 'testEvent',
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        self.mongo.event.delete_many({
+            'title': 'testEvent',
+            'creator_id': ObjectId(trainer._id)
+        })
+
+    def test_remove_event(self):
+        assert False
+
+    def test_list_events(self):
+        assert False

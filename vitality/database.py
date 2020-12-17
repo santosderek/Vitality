@@ -2,6 +2,7 @@ from .invitation import Invitation
 from .trainee import Trainee
 from .trainer import Trainer
 from .workout import Workout
+from .event import Event
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 from markupsafe import escape
@@ -430,15 +431,15 @@ class Database:
         If a workout with the passed key value pairs are not found, then we raise a WorkoutNotFound
         error. 
         """
-        if 'creator_id' in kwargs: 
+        if 'creator_id' in kwargs:
             kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
-        if '_id' in kwargs: 
+        if '_id' in kwargs:
             kwargs['_id'] = ObjectId(kwargs['_id'])
-            
+
         found_workout = self.mongo.workout.find_one({**kwargs})
         if found_workout:
             return self.workout_dict_to_class(found_workout)
-        else: 
+        else:
             raise WorkoutNotFound("Workout with key/value pairs not found.")
 
     def get_all_workouts_by_creatorid(self, creator_id: str):
@@ -624,6 +625,29 @@ class Database:
             self.trainer_add_trainee(recipient._id, sender._id)
 
         self.delete_invitation(invitation_id)
+
+    def create_event(self, event: Event):
+        """Creates an event document within the database using a passed Event class."""
+        if event is None:
+            raise EventNotFound("Event is None")
+
+        event_dict = event.as_dict()
+        event_dict.pop('_id')
+        self.mongo.event.insert(**event_dict)
+
+    def remove_event(self, event_id: str):
+        """Removes an Event document based on the event document's id"""
+        self.mongo.event.delete_one({
+            '_id': ObjectId(event_id)
+        })
+
+    def list_events(self):
+        pass
+
+
+class EventNotFound(ValueError):
+    """If a username was taken within the database class"""
+    pass
 
 
 class UsernameTakenError(ValueError):
