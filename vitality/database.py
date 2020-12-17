@@ -4,10 +4,11 @@ from .trainer import Trainer
 from .workout import Workout
 from .event import Event
 from bson.objectid import ObjectId
-from pymongo import MongoClient
+from datetime import datetime
 from markupsafe import escape
-import re
+from pymongo import MongoClient
 import hashlib
+import re
 
 from vitality import workout
 
@@ -635,11 +636,27 @@ class Database:
         event_dict.pop('_id')
         self.mongo.event.insert_one(event_dict)
 
-    def remove_event(self, event_id: str):
+    def delete_event(self, event_id: str, creator_id: str):
         """Removes an Event document based on the event document's id"""
         self.mongo.event.delete_one({
-            '_id': ObjectId(event_id)
+            '_id': ObjectId(event_id),
+            'creator_id': ObjectId(creator_id)
         })
+
+    def get_event_by_attributes(self, **kwargs):
+        if '_id' in kwargs:
+            kwargs['_id'] = ObjectId(kwargs['_id'])
+
+        if 'creator_id' in kwargs:
+            kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
+
+        returned_value = self.mongo.event.find_one(kwargs)
+
+        if returned_value is None: 
+            raise EventNotFound
+        
+        returned_value['date'] = datetime.fromisoformat(returned_value['date'])
+        return Event(**returned_value)
 
     def list_events(self):
         pass

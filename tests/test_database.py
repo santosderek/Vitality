@@ -1368,10 +1368,79 @@ class TestDatabase(unittest.TestCase):
             assert database_event['title'] == event.title
             assert database_event['description'] == event.description
         finally:
-            clean_up(trainer, trainer)
+            clean_up(trainee, trainer)
 
     def test_remove_event(self):
-        assert False
+        def clean_up(trainee, trainer):
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainee._id)
+            })
+
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainer._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        try:
+
+            clean_up(trainee, trainer)
+            event = Event(
+                _id=None,
+                creator_id=ObjectId(trainee._id),
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc'
+            )
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainee._id)
+            })
+            assert database_event['title'] == event.title
+            assert str(database_event['creator_id']) == str(event.creator_id)
+            assert database_event['date'] == str(event.date)
+            assert database_event['title'] == event.title
+            assert database_event['description'] == event.description
+            self.database.delete_event(database_event['_id'], trainee._id)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainee._id)
+            })
+            assert database_event is None
+            event = Event(
+                _id=None,
+                creator_id=ObjectId(trainer._id),
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc'
+            )
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainer._id)
+            })
+            assert database_event['title'] == event.title
+            assert str(database_event['creator_id']) == str(event.creator_id)
+            assert database_event['date'] == str(event.date)
+            assert database_event['title'] == event.title
+            assert database_event['description'] == event.description
+            self.database.delete_event(database_event['_id'], trainer._id)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainer._id)
+            })
+            assert database_event is None
+
+        finally:
+            clean_up(trainee, trainer)
+            
+    def test_get_event_by_attributes(self): 
+        pass
+
 
     def test_list_events(self):
         assert False
