@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row darkbg">
+    <div class="col-sm-12">
+        <h1 class="text-center pt-4" style="color: #47525E; ">
+            Features
+        </h1>
+    </div>
+    <div class="col-sm-12 col-md-4">
+        <img style="border: 4px solid white;" class="w-100" src="{{ url_for('static', filename='images/lunge.jpg' )}}"
+            alt="New Workout Routine">
+        <h3 class="pt-4 text-center">
+            Find Trainers Near You
+        </h3>
+        <p class="text-center">
+            Trainers that are willing to go above and beyond for results that you will see yoursef within a couple of weeks. Workouts that you can feel and know are working. You will be please with your  amazing results.
+        </p>
+    </div>
+    <div class="col-sm-12 col-md-4">
+        <img style="border: 4px solid white;" class="w-100"
+            src="{{ url_for('static', filename='images/pushup.jpg' )}}" alt="Search">
+        <h3 class="pt-4 text-center">
+            Create Workouts
+        </h3>
+        <p class="text-center">
+            Create amazing workouts that are personalize just for you. If you want to bulk up or slim down it's on you, you are in control with how hard you want it for that day or maybe have a lite day the ball is in your court.
+        </p>
+    </div>
+    <div class="col-sm-12 col-md-4">
+        <img style="border: 4px solid white;" class="w-100"
+            src="{{ url_for('static', filename='images/equipment.jpg') }}" alt="Workout List">
+        <h3 class="pt-4 text-center">
+            Get Workouts Recommendations
+        </h3>
+        <p class="text-center">
+            The workouts you choose to do will show off the prefect physique, man or woman you will be at your best ultimate shape ever. You will be amazed at the compliments that you will get from friends and family.
+        </p>
+    </div>
+</div>
+
+{% endblock %}
