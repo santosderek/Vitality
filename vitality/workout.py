@@ -5,7 +5,7 @@ DEFAULT_INSANE_EXP = 5000
 
 
 class Workout:
-    def __init__(self, _id: str, creator_id: str, name: str, difficulty: str = "easy", about: str = None, is_complete: bool = False):
+    def __init__(self, _id: str, creator_id: str, name: str, difficulty: str = "easy", about: str = None, is_complete: bool = False, total_time: str = None, reps: str = None, miles: str = None, category: str = None):
         """Constructor for Workout class."""
         self._id = _id
         self.creator_id = creator_id
@@ -13,10 +13,14 @@ class Workout:
         self.difficulty = difficulty
         self.about = about
         self.is_complete = is_complete
+        self.total_time = total_time
+        self.reps = reps
+        self.miles = miles
+        self.category = category
 
     def __repr__(self):
         """Returns all attributes of the Workout class as a dictionary."""
-        return f'Workout({self._id}, {self.creator_id}, {self.name}, {self.difficulty}, {self.about}, {self.is_complete})'
+        return f'Workout({self._id}, {self.creator_id}, {self.name}, {self.difficulty}, {self.about}, {self.is_complete},{self.total_time}, {self.reps}, {self.miles}, {self.category})'
 
     def as_dict(self):
         """Returns all attributes of the Workout class as a dictionary."""
