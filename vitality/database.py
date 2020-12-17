@@ -633,7 +633,7 @@ class Database:
 
         event_dict = event.as_dict()
         event_dict.pop('_id')
-        self.mongo.event.insert(**event_dict)
+        self.mongo.event.insert_one(event_dict)
 
     def remove_event(self, event_id: str):
         """Removes an Event document based on the event document's id"""

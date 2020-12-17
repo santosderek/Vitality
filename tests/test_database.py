@@ -1,12 +1,12 @@
-from tests import test_trainee
-import unittest
-from copy import deepcopy
 from bson.objectid import ObjectId
+from copy import deepcopy
+from datetime import datetime
 from vitality.database import *
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
 from vitality.settings import MONGO_URI
+import unittest
 
 
 class TestDatabase(unittest.TestCase):
@@ -1307,24 +1307,46 @@ class TestDatabase(unittest.TestCase):
         })['trainees']
 
     def test_create_event(self):
+        """Tests the creation of an event within the database"""
+        def clean_up(trainee, trainer):
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainee._id)
+            })
+
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainer._id)
+            })
+
         trainee = self.database.get_trainee_by_username('testtrainee')
         trainer = self.database.get_trainer_by_username('testtrainer')
 
-        self.mongo.event.delete_many({
-            'title': 'testEvent',
-            'creator_id': ObjectId(trainee._id)
-        })
+        try:
 
-        self.mongo.event.delete_many({
-            'title': 'testEvent',
-            'creator_id': ObjectId(trainer._id)
-        })
+            clean_up(trainee, trainer)
 
-        event = Event(
-            '_id' = None,
-            'creator_id': Object(trainee._id),
-            'date': datetime()
-        )
+            event = Event(
+                _id=None,
+                creator_id=ObjectId(trainee._id),
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc'
+            )
+
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainee._id)
+            })
+
+            assert database_event['title'] == event.title
+            assert str(database_event['creator_id']) == str(event.creator_id)
+            assert database_event['date'] == str(event.date)
+            assert database_event['title'] == event.title
+            assert database_event['description'] == event.description
+        finally:
+            clean_up(trainee, trainer)
 
     def test_remove_event(self):
         assert False
