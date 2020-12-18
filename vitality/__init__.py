@@ -687,7 +687,7 @@ def create_app():
                 return render_template("workout/new_workout.html", invalid_creatorid=True)
         return render_template("workout/new_workout.html")
 
-    @app.route('/search_workout', methods=["GET"])
+    @app.route('/search_workout', methods=["GET", "POST"])
     def search_workout():
         """Page to search for a workout"""
         if not g.user:
@@ -695,12 +695,27 @@ def create_app():
         default_vitality_user = g.database.get_trainer_by_username("vitality")
         default_workouts = g.database.get_all_workouts_by_creatorid(
             default_vitality_user._id)
-        return render_template("workout/search.html",
-                               default_workouts=default_workouts,
-                               default_easy_exp=DEFAULT_EASY_EXP,
-                               default_hard_exp=DEFAULT_HARD_EXP,
-                               default_medium_exp=DEFAULT_MEDIUM_EXP,
-                               default_insane_exp=DEFAULT_INSANE_EXP)
+        if request.method == "POST":
+            name = escape(request.form["name"])
+            workouts = g.database.get_all_workout_by_attributes(
+                name = {
+                    '$regex': r'(.+)?{}(.+)?'.format(name)
+                }
+            )
+
+            return render_template("workout/search.html", 
+            default_workouts=default_workouts,
+            default_easy_exp=DEFAULT_EASY_EXP,
+            default_hard_exp=DEFAULT_HARD_EXP,
+            default_medium_exp=DEFAULT_MEDIUM_EXP,
+            default_insane_exp=DEFAULT_INSANE_EXP,
+            workouts=workouts)
+        return render_template("workout/search.html", 
+        default_workouts=default_workouts,
+        default_easy_exp=DEFAULT_EASY_EXP,
+        default_hard_exp=DEFAULT_HARD_EXP,
+        default_medium_exp=DEFAULT_MEDIUM_EXP,
+        default_insane_exp=DEFAULT_INSANE_EXP)
 
     @app.route('/workout/<creator_id>/<workout_name>', methods=["GET", "POST"])
     def workout(creator_id: str, workout_name: str):

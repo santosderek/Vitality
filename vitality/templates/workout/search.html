@@ -46,10 +46,24 @@
 </div>
 <div class="row darkbg">
     <div class="col text-center">
-        <form action="search.html">
-            <input type="text" placeholder="Search.." name="search">
+        <form action="{{url_for('search_workout')}}" method="POST">
+            <input type="text" placeholder="Search.." name="name">
             <button type="submit"><i class="material-icons">search</i></button>
         </form>
     </div>
+    {%for workout in workouts%}
+    <div class="col-sm-12 card">
+        <p>
+            Name: {{workout.name}}
+        </p>
+        <p>
+            About: {{workout.about}}
+        </p>
+        <p>
+            Difficulty: {{workout.difficulty}}
+        </p>
+        <a class="button_title" href="{{url_for('workout', creator_id=workout.creator_id, workout_name=workout.name)}}">View</a>
+    </div>
+    {%endfor%}
 </div>
 {% endblock %}
