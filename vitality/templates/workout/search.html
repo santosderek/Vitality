@@ -51,6 +51,11 @@
             <button type="submit"><i class="material-icons">search</i></button>
         </form>
     </div>
+    {% if workouts|length == 0 %}
+    <div class="col-sm-12 text-center">
+        <h3>Search for a workout!</h3>
+    </div>
+    {% endif %}
     {%for workout in workouts%}
     <div class="col-sm-12 card">
         <p>
