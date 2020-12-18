@@ -19,7 +19,6 @@ class TestDatabase(unittest.TestCase):
         username="testtrainee",
         password="password",
         name="first last",
-        location="Earth",
         phone=1234567890,
         trainers=[])
 
@@ -29,7 +28,6 @@ class TestDatabase(unittest.TestCase):
         username="testtrainer",
         password="password",
         name="first last",
-        location="mars",
         phone=1234567890,
         trainees=[])
 

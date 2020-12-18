@@ -2,13 +2,10 @@
 
 {% block content %}
 
-    <div>
+    <div class="row">
         <h1>Find Trainers Near You</h1>
-        <form id="trainerSearch" action="/nearby_trainers" method="POST" >
-            <input type="hidden" id="lat" name="lat" value="{{g.user.lat}}">
-            <input type="hidden" id="lng" name="lng" value="{{g.user.lng}}">
-            <button type="submit" onclick="search()">
-        </form>
+        <input type="hidden" id="lat" name="lat" value="{{g.user.lat}}">
+        <input type="hidden" id="lng" name="lng" value="{{g.user.lng}}">
         <br>
     </div>
 

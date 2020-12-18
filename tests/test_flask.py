@@ -15,7 +15,6 @@ test_trainee = Trainee(
     username="testtrainee",
     password="password",
     name="first last",
-    location="Earth",
     phone=1234567890
 )
 
@@ -24,7 +23,6 @@ test_trainer = Trainer(
     username="testtrainer",
     password="password",
     name="first last",
-    location="Earth",
     phone=1234567890
 )
 
