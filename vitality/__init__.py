@@ -33,7 +33,7 @@ from flask import (
 )
 from markupsafe import escape
 import re
-from .settings import SECRET_KEY, MONGO_URI
+from .settings import SECRET_KEY, MONGO_URI, GOOGLE_MAPS_KEY
 import json
 from datetime import datetime
 from bson.errors import InvalidId
@@ -116,6 +116,8 @@ def create_app():
         """Actions to take before each request"""
         if 'database' not in g:
             g.database = Database(MONGO_URI)
+
+        g.google_maps_key = GOOGLE_MAPS_KEY
 
         g.user = None
         if 'user_id' in session:
@@ -325,7 +327,7 @@ def create_app():
                         g.database.set_trainer_phone(g.user._id, phone)
                     if name:
                         g.database.set_trainer_name(g.user._id, name)
-                    
+
                     if lng and lat:
                         g.database.set_coords(g.user._id, lng, lat)
 
@@ -569,7 +571,7 @@ def create_app():
 
         if type(g.user) is not Trainee:
             abort(403)
-    
+
         lat = float(g.user.lat)
         lng = float(g.user.lng)
         trainers = g.database.find_trainers_near_user(lng, lat)
@@ -874,9 +876,9 @@ def create_app():
             for trainer_id in g.user.trainers:
                 trainer = g.database.get_trainer_by_id(trainer_id)
                 list_of_added.append(trainer)
-        
+
         if request.method == 'POST':
-            try: 
+            try:
                 title = escape(request.form['title'])
                 description = escape(request.form['description'])
                 date = escape(request.form['date'])
@@ -887,22 +889,22 @@ def create_app():
                 hour, minute = time.split(':')
 
                 converted_datetime = datetime(int(year),
-                                            int(month),
-                                            int(day),
-                                            int(hour),
-                                            int(minute))
+                                              int(month),
+                                              int(day),
+                                              int(hour),
+                                              int(minute))
                 event = Event(_id=None,
-                            title=title,
-                            description=description,
-                            creator_id=g.user._id,
-                            participant_id=participant_id,
-                            date=converted_datetime)
+                              title=title,
+                              description=description,
+                              creator_id=g.user._id,
+                              participant_id=participant_id,
+                              date=converted_datetime)
 
                 g.database.create_event(event)
 
                 return render_template("user/add_event.html", list_of_added=list_of_added, success=True)
 
-            except InvalidId: 
+            except InvalidId:
                 return render_template("user/add_event.html", list_of_added=list_of_added, invalid_participant=True)
 
         return render_template("user/add_event.html", list_of_added=list_of_added)

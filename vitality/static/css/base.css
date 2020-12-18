@@ -37,6 +37,10 @@ button:hover, .button_title:hover, .card button {
     text-decoration: none;
 }
 
+.gm-style-iw-d {
+    color: #3f6499;
+}
+
 .row {
     margin: auto;
 }
