@@ -19,7 +19,6 @@ test_trainee = Trainee(
     username="testtrainee",
     password="password",
     name="first last",
-    location="Earth",
     phone=1234567890
 )
 
@@ -28,7 +27,6 @@ test_trainer = Trainer(
     username="testtrainer",
     password="password",
     name="first last",
-    location="Earth",
     phone=1234567890
 )
 
@@ -130,7 +128,6 @@ def test_failed_signup_username(client):
         password="password",
         name="test",
         repassword="password",
-        location="USA",
         phone="12345678",
         usertype="trainee"
     ), follow_redirects=True)
@@ -146,7 +143,6 @@ def test_failed_signup_username_uppercase(client):
         password="password",
         name="test",
         repassword="password",
-        location="USA",
         phone="12345678",
         usertype="trainee"
     ), follow_redirects=True)
@@ -162,7 +158,6 @@ def test_failed_signup_password(client):
         password="password^#$^%^",
         name="test",
         repassword="password",
-        location="USA",
         phone="12345678",
         usertype="trainee"
     ), follow_redirects=True)
@@ -178,7 +173,6 @@ def test_failed_signup_name(client):
         password="password",
         name="1245667*#",
         repassword="password",
-        location="USA",
         phone="12345678",
         usertype="trainee"
     ), follow_redirects=True)
@@ -194,23 +188,6 @@ def test_failed_signup_repassword(client):
         password="password",
         name="test",
         repassword="password^#$^%",
-        location="USA",
-        phone="12345678",
-        usertype="trainee"
-    ), follow_redirects=True)
-    assert returned_value.status_code == 400
-    assert b'Invalid characters found' in returned_value.data
-    assert g.user is None
-
-
-def test_failed_signup_location(client):
-    # Testing the failed signup page
-    returned_value = client.post('/signup', data=dict(
-        username="testtrainee",
-        password="password",
-        name="test",
-        repassword="password",
-        location="1234567^&$",
         phone="12345678",
         usertype="trainee"
     ), follow_redirects=True)
@@ -226,7 +203,6 @@ def test_failed_signup_phone(client):
         password="password",
         name="test",
         repassword="password",
-        location="USA",
         phone="phone",
         usertype="trainee"
     ), follow_redirects=True)
@@ -242,7 +218,6 @@ def test_failed_signup_usertype(client):
         password="password",
         name="test",
         repassword="password",
-        location="USA",
         phone="12345678",
         usertype="117"
     ), follow_redirects=True)
@@ -268,7 +243,6 @@ def test_failed_usersettings_username(client):
         password="password",
         name="test",
         repassword="password",
-        location="USA",
         phone="12345678",
     ), follow_redirects=True)
     assert returned_value.status_code == 400
@@ -292,7 +266,6 @@ def test_failed_usersettings_username_uppercase(client):
         password="password",
         name="test",
         repassword="password",
-        location="USA",
         phone="12345678",
     ), follow_redirects=True)
     assert returned_value.status_code == 400
@@ -316,7 +289,6 @@ def test_failed_usersettings_password(client):
         password="password^#$^%^",
         name="test",
         repassword="password",
-        location="USA",
         phone="12345678",
     ), follow_redirects=True)
     assert returned_value.status_code == 400
@@ -340,7 +312,6 @@ def test_failed_usersettings_repassword(client):
         password="password",
         name="test",
         repassword="password^#$^%^",
-        location="USA",
         phone="12345678",
     ), follow_redirects=True)
     assert returned_value.status_code == 400
@@ -364,14 +335,13 @@ def test_failed_usersettings_name(client):
         password="password",
         name="117",
         repassword="password",
-        location="USA",
         phone="12345678",
     ), follow_redirects=True)
     assert returned_value.status_code == 400
     assert b'Invalid characters found' in returned_value.data
 
 
-def test_failed_usersettings_location(client):
+"""def test_failed_usersettings_location(client):
     # Testing the failed user settings page
     # Get without a user
 
@@ -388,11 +358,10 @@ def test_failed_usersettings_location(client):
         password="password",
         name="test",
         repassword="password",
-        location="&^$^$123",
         phone="12345678",
     ), follow_redirects=True)
     assert returned_value.status_code == 400
-    assert b'Invalid characters found' in returned_value.data
+    assert b'Invalid characters found' in returned_value.data"""
 
 
 def test_failed_usersettings_phone(client):
@@ -412,7 +381,6 @@ def test_failed_usersettings_phone(client):
         password="password",
         name="test",
         repassword="password",
-        location="USA",
         phone="phone",
     ), follow_redirects=True)
     assert returned_value.status_code == 400
@@ -475,9 +443,10 @@ def test_signup(client):
         password="password",
         repassword="repassword",
         name="first last",
-        location="Earth",
         phone=1234567890,
-        usertype="trainee"
+        usertype="trainee",
+        lng=0,
+        lat=0
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Account was created!' not in returned_value.data
@@ -491,9 +460,10 @@ def test_signup(client):
         password="password",
         repassword="password",
         name="first last",
-        location="Earth",
         phone=1234567890,
-        usertype="notausertype"
+        usertype="notausertype",
+        lng=0,
+        lat=0
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Account was created!' not in returned_value.data
@@ -507,9 +477,10 @@ def test_signup(client):
         password="password",
         repassword="password",
         name="first last",
-        location="Earth",
         phone=1234567890,
-        usertype="trainee"
+        usertype="trainee",
+        lng=0,
+        lat=0
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Account was created!' not in returned_value.data
@@ -528,9 +499,10 @@ def test_signup(client):
         password="password",
         repassword="password",
         name="first last",
-        location="Earth",
         phone=1234567890,
-        usertype="trainee"
+        usertype="trainee",
+        lng=0,
+        lat=0
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Account was created!' in returned_value.data
@@ -546,9 +518,10 @@ def test_signup(client):
         password="password",
         repassword="password",
         name="first last",
-        location="Earth",
         phone=1234567890,
-        usertype="trainer"
+        usertype="trainer",
+        lng=0,
+        lat=0
     ), follow_redirects=True)
     assert returned_value.status_code == 200
     assert b'Account was created!' in returned_value.data
@@ -581,8 +554,6 @@ def test_profile(client):
                  'utf-8') in returned_value.data
     assert bytes('Phone: {}'.format(trainee.phone),
                  'utf-8') in returned_value.data
-    assert bytes('Location: {}'.format(trainee.location),
-                 'utf-8') in returned_value.data
     assert b'login' not in returned_value.data
 
     # Login
@@ -596,8 +567,6 @@ def test_profile(client):
     assert bytes('Name: {}'.format(trainer.name),
                  'utf-8') in returned_value.data
     assert bytes('Phone: {}'.format(trainer.phone),
-                 'utf-8') in returned_value.data
-    assert bytes('Location: {}'.format(trainer.location),
                  'utf-8') in returned_value.data
     assert b'login' not in returned_value.data
 
@@ -621,8 +590,9 @@ def test_usersettings(client):
         password="newpassword",
         repassword="newpassword",
         name="another",
-        location="Venus",
-        phone="0987654321"
+        phone="0987654321",
+        lng=0,
+        lat=0
     ), follow_redirects=True)
     assert returned_value.status_code == 200
 
@@ -633,7 +603,6 @@ def test_usersettings(client):
     assert database_user.username == 'testtrainee'
     assert database_user.password == password_sha256('newpassword')
     assert database_user.name == 'another'
-    assert database_user.location == 'Venus'
     assert database_user.phone == '0987654321'
 
     # Login as trainer
@@ -648,8 +617,9 @@ def test_usersettings(client):
         password="newpassword",
         repassword="newpassword",
         name="another",
-        location="Venus",
-        phone="0987654321"
+        phone="0987654321",
+        lng=0,
+        lat=0
     ), follow_redirects=True)
     assert returned_value.status_code == 200
 
@@ -660,7 +630,6 @@ def test_usersettings(client):
     assert database_user.username == 'testtrainer'
     assert database_user.password == password_sha256('newpassword')
     assert database_user.name == 'another'
-    assert database_user.location == 'Venus'
     assert database_user.phone == '0987654321'
 
     # Checking alphaPattern
@@ -672,7 +641,6 @@ def test_usersettings(client):
             password=trainer.password,
             repassword=trainer.password,
             name=trainer.name,
-            location=trainer.location,
             phone=trainer.phone
         ), follow_redirects=True)
         assert returned_value.status_code == 400
@@ -685,7 +653,6 @@ def test_usersettings(client):
             password=trainer.password,
             repassword=trainer.password,
             name=trainer.name,
-            location=trainer.location,
             phone=trainer.phone
         ), follow_redirects=True)
         assert returned_value.status_code == 400
@@ -698,7 +665,6 @@ def test_usersettings(client):
             password=trainer.password,
             repassword=repassword,
             name=trainer.name,
-            location=trainer.location,
             phone=trainer.phone
         ), follow_redirects=True)
         assert returned_value.status_code == 400
@@ -711,20 +677,17 @@ def test_usersettings(client):
             password=trainer.password,
             repassword=repassword,
             name=trainer.name,
-            location=trainer.location,
             phone=trainer.phone
         ), follow_redirects=True)
         assert returned_value.status_code == 400
 
     for character in '!@#$%^&*()_+\\<>.':
         trainer = g.database.get_trainer_by_username("testtrainer")
-        trainer.location = f"abc{character}"
         returned_value = client.post('/usersettings', data=dict(
             username=trainer.username,
             password=trainer.password,
             repassword=repassword,
             name=trainer.name,
-            location=trainer.location,
             phone=trainer.phone
         ), follow_redirects=True)
         assert returned_value.status_code == 400
@@ -737,7 +700,6 @@ def test_usersettings(client):
             password=trainer.password,
             repassword=repassword,
             name=trainer.name,
-            location=trainer.location,
             phone=trainer.phone
         ), follow_redirects=True)
         assert returned_value.status_code == 400

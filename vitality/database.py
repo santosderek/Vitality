@@ -21,6 +21,8 @@ class Database:
     def __init__(self, uri):
         """Constructor for Database class."""
         self.mongo = MongoClient(uri)['flaskDatabase']
+        self.mongo.trainee.create_index([('location', "2dsphere")], name='trainee_search_index', default_language='english')
+        self.mongo.trainer.create_index([('location', "2dsphere")], name='trainer_search_index', default_language='english')
 
     """ Trainee Functions """
 
@@ -29,6 +31,10 @@ class Database:
         trainee_dict['_id'] = str(trainee_dict['_id'])
         trainee_dict['trainers'] = [str(trainer_id)
                                     for trainer_id in trainee_dict['trainers']]
+        if 'location' in trainee_dict:
+            trainee_dict['lng'] = trainee_dict['location']['coordinates'][0]
+            trainee_dict['lat'] = trainee_dict['location']['coordinates'][1]
+            trainee_dict.pop("location")
         # WARNING: Removed converting trainers to classes due to unintended recursion
         return Trainee(**trainee_dict)
 
@@ -83,16 +89,6 @@ class Database:
                 }
             })
 
-    def set_trainee_location(self, id: str, location: str):
-        """Updates a trainee's location given a user id."""
-        self.mongo.trainee.update_one(
-            {"_id": ObjectId(id)},
-            {
-                "$set": {
-                    "location": location
-                }
-            })
-
     def set_trainee_phone(self, id: str, phone: int):
         """Updates a trainee's phone number given a user id."""
         self.mongo.trainee.update_one(
@@ -112,6 +108,34 @@ class Database:
                     "name": name
                 }
             })
+
+    def set_coords(self, id: str, lng: float, lat: float):
+        """Updates a user's coordinates """
+        if self.get_trainer_by_id(id) is None:
+            self.mongo.trainee.update_one(
+                {"_id": ObjectId(id)},
+                {
+                    "$set": {
+                        "location": {
+                            "type": "Point",
+                            "coordinates": [lng, lat]
+                        }
+                    }
+                }
+            )
+
+        if self.get_trainee_by_id(id) is None:
+            self.mongo.trainer.update_one(
+                {"_id": ObjectId(id)},
+                {
+                    "$set": {
+                        "location": {
+                            "type": "Point",
+                            "coordinates": [lng, lat]
+                        }
+                    }
+                }
+            )
 
     def trainee_add_trainer(self, trainee_id: str, trainer_id: str):
         """Add trainer object id to trainee's trainer list"""
@@ -140,6 +164,15 @@ class Database:
         trainee_dict = trainee.as_dict()
         trainee_dict.pop('_id', None)
         trainee_dict['password'] = password_sha256(trainee.password)
+        trainee_dict['location'] = {
+            'type': 'Point',
+            'coordinates': [
+                trainee_dict['lng'],
+                trainee_dict['lat']
+            ]
+        }
+        trainee_dict.pop('lat')
+        trainee_dict.pop('lng')
         self.mongo.trainee.insert_one(trainee_dict)
 
     def add_trainee_experience(self, trainee_id: str, value: int):
@@ -200,6 +233,10 @@ class Database:
         trainer_dict['_id'] = str(trainer_dict['_id'])
         trainer_dict['trainees'] = [str(trainee_id)
                                     for trainee_id in trainer_dict['trainees']]
+        if 'location' in trainer_dict: 
+            trainer_dict['lng'] = trainer_dict['location']['coordinates'][0]
+            trainer_dict['lat'] = trainer_dict['location']['coordinates'][1]
+            trainer_dict.pop("location")
         # WARNING: Removed converting trainees to classes due to unintended recursion
         return Trainer(**trainer_dict)
 
@@ -281,6 +318,28 @@ class Database:
 
         return trainees
 
+    def find_trainers_near_user(self, lng, lat, min=0, max=10000000000):
+        """Return a list of trainers based on the user's location"""
+        returned_list = self.mongo.trainer.find({
+            'location': {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [float(lng), float(lat)]
+                    },
+                    "$maxDistance": max,
+                    "$minDistance": min
+                }
+            }
+        })
+
+        trainer_list = []
+        for trainer in returned_list:
+            trainer_object = self.trainer_dict_to_class(trainer)
+            trainer_list.append(trainer_object)
+        
+        return trainer_list
+
     def set_trainer_username(self, id: str, username: str):
         """Updates a trainer's username given a trainer id."""
         self.mongo.trainer.update_one(
@@ -298,16 +357,6 @@ class Database:
             {
                 "$set": {
                     "password": password_sha256(password)
-                }
-            })
-
-    def set_trainer_location(self, id: str, location: str):
-        """Updates a trainer's location given a trainer id."""
-        self.mongo.trainer.update_one(
-            {"_id": ObjectId(id)},
-            {
-                "$set": {
-                    "location": location
                 }
             })
 
@@ -379,6 +428,15 @@ class Database:
         trainer_dict = trainer.as_dict()
         trainer_dict.pop('_id', None)
         trainer_dict['password'] = password_sha256(trainer.password)
+        trainer_dict['location'] = {
+            'type': 'Point',
+            'coordinates': [
+                trainer_dict['lng'],
+                trainer_dict['lat']
+            ]
+        }
+        trainer_dict.pop('lng')
+        trainer_dict.pop('lat')
         self.mongo.trainer.insert_one(trainer_dict)
 
     def add_trainer_experience(self, trainer_id: str, value: int):

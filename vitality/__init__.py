@@ -33,6 +33,8 @@ from flask import (
 )
 from markupsafe import escape
 import re
+from .settings import SECRET_KEY, MONGO_URI
+import json
 from datetime import datetime
 from bson.errors import InvalidId
 
@@ -202,10 +204,6 @@ def create_app():
                 if not alphaPattern.search(re_password):
                     raise InvalidCharactersException("Invalid characters")
 
-                location = escape(request.form['location'])
-                if not alphaPattern.search(location):
-                    raise InvalidCharactersException("Invalid characters")
-
                 phone = escape(request.form['phone'])
                 if not numberPattern.search(phone):
                     raise InvalidCharactersException("Invalid characters")
@@ -213,6 +211,10 @@ def create_app():
                 usertype = escape(request.form['usertype'])
                 if not stringPattern.search(usertype):
                     raise InvalidCharactersException("Invalid characters")
+
+                lat = float(escape(request.form['lat']))
+
+                lng = float(escape(request.form['lng']))
 
                 if username and password == re_password:
                     try:
@@ -223,9 +225,10 @@ def create_app():
                                 username=username,
                                 password=password,
                                 name=name,
-                                location=location,
                                 phone=phone,
-                                exp=0)
+                                exp=0,
+                                lng=lng,
+                                lat=lat)
 
                             g.database.add_trainee(new_user)
 
@@ -235,9 +238,10 @@ def create_app():
                                 username=username,
                                 password=password,
                                 name=name,
-                                location=location,
                                 phone=phone,
-                                exp=0)
+                                exp=0,
+                                lng=lng,
+                                lat=lat)
 
                             g.database.add_trainer(new_user)
 
@@ -291,24 +295,25 @@ def create_app():
                 re_password = escape(request.form['repassword'])
                 if not alphaPattern.search(re_password):
                     raise InvalidCharactersException("Invalid characters")
-                location = escape(request.form['location'])
-                if not alphaPattern.search(location):
-                    raise InvalidCharactersException("Invalid characters")
                 phone = escape(request.form['phone'])
                 if not numberPattern.search(phone):
                     raise InvalidCharactersException("Invalid characters")
+                lat = float(escape(request.form['lat']))
+                lng = float(escape(request.form['lng']))
 
                 if g.database.get_trainee_by_id(g.user._id) is not None:
                     if username:
                         g.database.set_trainee_username(g.user._id, username)
                     if password and re_password and password == re_password:
                         g.database.set_trainee_password(g.user._id, password)
-                    if location:
-                        g.database.set_trainee_location(g.user._id, location)
                     if phone:
                         g.database.set_trainee_phone(g.user._id, phone)
                     if name:
                         g.database.set_trainee_name(g.user._id, name)
+
+                    if lng and lat:
+                        g.database.set_coords(g.user._id, lng, lat)
+
                     return redirect(url_for('usersettings'))
 
                 elif g.database.get_trainer_by_id(g.user._id) is not None:
@@ -316,12 +321,14 @@ def create_app():
                         g.database.set_trainer_username(g.user._id, username)
                     if password and re_password and password == re_password:
                         g.database.set_trainer_password(g.user._id, password)
-                    if location:
-                        g.database.set_trainer_location(g.user._id, location)
                     if phone:
                         g.database.set_trainer_phone(g.user._id, phone)
                     if name:
                         g.database.set_trainer_name(g.user._id, name)
+                    
+                    if lng and lat:
+                        g.database.set_coords(g.user._id, lng, lat)
+
                     return redirect(url_for('usersettings'))
 
             except InvalidCharactersException as e:
@@ -552,6 +559,31 @@ def create_app():
                                    trainer_id_list=g.user.trainers)
 
         return render_template("trainee/trainer_search.html")
+
+    @app.route('/nearby_trainers', methods=["GET", "POST"])
+    def nearby_trainers():
+        """Page for trainees to see nearby trainers on a map"""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user')
+            return redirect(url_for('login'))
+
+        if type(g.user) is not Trainee:
+            abort(403)
+    
+        lat = float(g.user.lat)
+        lng = float(g.user.lng)
+        trainers = g.database.find_trainers_near_user(lng, lat)
+        json_trainers = []
+
+        for trainer in trainers:
+            json_trainer = {
+                'username': trainer.username,
+                'lng': trainer.lng,
+                'lat': trainer.lat
+            }
+            json_trainers.append(json_trainer)
+
+        return render_template("trainee/nearby_trainers.html", json_trainers=json_trainers)
 
     @app.route('/trainee_search', methods=["GET", "POST"])
     def trainee_search():
