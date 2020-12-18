@@ -7,7 +7,7 @@
         <form id="trainerSearch" action="/nearby_trainers" method="POST" >
             <input type="hidden" id="lat" name="lat" value="{{g.user.lat}}">
             <input type="hidden" id="lng" name="lng" value="{{g.user.lng}}">
-            <input type="submit" value="Search">
+            <button type="submit" onclick="search()">
         </form>
         <br>
     </div>

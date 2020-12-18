@@ -7,36 +7,26 @@
 
 <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO-g-4D9U2--jzyTPvNwOlsd_zu56ebdo&callback=initMap&libraries=places&v=weekly"
-  defer
-></script>
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO-g-4D9U2--jzyTPvNwOlsd_zu56ebdo&callback=initMap&libraries=places&v=weekly"
+    defer></script>
 
 <div id="map"></div>
 
 <script>
-    window.addEventListener('load', function(){
-        $("#trainerSearch").submit(function(event){
-            console.log("sending request");
-            event.preventDefault();
-            $.ajax({
-            type: "POST",
-            url: "{{ url_for("nearby_trainers") }}",
-            data: {
-                'lat': {{g.user.lat}},
-                'lng': {{g.user.lng}}
-            },
-            dataType: "json",
-            success: function(data) {
-                console.log("creating markers");
+    function search() {
+        event.preventDefault();
+        console.log("creating markers");
                 var markers = [];
                 var infowindows = [];
                 var latlng;
                 var i;
+                data = {{ json_trainers | tojson }};
                 console.log(data);
 
-                for(i = 0; i < data.length; i++){
+                for (i = 0; i < data.length; i++) {
                     console.log("creating one marker");
-                    latlng = new google.maps.LatLng(float(data[i].lat), float(data[i].lng));
+                    console.log(data[i].lat, data[i].lng, data[i].username)
+                    latlng = new google.maps.LatLng(data[i].lat, data[i].lng);
                     markers[i] = new google.maps.Marker({
                         map,
                         anchorPoint: new google.maps.Point(0, -29),
@@ -48,19 +38,13 @@
                         infowindows[i].open(map, marker);
                     });
                 }
-            },
-            error: function() {
-                $("#map").innerHTML = "Error: Map could not be displayed";
-            }
-        });
-    });
-});
-    
+        }
+
     function initMap() {
         var userLat = parseFloat($("#lat").val());
         var userLng = parseFloat($("#lng").val());
-        
-        if((userLng == null || userLat == null)) {
+
+        if ((userLng == null || userLat == null)) {
             userLat = 35.2270869;
             userLng = -80.8431267;
         }
@@ -69,7 +53,7 @@
             center: { lat: userLat, lng: userLng },
             zoom: 12,
         });
-        
+
         const infowindow = new google.maps.InfoWindow();
         infowindow.setContent("Your location");
         const marker = new google.maps.Marker({

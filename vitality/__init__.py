@@ -24,6 +24,8 @@ from flask import (
 from markupsafe import escape
 import re
 from .settings import SECRET_KEY, MONGO_URI
+import json
+
 
 def create_app():
     """Application factory for our flask web server"""
@@ -522,8 +524,8 @@ def create_app():
             abort(403)
 
         if(request.method == "POST"):
-            lat = float(escape(request.form['lng']))
-            lng = float(escape(request.form['lat']))
+            lat = float(escape(request.form['lat']))
+            lng = float(escape(request.form['lng']))
 
             trainers = g.database.find_trainers_near_user(lng, lat)
 
@@ -538,9 +540,21 @@ def create_app():
                 json_trainers.append(json_trainer)
         
             return str(json_trainers), 200
-        
+    
+        lat = float(g.user.lat)
+        lng = float(g.user.lng)
+        trainers = g.database.find_trainers_near_user(lng, lat)
+        json_trainers = []
 
-        return render_template("trainee/nearby_trainers.html")
+        for trainer in trainers:
+            json_trainer = {
+                'username': trainer.username,
+                'lng': trainer.lng,
+                'lat': trainer.lat
+            }
+            json_trainers.append(json_trainer)
+
+        return render_template("trainee/nearby_trainers.html", json_trainers=json_trainers)
 
     @app.route('/trainee_search', methods=["GET", "POST"])
     def trainee_search():
