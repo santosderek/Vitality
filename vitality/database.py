@@ -2,11 +2,13 @@ from .invitation import Invitation
 from .trainee import Trainee
 from .trainer import Trainer
 from .workout import Workout
+from .event import Event
 from bson.objectid import ObjectId
-from pymongo import MongoClient
+from datetime import datetime
 from markupsafe import escape
-import re
+from pymongo import MongoClient
 import hashlib
+import re
 
 from vitality import workout
 
@@ -488,15 +490,15 @@ class Database:
         If a workout with the passed key value pairs are not found, then we raise a WorkoutNotFound
         error. 
         """
-        if 'creator_id' in kwargs: 
+        if 'creator_id' in kwargs:
             kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
-        if '_id' in kwargs: 
+        if '_id' in kwargs:
             kwargs['_id'] = ObjectId(kwargs['_id'])
-            
+
         found_workout = self.mongo.workout.find_one({**kwargs})
         if found_workout:
             return self.workout_dict_to_class(found_workout)
-        else: 
+        else:
             raise WorkoutNotFound("Workout with key/value pairs not found.")
 
     def get_all_workouts_by_creatorid(self, creator_id: str):
@@ -734,6 +736,83 @@ class Database:
             self.trainer_add_trainee(recipient._id, sender._id)
 
         self.delete_invitation(invitation_id)
+
+    def create_event(self, event: Event):
+        """Creates an event document within the database using a passed Event class."""
+        if event is None:
+            raise EventNotFound("Event is None")
+
+        event_dict = event.as_dict()
+        event_dict.pop('_id')
+        event_dict['creator_id'] = ObjectId(event_dict['creator_id'])
+        event_dict['participant_id'] = ObjectId(event_dict['participant_id'])
+        self.mongo.event.insert_one(event_dict)
+
+    def delete_event(self, event_id: str, creator_id: str):
+        """Removes an Event document based on the event document's id"""
+        self.mongo.event.delete_one({
+            '_id': ObjectId(event_id),
+            'creator_id': ObjectId(creator_id)
+        })
+
+    def get_event_by_attributes(self, **kwargs):
+        if '_id' in kwargs:
+            kwargs['_id'] = ObjectId(kwargs['_id'])
+
+        if 'creator_id' in kwargs:
+            kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
+        
+        if 'participant_id' in kwargs:
+            kwargs['participant_id'] = ObjectId(kwargs['participant_id'])
+
+        if 'date' in kwargs:
+            kwargs['date'] = str(kwargs['date'])
+
+        returned_value = self.mongo.event.find_one(kwargs)
+
+        if returned_value is None:
+            raise EventNotFound
+
+        returned_value['date'] = datetime.fromisoformat(returned_value['date'])
+        returned_value['_id'] = str(returned_value['_id'])
+        returned_value['creator_id'] = str(returned_value['creator_id'])
+        returned_value['participant_id'] = str(returned_value['participant_id'])
+        return Event(**returned_value)
+
+    def list_events_from_user_id(self, user_id: str):
+        """Returns the created and invited events"""
+        # Get created events as Event objects
+        created_events = self.mongo.event.find({
+            'creator_id': ObjectId(user_id)
+        })
+
+        created_event_classes = []
+        for event in created_events:
+            event['_id'] = str(event['_id'])
+            event['creator_id'] = str(event['creator_id'])
+            event['participant_id'] = str(event['participant_id'])
+            event['date'] = datetime.fromisoformat(event['date'])
+            created_event_classes.append(Event(**event))
+
+        # Get recieved events as Event objects
+        recieved_events = self.mongo.event.find({
+            'participant_id': ObjectId(user_id)
+        })
+
+        recieved_event_classes = []
+        for event in recieved_events:
+            event['_id'] = str(event['_id'])
+            event['creator_id'] = str(event['creator_id'])
+            event['participant_id'] = str(event['participant_id'])
+            event['date'] = datetime.fromisoformat(event['date'])
+            recieved_event_classes.append(Event(**event))
+
+        return created_event_classes, recieved_event_classes
+
+
+class EventNotFound(ValueError):
+    """If a username was taken within the database class"""
+    pass
 
 
 class UsernameTakenError(ValueError):
