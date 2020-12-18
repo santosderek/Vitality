@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="row">
+        <h1>Find Trainers Near You</h1>
+        <input type="hidden" id="lat" name="lat" value="{{g.user.lat}}">
+        <input type="hidden" id="lng" name="lng" value="{{g.user.lng}}">
+        <br>
+    </div>
+
+    {% include "user/find_trainer_map.html" ignore missing %}
+
+{% endblock %}

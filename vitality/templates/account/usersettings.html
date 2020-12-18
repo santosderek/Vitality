@@ -26,13 +26,15 @@
                 <input class="fields" type="password" placeholder="" name="repassword" disabled>
                 <br />
 
-                <label for="location"><b>Location</b></label>
-                <input class="fields" type="text" placeholder="{{g.user.location}}" name="location" disabled>
-                <br />
-
                 <label for="phone"><b>Phone</b></label><br>
                 <input class="fields" type="number" placeholder="{{g.user.phone}}" name="phone" disabled><br>
                 <br />
+
+                {% include "user/map.html" ignore missing %}
+                <input type="hidden" id="lat" name="lat" value="0">
+                <input type="hidden" id="lng" name="lng" value="0">
+                <input type="hidden" id="userLat" name="userLat" value="{{g.user.lat}}">
+                <input type="hidden" id="userLng" name="userLng" value="{{g.user.lng}}">
 
                 <input class="fields" type="submit" placeholder="Submit Changes" value="Submit Changes" disabled>
                 <br><br>

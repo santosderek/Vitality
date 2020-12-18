@@ -2,8 +2,9 @@ from collections import defaultdict
 from werkzeug.exceptions import default_exceptions
 from .trainee import Trainee
 from .trainer import Trainer
+from .event import Event
 from .database import (
-    Database,
+    Database, EventNotFound,
     UsernameTakenError,
     WorkoutCreatorIdNotFoundError, WorkoutNotFound,
     password_sha256,
@@ -19,6 +20,7 @@ from .workout import (
     DEFAULT_HARD_EXP,
     DEFAULT_INSANE_EXP
 )
+from .settings import SECRET_KEY, MONGO_URI
 from flask import (
     abort,
     Flask,
@@ -32,6 +34,9 @@ from flask import (
 from markupsafe import escape
 import re
 from .settings import SECRET_KEY, MONGO_URI
+import json
+from datetime import datetime
+from bson.errors import InvalidId
 
 DEFAULT_VITALITY_PASSWORD = "DefaultVitalityTrainerPassword"
 
@@ -126,7 +131,7 @@ def create_app():
         """The home page of Vitality"""
         app.logger.info('Rendering home')
         return render_template("home.html")
-    
+
     @app.route('/features', methods=["GET"])
     def features():
         """The features page of Vitality"""
@@ -199,10 +204,6 @@ def create_app():
                 if not alphaPattern.search(re_password):
                     raise InvalidCharactersException("Invalid characters")
 
-                location = escape(request.form['location'])
-                if not alphaPattern.search(location):
-                    raise InvalidCharactersException("Invalid characters")
-
                 phone = escape(request.form['phone'])
                 if not numberPattern.search(phone):
                     raise InvalidCharactersException("Invalid characters")
@@ -210,6 +211,10 @@ def create_app():
                 usertype = escape(request.form['usertype'])
                 if not stringPattern.search(usertype):
                     raise InvalidCharactersException("Invalid characters")
+
+                lat = float(escape(request.form['lat']))
+
+                lng = float(escape(request.form['lng']))
 
                 if username and password == re_password:
                     try:
@@ -220,9 +225,10 @@ def create_app():
                                 username=username,
                                 password=password,
                                 name=name,
-                                location=location,
                                 phone=phone,
-                                exp=0)
+                                exp=0,
+                                lng=lng,
+                                lat=lat)
 
                             g.database.add_trainee(new_user)
 
@@ -232,9 +238,10 @@ def create_app():
                                 username=username,
                                 password=password,
                                 name=name,
-                                location=location,
                                 phone=phone,
-                                exp=0)
+                                exp=0,
+                                lng=lng,
+                                lat=lat)
 
                             g.database.add_trainer(new_user)
 
@@ -288,24 +295,25 @@ def create_app():
                 re_password = escape(request.form['repassword'])
                 if not alphaPattern.search(re_password):
                     raise InvalidCharactersException("Invalid characters")
-                location = escape(request.form['location'])
-                if not alphaPattern.search(location):
-                    raise InvalidCharactersException("Invalid characters")
                 phone = escape(request.form['phone'])
                 if not numberPattern.search(phone):
                     raise InvalidCharactersException("Invalid characters")
+                lat = float(escape(request.form['lat']))
+                lng = float(escape(request.form['lng']))
 
                 if g.database.get_trainee_by_id(g.user._id) is not None:
                     if username:
                         g.database.set_trainee_username(g.user._id, username)
                     if password and re_password and password == re_password:
                         g.database.set_trainee_password(g.user._id, password)
-                    if location:
-                        g.database.set_trainee_location(g.user._id, location)
                     if phone:
                         g.database.set_trainee_phone(g.user._id, phone)
                     if name:
                         g.database.set_trainee_name(g.user._id, name)
+
+                    if lng and lat:
+                        g.database.set_coords(g.user._id, lng, lat)
+
                     return redirect(url_for('usersettings'))
 
                 elif g.database.get_trainer_by_id(g.user._id) is not None:
@@ -313,12 +321,14 @@ def create_app():
                         g.database.set_trainer_username(g.user._id, username)
                     if password and re_password and password == re_password:
                         g.database.set_trainer_password(g.user._id, password)
-                    if location:
-                        g.database.set_trainer_location(g.user._id, location)
                     if phone:
                         g.database.set_trainer_phone(g.user._id, phone)
                     if name:
                         g.database.set_trainer_name(g.user._id, name)
+                    
+                    if lng and lat:
+                        g.database.set_coords(g.user._id, lng, lat)
+
                     return redirect(url_for('usersettings'))
 
             except InvalidCharactersException as e:
@@ -437,12 +447,14 @@ def create_app():
 
         # Get all workouts
         workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
-
+        created_events, recieved_events = g.database.list_events_from_user_id(
+            g.user._id)
+        event_length_array = [len(created_events), len(recieved_events)]
         return render_template("user/overview.html",
                                trainees=trainees,
                                workouts=workouts,
-                               events=[],
-                               invitations=invitations)
+                               invitations=invitations,
+                               event_length_array=event_length_array)
 
     @app.route('/list_trainees', methods=["GET"])
     def list_trainees():
@@ -464,21 +476,6 @@ def create_app():
                 trainees.append(trainee)
         return render_template("user/list_added.html",
                                users=trainees)
-
-    @app.route('/trainer_schedule', methods=["GET"])
-    def trainer_schedule():
-        """Trainer schedule page which gets populated by stored event list."""
-        if not g.user:
-            app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'))
-
-        if type(g.user) is not Trainer:
-            abort(403)
-
-        app.logger.debug('Trainer {} loaded Trainer Schedule.'.format(
-            str(session['user_id'])))
-        return render_template("user/schedule.html",
-                               events=[])
 
     """ Trainee pages """
     @app.route('/trainee_overview', methods=["GET"])
@@ -512,11 +509,14 @@ def create_app():
 
         # Get all workouts
         workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
-
+        created_events, recieved_events = g.database.list_events_from_user_id(
+            g.user._id)
+        event_length_array = [len(created_events), len(recieved_events)]
         return render_template("user/overview.html",
                                trainers=trainers,
                                workouts=workouts,
-                               invitations=invitations)
+                               invitations=invitations,
+                               event_length_array=event_length_array)
 
     @app.route('/list_trainers', methods=["GET"])
     def list_trainers():
@@ -537,21 +537,6 @@ def create_app():
                 trainers.append(trainer)
         return render_template("user/list_added.html",
                                users=trainers)
-
-    @app.route('/trainee_schedule', methods=["GET"])
-    def trainee_schedule():
-        """Trainee schedule page which gets populated by stored event list."""
-        if not g.user:
-            app.logger.debug('Redirecting user because there is no g.user.')
-            return redirect(url_for('login'))
-
-        if type(g.user) == Trainer:
-            abort(403)
-
-        app.logger.debug('Trainer {} loaded Trainer Schedule.'.format(
-            str(session['user_id'])))
-        return render_template("user/schedule.html",
-                               events=[])
 
     @app.route('/trainer_search', methods=["GET", "POST"])
     def trainer_search():
@@ -574,6 +559,31 @@ def create_app():
                                    trainer_id_list=g.user.trainers)
 
         return render_template("trainee/trainer_search.html")
+
+    @app.route('/nearby_trainers', methods=["GET", "POST"])
+    def nearby_trainers():
+        """Page for trainees to see nearby trainers on a map"""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user')
+            return redirect(url_for('login'))
+
+        if type(g.user) is not Trainee:
+            abort(403)
+    
+        lat = float(g.user.lat)
+        lng = float(g.user.lng)
+        trainers = g.database.find_trainers_near_user(lng, lat)
+        json_trainers = []
+
+        for trainer in trainers:
+            json_trainer = {
+                'username': trainer.username,
+                'lng': trainer.lng,
+                'lat': trainer.lat
+            }
+            json_trainers.append(json_trainer)
+
+        return render_template("trainee/nearby_trainers.html", json_trainers=json_trainers)
 
     @app.route('/trainee_search', methods=["GET", "POST"])
     def trainee_search():
@@ -644,6 +654,10 @@ def create_app():
             name = escape(request.form['name'])
             about = escape(request.form['about'])
             difficulty = escape(request.form['difficulty'])
+            total_time = escape(request.form['total_time'])
+            reps = escape(request.form['reps'])
+            miles = escape(request.form['miles'])
+            category = escape(request.form['category'])
             try:
                 existing_workout = g.database.get_workout_by_attributes(
                     creator_id=g.user._id,
@@ -659,7 +673,11 @@ def create_app():
                     name=name,
                     difficulty=difficulty,
                     about=about,
-                    is_complete=False
+                    is_complete=False,
+                    total_time=total_time,
+                    reps=reps,
+                    miles=miles,
+                    category=category
                 ))
                 return render_template("workout/new_workout.html", workout_added=True)
             except WorkoutCreatorIdNotFoundError:
@@ -675,12 +693,12 @@ def create_app():
         default_vitality_user = g.database.get_trainer_by_username("vitality")
         default_workouts = g.database.get_all_workouts_by_creatorid(
             default_vitality_user._id)
-        return render_template("workout/search.html", 
-        default_workouts=default_workouts,
-        default_easy_exp=DEFAULT_EASY_EXP,
-        default_hard_exp=DEFAULT_HARD_EXP,
-        default_medium_exp=DEFAULT_MEDIUM_EXP,
-        default_insane_exp=DEFAULT_INSANE_EXP)
+        return render_template("workout/search.html",
+                               default_workouts=default_workouts,
+                               default_easy_exp=DEFAULT_EASY_EXP,
+                               default_hard_exp=DEFAULT_HARD_EXP,
+                               default_medium_exp=DEFAULT_MEDIUM_EXP,
+                               default_insane_exp=DEFAULT_INSANE_EXP)
 
     @app.route('/workout/<creator_id>/<workout_name>', methods=["GET", "POST"])
     def workout(creator_id: str, workout_name: str):
@@ -717,7 +735,10 @@ def create_app():
         # Check creator_id and workout name, then update the workout to be completed in a POST req
         if request.method == "POST":
             completed = str(escape(request.form['completed']))
-
+            total_time = str(escape(request.form['total_time']))
+            reps = str(escape(request.form['reps']))
+            miles = str(escape(request.form['miles']))
+            category = str(escape(request.form['category']))
             if completed != 'true':
                 abort(400)
             app.logger.debug('heyyy')
@@ -725,7 +746,11 @@ def create_app():
                 g.database.add_trainer_experience(g.user._id, exp_value)
             if type(g.user) is Trainee:
                 g.database.add_trainee_experience(g.user._id, exp_value)
-
+            g.database.set_workout_total_time(
+                g.user._id, workout_name, total_time)
+            g.database.set_workout_reps(g.user._id, workout_name, reps)
+            g.database.set_workout_miles(g.user._id, workout_name, miles)
+            g.database.set_workout_category(g.user._id, workout_name, category)
             g.database.set_workout_status(g.user._id, workout_name, True)
             workout_info = g.database.get_workout_by_attributes(name=workout_name,
                                                                 creator_id=creator_id)
@@ -789,6 +814,98 @@ def create_app():
         except InvitationNotFound as error:
             app.logger.debug("User could not find invitation!")
             abort(500)
+
+    """Schedule"""
+    @app.route('/schedule', methods=["GET"])
+    def schedule():
+        """Shows a users created and recieved events."""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        app.logger.debug('User {} loaded Schedule.'.format(
+            str(session['user_id'])))
+
+        created_events, recieved_events = g.database.list_events_from_user_id(
+            g.user._id)
+        return render_template("user/schedule.html",
+                               created_events=created_events,
+                               recieved_events=recieved_events)
+
+    @app.route('/event/<creator_id>/<event_title>', methods=["GET"])
+    def event(creator_id, event_title):
+        """Shows event."""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        try:
+            creator_id = escape(creator_id)
+            event_title = escape(event_title)
+            event = g.database.get_event_by_attributes(title=event_title,
+                                                       creator_id=creator_id)
+            creator = g.database.get_trainer_by_id(creator_id) or \
+                g.database.get_trainee_by_id(creator_id)
+            participant = g.database.get_trainer_by_id(event.participant_id) or \
+                g.database.get_trainee_by_id(event.participant_id)
+
+            return render_template("user/event.html",
+                                   event=event,
+                                   creator=creator,
+                                   participant=participant)
+        except EventNotFound:
+            app.logger.debug("Event could not be found.")
+            abort(404)
+
+    @app.route('/add_event', methods=["GET", "POST"])
+    def add_event():
+        """Adds an event to the database."""
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        list_of_added = []
+        if type(g.user) == Trainer:
+            for trainee_id in g.user.trainees:
+                trainee = g.database.get_trainee_by_id(trainee_id)
+                list_of_added.append(trainee)
+
+        elif type(g.user) == Trainee:
+            for trainer_id in g.user.trainers:
+                trainer = g.database.get_trainer_by_id(trainer_id)
+                list_of_added.append(trainer)
+        
+        if request.method == 'POST':
+            try: 
+                title = escape(request.form['title'])
+                description = escape(request.form['description'])
+                date = escape(request.form['date'])
+                time = escape(request.form['time'])
+                participant_id = escape(request.form['participant_id'])
+
+                year, month, day = date.split('-')
+                hour, minute = time.split(':')
+
+                converted_datetime = datetime(int(year),
+                                            int(month),
+                                            int(day),
+                                            int(hour),
+                                            int(minute))
+                event = Event(_id=None,
+                            title=title,
+                            description=description,
+                            creator_id=g.user._id,
+                            participant_id=participant_id,
+                            date=converted_datetime)
+
+                g.database.create_event(event)
+
+                return render_template("user/add_event.html", list_of_added=list_of_added, success=True)
+
+            except InvalidId: 
+                return render_template("user/add_event.html", list_of_added=list_of_added, invalid_participant=True)
+
+        return render_template("user/add_event.html", list_of_added=list_of_added)
 
     @app.errorhandler(400)
     def page_bad_request(e):

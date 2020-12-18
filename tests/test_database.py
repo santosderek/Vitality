@@ -1,12 +1,12 @@
-from tests import test_trainee
-import unittest
-from copy import deepcopy
 from bson.objectid import ObjectId
+from copy import deepcopy
+from datetime import datetime
 from vitality.database import *
 from vitality.trainee import Trainee
 from vitality.trainer import Trainer
 from vitality.workout import Workout
 from vitality.settings import MONGO_URI
+import unittest
 
 
 class TestDatabase(unittest.TestCase):
@@ -20,7 +20,6 @@ class TestDatabase(unittest.TestCase):
         username="testtrainee",
         password="password",
         name="first last",
-        location="Earth",
         phone=1234567890,
         trainers=[])
 
@@ -30,7 +29,6 @@ class TestDatabase(unittest.TestCase):
         username="testtrainer",
         password="password",
         name="first last",
-        location="mars",
         phone=1234567890,
         trainees=[])
 
@@ -41,7 +39,11 @@ class TestDatabase(unittest.TestCase):
         name="testing",
         difficulty="easy",
         about="workout",
-        is_complete=False)
+        is_complete=False,
+        total_time="20 minutes",
+        reps="10",
+        miles="2",
+        category="cardio")
 
     def setUp(self):
         self.tearDown()
@@ -210,27 +212,6 @@ class TestDatabase(unittest.TestCase):
             new_trainee.username)
         new_trainee.password = password_sha256(new_trainee.password)
         self.assertTrue(db_user.password == new_trainee.password)
-
-        self.database.remove_trainee(db_user._id)
-        self.assertTrue(
-            self.database.get_trainee_by_id(db_user._id) is None)
-
-    def test_set_trainee_location(self):
-        new_trainee = deepcopy(self.test_trainee)
-
-        # Updating user object to database user
-        new_trainee = self.database.get_trainee_by_username(
-            new_trainee.username)
-
-        # Changing location
-        new_trainee.location = "newLocation"
-        self.database.set_trainee_location(
-            new_trainee._id, new_trainee.location)
-
-        # Checking location
-        db_user = self.database.get_trainee_by_username(
-            new_trainee.username)
-        self.assertTrue(db_user.location == new_trainee.location)
 
         self.database.remove_trainee(db_user._id)
         self.assertTrue(
@@ -448,27 +429,51 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(
             self.database.get_trainer_by_id(db_user._id) is None)
 
-    def test_set_trainer_location(self):
-
+    def test_set_coords(self):
+        # tests the set_coords method for both trainer and trainee
         new_trainer = deepcopy(self.test_trainer)
 
         # Updating user object to database user
         new_trainer = self.database.get_trainer_by_username(
             new_trainer.username)
 
-        # Changing location
-        new_trainer.location = "newLocation"
-        self.database.set_trainer_location(
-            new_trainer._id, new_trainer.location)
+        # Changing coordinates
+        new_trainer.lng = 5
+        new_trainer.lat = 5
+        self.database.set_coords(
+            new_trainer._id, new_trainer.lng, new_trainer.lat)
 
-        # Checking location
+        # Checking coordinates
         db_user = self.database.get_trainer_by_username(
             new_trainer.username)
-        self.assertTrue(db_user.location == new_trainer.location)
+        self.assertTrue(db_user.lng == new_trainer.lng)
+        self.assertTrue(db_user.lat == new_trainer.lat)
 
         self.database.remove_trainer(db_user._id)
         self.assertTrue(
             self.database.get_trainer_by_id(db_user._id) is None)
+
+        new_trainee = deepcopy(self.test_trainee)
+
+        # Updating user object to database user
+        new_trainee = self.database.get_trainee_by_username(
+            new_trainee.username)
+
+        # Changing coordinates
+        new_trainee.lng = 5
+        new_trainee.lat = 5
+        self.database.set_coords(
+            new_trainee._id, new_trainee.lng, new_trainee.lat)
+
+        # Checking coordinates
+        db_user = self.database.get_trainee_by_username(
+            new_trainee.username)
+        self.assertTrue(db_user.lng == new_trainee.lng)
+        self.assertTrue(db_user.lat == new_trainee.lat)
+
+        self.database.remove_trainee(db_user._id)
+        self.assertTrue(
+            self.database.get_trainee_by_id(db_user._id) is None)
 
     def test_set_trainer_phone(self):
 
@@ -548,7 +553,6 @@ class TestDatabase(unittest.TestCase):
 
         workout = self.database.get_workout_by_attributes(_id=str(workout._id))
         assert workout is not None
-        
 
     def test_get_workout_class_by_id(self):
         new_workout = deepcopy(self.test_workout)
@@ -788,26 +792,23 @@ class TestDatabase(unittest.TestCase):
                                               username="testtrainee1",
                                               password="pass",
                                               name="testTrainee1",
-                                              location="somewhere",
                                               phone=1234567890))
             self.database.add_trainee(Trainee(_id=None,
                                               username="testtrainee2",
                                               password="pass",
                                               name="testTrainee2",
-                                              location="somewhere",
+                                              
                                               phone=1234567890))
             self.database.add_trainee(Trainee(_id=None,
                                               username="testtrainee3",
                                               password="pass",
                                               name="testTrainee3",
-                                              location="somewhere",
                                               phone=1234567890))
 
             self.database.add_trainer(Trainer(_id=None,
                                               username="testtrainer1",
                                               password="pass",
                                               name="testTrainer3",
-                                              location="somewhere",
                                               phone=1234567890))
 
             trainee1_id = str(self.database.mongo.trainee.find_one(
@@ -864,26 +865,22 @@ class TestDatabase(unittest.TestCase):
                                               username="testtrainer1",
                                               password="pass",
                                               name="testTrainer1",
-                                              location="somewhere",
                                               phone=1234567890))
             self.database.add_trainer(Trainer(_id=None,
                                               username="testtrainer2",
                                               password="pass",
                                               name="testTrainer2",
-                                              location="somewhere",
                                               phone=1234567890))
             self.database.add_trainer(Trainer(_id=None,
                                               username="testtrainer3",
                                               password="pass",
                                               name="testTrainer3",
-                                              location="somewhere",
                                               phone=1234567890))
 
             self.database.add_trainee(Trainee(_id=None,
                                               username="testtrainee1",
                                               password="pass",
                                               name="testTrainer3",
-                                              location="somewhere",
                                               phone=1234567890))
 
             trainer1_id = str(self.database.mongo.trainer.find_one(
@@ -972,6 +969,86 @@ class TestDatabase(unittest.TestCase):
         })
         assert workout is not None
         assert workout['is_complete'] is True
+
+    def test_set_workout_total_time(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['total_time'] == "20 minutes"
+
+        self.database.set_workout_total_time(trainee._id, workout['name'], "10")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['total_time'] =="10"
+
+    def test_set_workout_reps(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['reps'] == "10"
+
+        self.database.set_workout_reps(trainee._id, workout['name'], "5")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['reps'] == "5"
+
+    def test_set_workout_miles(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['miles'] == "2"
+
+        self.database.set_workout_miles(trainee._id, workout['name'], "5")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['miles'] == "5"
+
+    def test_set_workout_category(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['category'] == "cardio"
+
+        self.database.set_workout_category(trainee._id, workout['name'], "Abs")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['category'] == "Abs"
 
     """Invitation tests"""
 
@@ -1306,3 +1383,289 @@ class TestDatabase(unittest.TestCase):
         assert ObjectId(trainee._id) not in self.database.mongo.trainer.find_one({
             '_id': ObjectId(trainer._id)
         })['trainees']
+
+    def test_find_trainers_near_user(self):
+        """Tests the find nearby trainers function to see if it returns a populated list"""
+
+        new_trainee = deepcopy(self.test_trainee)
+
+        # Updating user object to database user
+        new_trainee = self.database.get_trainee_by_username(
+            new_trainee.username)
+
+        new_trainer = deepcopy(self.test_trainer)
+
+        # Updating user object to database user
+        new_trainer = self.database.get_trainer_by_username(
+            new_trainer.username)
+
+        # setting trainee and trainer with coordinates that should be close enough
+        self.database.set_coords(new_trainee._id, new_trainee.lng, new_trainee.lat)
+        self.database.set_coords(new_trainer._id, new_trainer.lng, new_trainer.lat)
+
+        # running test
+        returned_list = self.database.find_trainers_near_user(new_trainee.lng, new_trainee.lat)
+
+        # checking if list is empty
+        assert returned_list
+
+    def test_create_event(self):
+        """Tests the creation of an event within the database"""
+        def clean_up(trainee, trainer):
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainee._id)
+            })
+
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainer._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        try:
+
+            clean_up(trainee, trainer)
+
+            event = Event(
+                _id=None,
+                creator_id=trainee._id,
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc',
+                participant_id=trainer._id
+            )
+
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainee._id)
+            })
+
+            assert database_event['title'] == event.title
+            assert str(database_event['creator_id']) == str(event.creator_id)
+            assert database_event['date'] == str(event.date)
+            assert database_event['title'] == event.title
+            assert database_event['description'] == event.description
+            assert str(database_event['participant_id']
+                       ) == event.participant_id
+
+            clean_up(trainee, trainer)
+
+            event = Event(
+                _id=None,
+                creator_id=trainer._id,
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc',
+                participant_id=trainer._id
+            )
+
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainer._id)
+            })
+
+            assert database_event['title'] == event.title
+            assert str(database_event['creator_id']) == str(event.creator_id)
+            assert database_event['date'] == str(event.date)
+            assert database_event['title'] == event.title
+            assert database_event['description'] == event.description
+            assert str(database_event['participant_id']
+                       ) == event.participant_id
+        finally:
+            clean_up(trainee, trainer)
+
+    def test_remove_event(self):
+        def clean_up(trainee, trainer):
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainee._id)
+            })
+
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainer._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        try:
+
+            clean_up(trainee, trainer)
+            event = Event(
+                _id=None,
+                creator_id=trainee._id,
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc',
+                participant_id=trainer._id
+            )
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainee._id)
+            })
+            assert database_event['title'] == event.title
+            assert str(database_event['creator_id']) == str(event.creator_id)
+            assert database_event['date'] == str(event.date)
+            assert database_event['title'] == event.title
+            assert database_event['description'] == event.description
+            assert str(database_event['participant_id']
+                       ) == event.participant_id
+            self.database.delete_event(database_event['_id'], trainee._id)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainee._id)
+            })
+            assert database_event is None
+            event = Event(
+                _id=None,
+                creator_id=trainer._id,
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc',
+                participant_id=trainee._id
+            )
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainer._id)
+            })
+            assert database_event['title'] == event.title
+            assert str(database_event['creator_id']) == str(event.creator_id)
+            assert database_event['date'] == str(event.date)
+            assert database_event['title'] == event.title
+            assert database_event['description'] == event.description
+            assert str(database_event['participant_id']
+                       ) == event.participant_id
+            self.database.delete_event(database_event['_id'], trainer._id)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainer._id)
+            })
+            assert database_event is None
+
+        finally:
+            clean_up(trainee, trainer)
+
+    def test_get_event_by_attributes(self):
+        """Test to get an event class from the database using specific attributes"""
+        def clean_up(trainee, trainer):
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainee._id)
+            })
+
+            self.database.mongo.event.delete_many({
+                'title': 'testEvent',
+                'creator_id': ObjectId(trainer._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        try:
+            clean_up(trainee, trainer)
+            event = Event(
+                _id=None,
+                creator_id=trainee._id,
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc',
+                participant_id=trainer._id
+            )
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainee._id)
+            })
+            assert database_event is not None
+
+            database_event = self.database.get_event_by_attributes(creator_id=event.creator_id,
+                                                                   title=event.title)
+            assert database_event is not None
+            assert database_event.title == event.title
+
+            database_event = self.database.get_event_by_attributes(creator_id=event.creator_id,
+                                                                   date=str(event.date))
+            assert database_event is not None
+            assert database_event.date == event.date
+
+            database_event = self.database.get_event_by_attributes(creator_id=event.creator_id,
+                                                                   date=event.date)
+            assert database_event is not None
+            assert database_event.date == event.date
+
+            database_event = self.database.get_event_by_attributes(creator_id=event.creator_id,
+                                                                   description=event.description)
+            assert database_event is not None
+            assert database_event.description == event.description
+
+            database_event = self.database.get_event_by_attributes(creator_id=event.creator_id,
+                                                                   participant_id=event.participant_id)
+            assert database_event is not None
+            assert database_event.participant_id == event.participant_id
+
+        finally:
+            clean_up(trainee, trainer)
+
+    def test_list_events(self):
+        """Checks to see if a list of recieved and created events are stored within the database"""
+
+        def clean_up(trainee, trainer):
+            self.database.mongo.event.delete_many({
+                'creator_id': ObjectId(trainee._id)
+            })
+
+            self.database.mongo.event.delete_many({
+                'creator_id': ObjectId(trainer._id)
+            })
+
+        trainee = self.database.get_trainee_by_username('testtrainee')
+        trainer = self.database.get_trainer_by_username('testtrainer')
+
+        try:
+            clean_up(trainee, trainer)
+            event = Event(
+                _id=None,
+                creator_id=trainee._id,
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc',
+                participant_id=trainer._id
+            )
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainee._id)
+            })
+            assert database_event is not None
+            assert str(database_event['creator_id']) == event.creator_id
+            assert str(database_event['participant_id']
+                       ) == event.participant_id
+
+            event = Event(
+                _id=None,
+                creator_id=trainer._id,
+                title='testEvent',
+                date=datetime(2020, 12, 2),
+                description='a simple desc',
+                participant_id=trainee._id
+            )
+            self.database.create_event(event)
+            database_event = self.database.mongo.event.find_one({
+                'title': event.title,
+                'creator_id': ObjectId(trainer._id)
+            })
+            assert database_event is not None
+            assert str(database_event['creator_id']) == event.creator_id
+            assert str(database_event['participant_id']
+                       ) == event.participant_id
+
+        finally:
+            clean_up(trainee, trainer)

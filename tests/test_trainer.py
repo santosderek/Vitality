@@ -9,7 +9,6 @@ def test_as_dict():
         username="trainer",
         password="newPassword",
         name="test trainer",
-        location="mars",
         phone="1234567890",
         body_type="big",
         body_fat="fat",
@@ -18,6 +17,8 @@ def test_as_dict():
         exp=12345,
         goal_weight="95",
         goal_body_fat="notfat",
+        lng=0,
+        lat=0,
         trainees=[
             "000000000000000000000002"
         ]
@@ -29,7 +30,6 @@ def test_as_dict():
         username="trainer",
         password="newPassword",
         name="test trainer",
-        location="mars",
         phone="1234567890",
         body_type="big",
         body_fat="fat",
@@ -38,6 +38,8 @@ def test_as_dict():
         exp=12345,
         goal_weight="95",
         goal_body_fat="notfat",
+        lng=0,
+        lat=0,
         trainees=[
             "000000000000000000000002"
         ]
@@ -52,7 +54,6 @@ def test_initalization():
         username="trainer",
         password="newPassword",
         name="test trainer",
-        location="mars",
         phone="1234567890",
         body_type="big",
         body_fat="fat",
@@ -61,6 +62,8 @@ def test_initalization():
         exp=12345,
         goal_weight="95",
         goal_body_fat="notfat",
+        lng=0,
+        lat=0,
         trainees=[
             "000000000000000000000002"
         ]
@@ -70,7 +73,6 @@ def test_initalization():
     assert trainer.username == 'trainer'
     assert trainer.password == "newPassword"
     assert trainer.name == "test trainer"
-    assert trainer.location == "mars"
     assert trainer.phone == "1234567890"
     assert trainer.body_type == "big"
     assert trainer.body_fat == "fat"
@@ -79,6 +81,8 @@ def test_initalization():
     assert trainer.exp == 12345
     assert trainer.goal_weight == "95"
     assert trainer.goal_body_fat == "notfat"
+    assert trainer.lng == 0
+    assert trainer.lat == 0
     assert trainer.trainees == ["000000000000000000000002"]
 
 
@@ -88,7 +92,6 @@ def test_repr():
         username="trainer",
         password="newPassword",
         name="test trainer",
-        location="mars",
         phone="1234567890",
         body_type="big",
         body_fat="fat",
@@ -97,10 +100,12 @@ def test_repr():
         exp="12345",
         goal_weight="95",
         goal_body_fat="notfat",
+        lng="0",
+        lat="0",
         trainees=[
             "000000000000000000000002"
         ]
     )
 
     assert repr(
-        trainer) == "Trainer(000000000000000000000001, trainer, newPassword, test trainer, mars, 1234567890, big, fat, 7, 100, 12345, 95, notfat, [\'000000000000000000000002\'])"
+        trainer) == "Trainer(000000000000000000000001, trainer, newPassword, test trainer, 1234567890, big, fat, 7, 100, 12345, 95, notfat, 0, 0, [\'000000000000000000000002\'])"
