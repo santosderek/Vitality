@@ -553,7 +553,6 @@ class TestDatabase(unittest.TestCase):
 
         workout = self.database.get_workout_by_attributes(_id=str(workout._id))
         assert workout is not None
-<<<<<<< HEAD
 
     def test_get_all_workout_by_attributes(self):
         trainee = self.database.mongo.trainee.find_one({
@@ -571,8 +570,6 @@ class TestDatabase(unittest.TestCase):
                                                     name='nope not a name')
 
         
-=======
->>>>>>> 7127b99d1686232c0b390e4ce2b87c9b0bcac701
 
     def test_get_workout_class_by_id(self):
         new_workout = deepcopy(self.test_workout)

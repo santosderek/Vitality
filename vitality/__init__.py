@@ -695,7 +695,6 @@ def create_app():
         default_vitality_user = g.database.get_trainer_by_username("vitality")
         default_workouts = g.database.get_all_workouts_by_creatorid(
             default_vitality_user._id)
-<<<<<<< HEAD
         if request.method == "POST":
             name = escape(request.form["name"])
             workouts = g.database.get_all_workout_by_attributes(
@@ -715,14 +714,6 @@ def create_app():
         default_hard_exp=DEFAULT_HARD_EXP,
         default_medium_exp=DEFAULT_MEDIUM_EXP,
         default_insane_exp=DEFAULT_INSANE_EXP)
-=======
-        return render_template("workout/search.html",
-                               default_workouts=default_workouts,
-                               default_easy_exp=DEFAULT_EASY_EXP,
-                               default_hard_exp=DEFAULT_HARD_EXP,
-                               default_medium_exp=DEFAULT_MEDIUM_EXP,
-                               default_insane_exp=DEFAULT_INSANE_EXP)
->>>>>>> 7127b99d1686232c0b390e4ce2b87c9b0bcac701
 
     @app.route('/workout/<creator_id>/<workout_name>', methods=["GET", "POST"])
     def workout(creator_id: str, workout_name: str):
