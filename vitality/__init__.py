@@ -113,12 +113,12 @@ def create_app():
     lowerPattern = re.compile(r"^[a-z0-9\s]*$")
 
     categories = [
-            'low carb recipe',
-            'paleo carb recipe',
-            'high protein recipe',
-            'weight watchers recipe',
-            'sugar free recipe',
-            'vegan recipe',
+            'Low Carb Recipe',
+            'Paleo Carb Recipe',
+            'High Protein Recipe',
+            'Weight Watchers Recipe',
+            'Sugar Free Recipe',
+            'Vegan Recipe',
 
         ]
 
@@ -936,13 +936,12 @@ def create_app():
 
         return render_template("user/add_event.html", list_of_added=list_of_added)
 
+    """ Diets """
     @app.route('/diets', methods=["GET", "POST"])
     def diets():
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
-
-        
 
         return render_template('diet/diets.html', categories=categories)
 

@@ -6,7 +6,9 @@
     {% for category in categories %}
     <div class="col-sm-12 col-md-4">
         <div class="card">
-            <div class="card-body">
+            <div class="card-body text-center">
+                <img class="card-img-top" style="width: 5em; filter: invert(100%) sepia(0%) saturate(1641%) hue-rotate(158deg) brightness(96%) contrast(93%);"
+                    src="{{ url_for('static', filename='images/hamburger.svg')}}" alt="Card image cap">
                 <h5 class="card-title">{{ category}}</h5>
                 <a href="{{url_for('videos', category=category)}}" class="view_button">View</a>
             </div>
