@@ -9,7 +9,6 @@ def test_as_dict():
         username="user",
         password="newPassword",
         name="test user",
-        location="mars",
         phone="1234567890",
         body_type="big",
         body_fat="fat",
@@ -26,7 +25,6 @@ def test_as_dict():
         username="user",
         password="newPassword",
         name="test user",
-        location="mars",
         phone="1234567890",
         body_type="big",
         body_fat="fat",
@@ -46,7 +44,6 @@ def test_initalization():
         username="user",
         password="newPassword",
         name="test user",
-        location="mars",
         phone="1234567890",
         body_type="big",
         body_fat="fat",
@@ -61,7 +58,6 @@ def test_initalization():
     assert user.username == 'user'
     assert user.password == "newPassword"
     assert user.name == "test user"
-    assert user.location == "mars"
     assert user.phone == "1234567890"
     assert user.body_type == "big"
     assert user.body_fat == "fat"
@@ -78,7 +74,6 @@ def test_repr():
         username="user",
         password="newPassword",
         name="test user",
-        location="mars",
         phone="1234567890",
         body_type="big",
         body_fat="fat",
@@ -90,7 +85,7 @@ def test_repr():
     )
 
     assert repr(user) \
-        == "User(000000000000000000000001, user, newPassword, test user, mars, 1234567890, big, fat, 7, 100, 12345, 95, notfat)"
+        == "User(000000000000000000000001, user, newPassword, test user, 1234567890, big, fat, 7, 100, 12345, 95, notfat)"
 
 
 if __name__ == '__main__':
