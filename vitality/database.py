@@ -301,7 +301,7 @@ class Database:
 
         return trainees
 
-    def find_trainers_near_user(self, lng, lat, min=0, max=80500):
+    def find_trainers_near_user(self, lng, lat, min=0, max=10000000000):
         """Return a list of trainers based on the user's location"""
         returned_list = self.mongo.trainer.find({
             'location': {
