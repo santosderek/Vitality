@@ -51,6 +51,15 @@
                 title: data[i].username
             });
 
+            const infowindow = new google.maps.InfoWindow({
+                content: data[i].username,
+            });
+
+
+            marker.addListener('click', () => {
+                infowindow.open(map, marker);
+            });
+
             marker.setMap(map);
         }
 
