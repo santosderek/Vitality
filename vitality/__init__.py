@@ -591,24 +591,6 @@ def create_app():
 
         if type(g.user) is not Trainee:
             abort(403)
-
-        if(request.method == "POST"):
-            lat = float(escape(request.form['lat']))
-            lng = float(escape(request.form['lng']))
-
-            trainers = g.database.find_trainers_near_user(lng, lat)
-
-            json_trainers = []
-
-            for trainer in trainers:
-                json_trainer = {
-                    'username': trainer.username,
-                    'lng': trainer.lng,
-                    'lat': trainer.lat
-                }
-                json_trainers.append(json_trainer)
-        
-            return str(json_trainers), 200
     
         lat = float(g.user.lat)
         lng = float(g.user.lng)
