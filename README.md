@@ -49,8 +49,7 @@ Please look at the `requirements.txt` file found in the root of our repo for the
         FLASK_ENV=development
         MONGO_URI=mongodb://localhost:27017
         MONGO_DATABASE=flask
-        GOOGLE_CLIENT_ID=
-        GOOGLE_SECRET_ID=
+        GOOGLE_MAPS_KEY=
         ```
 
     6. Double click `start_flask.bat` (windows) or `start_flask.sh` (linux/mac)
