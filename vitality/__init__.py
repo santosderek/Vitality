@@ -38,6 +38,7 @@ import json
 from datetime import datetime
 from bson.errors import InvalidId
 from .youtube import Youtube
+import random
 
 DEFAULT_VITALITY_PASSWORD = "DefaultVitalityTrainerPassword"
 
@@ -113,14 +114,18 @@ def create_app():
     lowerPattern = re.compile(r"^[a-z0-9\s]*$")
 
     categories = [
-            'Low Carb Recipe',
-            'Paleo Carb Recipe',
-            'High Protein Recipe',
-            'Weight Watchers Recipe',
-            'Sugar Free Recipe',
-            'Vegan Recipe',
+        'Low Carb Recipe',
+        'Paleo Carb Recipe',
+        'High Protein Recipe',
+        'Weight Watchers Recipe',
+        'Sugar Free Recipe',
+        'Vegan Recipe']
 
-        ]
+    predefined_workout_topics = [
+        'Abs Workout Routine',
+        'Legs Workout Routine',
+        'Full Body Workout'
+    ]
 
     @app.before_request
     def before_request():
@@ -707,6 +712,9 @@ def create_app():
         default_vitality_user = g.database.get_trainer_by_username("vitality")
         default_workouts = g.database.get_all_workouts_by_creatorid(
             default_vitality_user._id)
+        
+        
+
         if request.method == "POST":
             name = escape(request.form["name"])
             workouts = g.database.get_all_workout_by_attributes(
@@ -714,6 +722,9 @@ def create_app():
                     '$regex': r'(.+)?{}(.+)?'.format(name)
                 }
             )
+            youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
+            workout_topic = random.choice(predefined_workout_topics)
+            list_of_workout_videos = youtube.search_topic(workout_topic)['items']
 
             return render_template("workout/search.html",
                                    default_workouts=default_workouts,
@@ -721,7 +732,9 @@ def create_app():
                                    default_hard_exp=DEFAULT_HARD_EXP,
                                    default_medium_exp=DEFAULT_MEDIUM_EXP,
                                    default_insane_exp=DEFAULT_INSANE_EXP,
-                                   workouts=workouts)
+                                   workouts=workouts,
+                                   list_of_workout_videos=list_of_workout_videos)
+
         return render_template("workout/search.html",
                                default_workouts=default_workouts,
                                default_easy_exp=DEFAULT_EASY_EXP,
@@ -951,7 +964,7 @@ def create_app():
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
 
-        if not category  in categories:
+        if not category in categories:
             abort(400)
 
         youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
