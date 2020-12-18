@@ -36,6 +36,9 @@ jobs:
       with:
         mongodb-version: latest
     - name: Test with pytest
+      env:
+        GOOGLE_MAPS_KEY: ${{ secrets.GOOGLE_MAPS_KEY }}
+        GOOGLE_YOUTUBE_KEY: ${{ secrets.GOOGLE_YOUTUBE_KEY }}
       run: |
         pytest -v
 
