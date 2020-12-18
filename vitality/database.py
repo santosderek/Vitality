@@ -440,6 +440,25 @@ class Database:
             return self.workout_dict_to_class(found_workout)
         else: 
             raise WorkoutNotFound("Workout with key/value pairs not found.")
+    
+    def get_all_workout_by_attributes(self, **kwargs):
+        """
+        Returns a single workout based on the keyword arguments passed to the function.
+        Each key represents the attribute to append to the find function.
+        If a workout with the passed key value pairs are not found, then we raise a WorkoutNotFound
+        error. 
+        """
+        if 'creator_id' in kwargs: 
+            kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
+        if '_id' in kwargs: 
+            kwargs['_id'] = ObjectId(kwargs['_id'])
+            
+        found_workout = self.mongo.workout.find({**kwargs})
+        workouts = []
+        for workout in found_workout:
+            workout = self.workout_dict_to_class(workout)
+            workouts.append(workout)
+        return workouts
 
     def get_all_workouts_by_creatorid(self, creator_id: str):
         """Returns the Workout class found by the workout's id."""
