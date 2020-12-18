@@ -1,13 +1,13 @@
 from vitality.youtube import Youtube
-from os import environ
+from os import environ, getenv
+from os.path import exists
 from vitality.settings import GOOGLE_MAPS_KEY
-import pytest
+from dotenv import load_dotenv 
 
-youtube = Youtube('')
-
-@pytest.mark.skip()
+# @pytest.mark.skip
 def test_search_topic():
 
+    load_dotenv('.env')
+    youtube = Youtube(getenv("GOOGLE_YOUTUBE_KEY"))
     response = youtube.search_topic('fish')
-
     assert len(response) == 6
