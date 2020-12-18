@@ -3,4 +3,4 @@ markupsafe
 pymongo
 pytest
 python-dotenv
-requests
+google-api-python-client

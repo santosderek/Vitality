@@ -51,6 +51,11 @@
             <button type="submit"><i class="material-icons">search</i></button>
         </form>
     </div>
+    {% if workouts|length == 0 %}
+    <div class="col-sm-12 text-center">
+        <h3>Search for a workout!</h3>
+    </div>
+    {% endif %}
     {%for workout in workouts%}
     <div class="col-sm-12 card">
         <p>
@@ -65,5 +70,23 @@
         <a class="button_title" href="{{url_for('workout', creator_id=workout.creator_id, workout_name=workout.name)}}">View</a>
     </div>
     {%endfor%}
+
+    <div class="col-sm-12">
+        <h3>Recommended Videos:</h3>
+    </div>
+    {% for youtube in list_of_workout_videos %}
+    <div class="col-sm-12 col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <img class="card-img-top" src="{{ youtube['snippet']['thumbnails']['high']['url']}}" alt="Card image cap">
+                <h5 class="card-title">{{ youtube['snippet']['title']}}</h5>
+                <p class="card-text"><b>{{youtube['snippet']['channelTitle']}}</b></p>
+                <a href="https://www.youtube.com/watch?v={{youtube['id']['videoId']}}"
+                    class="view_button">View</a>
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

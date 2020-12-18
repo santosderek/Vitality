@@ -13,6 +13,7 @@ from vitality.workout import Workout
 from vitality.event import Event
 from vitality.settings import MONGO_URI, SECRET_KEY
 from datetime import datetime
+from dotenv import load_dotenv 
 
 test_trainee = Trainee(
     _id=None,
@@ -60,6 +61,7 @@ def login_as_testTrainer(client):
 @pytest.fixture
 def client():
     environ['SECRET_KEY'] = 'aTestSecret'
+    load_dotenv('.env')
     app = create_app()
     app.config['TESTING'] = True
     app.secret_key = environ.get('SECRET_KEY')
