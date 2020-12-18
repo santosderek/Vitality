@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row">
+    {% for youtube in youtube_videos %}
+    <div class="col-sm-12 col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <img class="card-img-top" src="{{ youtube['snippet']['thumbnails']['high']['url']}}" alt="Card image cap">
+                <h5 class="card-title">{{ youtube['snippet']['title']}}</h5>
+                <p class="card-text">{{youtube['snippet']['channelTitle']}}</p>
+                <a href="https://www.youtube.com/watch?v={{youtube['id']['videoId']}}"
+                    class="view_button">View</a>
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

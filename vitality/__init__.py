@@ -11,16 +11,13 @@ from .database import (
     InvalidCharactersException,
     UserNotFoundError,
     IncorrectRecipientID,
-    InvitationNotFound
-)
+    InvitationNotFound)
 from .workout import (
     Workout,
     DEFAULT_EASY_EXP,
     DEFAULT_MEDIUM_EXP,
     DEFAULT_HARD_EXP,
-    DEFAULT_INSANE_EXP
-)
-from .settings import SECRET_KEY, MONGO_URI
+    DEFAULT_INSANE_EXP)
 from flask import (
     abort,
     Flask,
@@ -29,14 +26,18 @@ from flask import (
     redirect,
     request,
     session,
-    g
-)
+    g)
 from markupsafe import escape
 import re
-from .settings import SECRET_KEY, MONGO_URI, GOOGLE_MAPS_KEY
+from .settings import (
+    SECRET_KEY,
+    MONGO_URI,
+    GOOGLE_MAPS_KEY,
+    GOOGLE_YOUTUBE_KEY)
 import json
 from datetime import datetime
 from bson.errors import InvalidId
+from .youtube import Youtube
 
 DEFAULT_VITALITY_PASSWORD = "DefaultVitalityTrainerPassword"
 
@@ -111,6 +112,16 @@ def create_app():
     stringPattern = re.compile(r"^[a-zA-Z]*$")
     lowerPattern = re.compile(r"^[a-z0-9\s]*$")
 
+    categories = [
+            'low carb recipe',
+            'paleo carb recipe',
+            'high protein recipe',
+            'weight watchers recipe',
+            'sugar free recipe',
+            'vegan recipe',
+
+        ]
+
     @app.before_request
     def before_request():
         """Actions to take before each request"""
@@ -118,6 +129,7 @@ def create_app():
             g.database = Database(MONGO_URI)
 
         g.google_maps_key = GOOGLE_MAPS_KEY
+        g.GOOGLE_YOUTUBE_KEY = GOOGLE_YOUTUBE_KEY
 
         g.user = None
         if 'user_id' in session:
@@ -698,24 +710,24 @@ def create_app():
         if request.method == "POST":
             name = escape(request.form["name"])
             workouts = g.database.get_all_workout_by_attributes(
-                name = {
+                name={
                     '$regex': r'(.+)?{}(.+)?'.format(name)
                 }
             )
 
-            return render_template("workout/search.html", 
-            default_workouts=default_workouts,
-            default_easy_exp=DEFAULT_EASY_EXP,
-            default_hard_exp=DEFAULT_HARD_EXP,
-            default_medium_exp=DEFAULT_MEDIUM_EXP,
-            default_insane_exp=DEFAULT_INSANE_EXP,
-            workouts=workouts)
-        return render_template("workout/search.html", 
-        default_workouts=default_workouts,
-        default_easy_exp=DEFAULT_EASY_EXP,
-        default_hard_exp=DEFAULT_HARD_EXP,
-        default_medium_exp=DEFAULT_MEDIUM_EXP,
-        default_insane_exp=DEFAULT_INSANE_EXP)
+            return render_template("workout/search.html",
+                                   default_workouts=default_workouts,
+                                   default_easy_exp=DEFAULT_EASY_EXP,
+                                   default_hard_exp=DEFAULT_HARD_EXP,
+                                   default_medium_exp=DEFAULT_MEDIUM_EXP,
+                                   default_insane_exp=DEFAULT_INSANE_EXP,
+                                   workouts=workouts)
+        return render_template("workout/search.html",
+                               default_workouts=default_workouts,
+                               default_easy_exp=DEFAULT_EASY_EXP,
+                               default_hard_exp=DEFAULT_HARD_EXP,
+                               default_medium_exp=DEFAULT_MEDIUM_EXP,
+                               default_insane_exp=DEFAULT_INSANE_EXP)
 
     @app.route('/workout/<creator_id>/<workout_name>', methods=["GET", "POST"])
     def workout(creator_id: str, workout_name: str):
@@ -923,6 +935,29 @@ def create_app():
                 return render_template("user/add_event.html", list_of_added=list_of_added, invalid_participant=True)
 
         return render_template("user/add_event.html", list_of_added=list_of_added)
+
+    @app.route('/diets', methods=["GET", "POST"])
+    def diets():
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        
+
+        return render_template('diet/diets.html', categories=categories)
+
+    @app.route('/videos/<category>', methods=["GET"])
+    def videos(category):
+        if not g.user:
+            app.logger.debug('Redirecting user because there is no g.user.')
+            return redirect(url_for('login'))
+
+        if not category  in categories:
+            abort(400)
+
+        youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
+        youtube_videos = youtube.search_topic(category)['items']
+        return render_template('diet/videos.html', youtube_videos=youtube_videos)
 
     @app.errorhandler(400)
     def page_bad_request(e):
