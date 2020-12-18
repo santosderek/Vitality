@@ -217,27 +217,6 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(
             self.database.get_trainee_by_id(db_user._id) is None)
 
-    def test_set_trainee_location(self):
-        new_trainee = deepcopy(self.test_trainee)
-
-        # Updating user object to database user
-        new_trainee = self.database.get_trainee_by_username(
-            new_trainee.username)
-
-        # Changing location
-        new_trainee.location = "newLocation"
-        self.database.set_trainee_location(
-            new_trainee._id, new_trainee.location)
-
-        # Checking location
-        db_user = self.database.get_trainee_by_username(
-            new_trainee.username)
-        self.assertTrue(db_user.location == new_trainee.location)
-
-        self.database.remove_trainee(db_user._id)
-        self.assertTrue(
-            self.database.get_trainee_by_id(db_user._id) is None)
-
     def test_set_trainee_phone(self):
         new_trainee = deepcopy(self.test_trainee)
 
@@ -450,27 +429,51 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(
             self.database.get_trainer_by_id(db_user._id) is None)
 
-    def test_set_trainer_location(self):
-
+    def test_set_coords(self):
+        # tests the set_coords method for both trainer and trainee
         new_trainer = deepcopy(self.test_trainer)
 
         # Updating user object to database user
         new_trainer = self.database.get_trainer_by_username(
             new_trainer.username)
 
-        # Changing location
-        new_trainer.location = "newLocation"
-        self.database.set_trainer_location(
-            new_trainer._id, new_trainer.location)
+        # Changing coordinates
+        new_trainer.lng = 5
+        new_trainer.lat = 5
+        self.database.set_coords(
+            new_trainer._id, new_trainer.lng, new_trainer.lat)
 
-        # Checking location
+        # Checking coordinates
         db_user = self.database.get_trainer_by_username(
             new_trainer.username)
-        self.assertTrue(db_user.location == new_trainer.location)
+        self.assertTrue(db_user.lng == new_trainer.lng)
+        self.assertTrue(db_user.lat == new_trainer.lat)
 
         self.database.remove_trainer(db_user._id)
         self.assertTrue(
             self.database.get_trainer_by_id(db_user._id) is None)
+
+        new_trainee = deepcopy(self.test_trainee)
+
+        # Updating user object to database user
+        new_trainee = self.database.get_trainee_by_username(
+            new_trainee.username)
+
+        # Changing coordinates
+        new_trainee.lng = 5
+        new_trainee.lat = 5
+        self.database.set_coords(
+            new_trainee._id, new_trainee.lng, new_trainee.lat)
+
+        # Checking coordinates
+        db_user = self.database.get_trainee_by_username(
+            new_trainee.username)
+        self.assertTrue(db_user.lng == new_trainee.lng)
+        self.assertTrue(db_user.lat == new_trainee.lat)
+
+        self.database.remove_trainee(db_user._id)
+        self.assertTrue(
+            self.database.get_trainee_by_id(db_user._id) is None)
 
     def test_set_trainer_phone(self):
 
@@ -790,26 +793,23 @@ class TestDatabase(unittest.TestCase):
                                               username="testtrainee1",
                                               password="pass",
                                               name="testTrainee1",
-                                              location="somewhere",
                                               phone=1234567890))
             self.database.add_trainee(Trainee(_id=None,
                                               username="testtrainee2",
                                               password="pass",
                                               name="testTrainee2",
-                                              location="somewhere",
+                                              
                                               phone=1234567890))
             self.database.add_trainee(Trainee(_id=None,
                                               username="testtrainee3",
                                               password="pass",
                                               name="testTrainee3",
-                                              location="somewhere",
                                               phone=1234567890))
 
             self.database.add_trainer(Trainer(_id=None,
                                               username="testtrainer1",
                                               password="pass",
                                               name="testTrainer3",
-                                              location="somewhere",
                                               phone=1234567890))
 
             trainee1_id = str(self.database.mongo.trainee.find_one(
@@ -866,26 +866,22 @@ class TestDatabase(unittest.TestCase):
                                               username="testtrainer1",
                                               password="pass",
                                               name="testTrainer1",
-                                              location="somewhere",
                                               phone=1234567890))
             self.database.add_trainer(Trainer(_id=None,
                                               username="testtrainer2",
                                               password="pass",
                                               name="testTrainer2",
-                                              location="somewhere",
                                               phone=1234567890))
             self.database.add_trainer(Trainer(_id=None,
                                               username="testtrainer3",
                                               password="pass",
                                               name="testTrainer3",
-                                              location="somewhere",
                                               phone=1234567890))
 
             self.database.add_trainee(Trainee(_id=None,
                                               username="testtrainee1",
                                               password="pass",
                                               name="testTrainer3",
-                                              location="somewhere",
                                               phone=1234567890))
 
             trainer1_id = str(self.database.mongo.trainer.find_one(
@@ -1388,3 +1384,28 @@ class TestDatabase(unittest.TestCase):
         assert ObjectId(trainee._id) not in self.database.mongo.trainer.find_one({
             '_id': ObjectId(trainer._id)
         })['trainees']
+
+    def test_find_trainers_near_user(self):
+        """Tests the find nearby trainers function to see if it returns a populated list"""
+
+        new_trainee = deepcopy(self.test_trainee)
+
+        # Updating user object to database user
+        new_trainee = self.database.get_trainee_by_username(
+            new_trainee.username)
+
+        new_trainer = deepcopy(self.test_trainer)
+
+        # Updating user object to database user
+        new_trainer = self.database.get_trainer_by_username(
+            new_trainer.username)
+
+        # setting trainee and trainer with coordinates that should be close enough
+        self.database.set_coords(new_trainee._id, new_trainee.lng, new_trainee.lat)
+        self.database.set_coords(new_trainer._id, new_trainer.lng, new_trainer.lat)
+
+        # running test
+        returned_list = self.database.find_trainers_near_user(new_trainee.lng, new_trainee.lat)
+
+        # checking if list is empty
+        assert returned_list

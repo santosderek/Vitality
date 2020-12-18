@@ -20,7 +20,6 @@ class User:
         self.username = str(username)
         self.password = str(password)
         self.name = str(name)
-        self.location = str(location)
         self.phone = str(phone)
         self.body_type = str(body_type)
         self.body_fat = str(body_fat)

@@ -223,9 +223,9 @@ def create_app():
                                 password=password,
                                 name=name,
                                 phone=phone,
+                                exp=0,
                                 lng=lng,
-                                lat=lat,
-                                exp=0)
+                                lat=lat)
 
                             g.database.add_trainee(new_user)
 
@@ -236,9 +236,9 @@ def create_app():
                                 password=password,
                                 name=name,
                                 phone=phone,
+                                exp=0,
                                 lng=lng,
-                                lat=lat,
-                                exp=0)
+                                lat=lat)
 
                             g.database.add_trainer(new_user)
 
