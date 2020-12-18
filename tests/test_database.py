@@ -1,3 +1,4 @@
+from tests import test_trainee
 import unittest
 from copy import deepcopy
 from bson.objectid import ObjectId
@@ -38,7 +39,11 @@ class TestDatabase(unittest.TestCase):
         name="testing",
         difficulty="easy",
         about="workout",
-        exp=10)
+        is_complete=False,
+        total_time="20 minutes",
+        reps="10",
+        miles="2",
+        category="cardio")
 
     def setUp(self):
         self.tearDown()
@@ -253,6 +258,34 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(
             self.database.get_trainee_by_id(db_user._id) is None)
 
+    def test_add_trainee_experience(self):
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+        assert trainee['exp'] == 0
+
+        self.database.add_trainee_experience(str(trainee['_id']), 10)
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+        assert trainee['exp'] == 10
+
+        self.database.add_trainee_experience(str(trainee['_id']), 20)
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+        assert trainee['exp'] == 30
+
+        self.database.add_trainee_experience(str(trainee['_id']), 30)
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+        assert trainee['exp'] == 60
+
     def test_set_trainee_name(self):
         new_trainee = deepcopy(self.test_trainee)
 
@@ -291,6 +324,34 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(found_trainees[0].as_dict(), trainee.as_dict())
 
     """ Test trainer """
+
+    def test_add_trainer_experience(self):
+        trainer = self.database.mongo.trainer.find_one({
+            'username': self.test_trainer.username
+        })
+        assert trainer is not None
+        assert trainer['exp'] == 0
+
+        self.database.add_trainer_experience(str(trainer['_id']), 10)
+        trainer = self.database.mongo.trainer.find_one({
+            'username': self.test_trainer.username
+        })
+        assert trainer is not None
+        assert trainer['exp'] == 10
+
+        self.database.add_trainer_experience(str(trainer['_id']), 20)
+        trainer = self.database.mongo.trainer.find_one({
+            'username': self.test_trainer.username
+        })
+        assert trainer is not None
+        assert trainer['exp'] == 30
+
+        self.database.add_trainer_experience(str(trainer['_id']), 30)
+        trainer = self.database.mongo.trainer.find_one({
+            'username': self.test_trainer.username
+        })
+        assert trainer is not None
+        assert trainer['exp'] == 60
 
     def test_add_trainer(self):
 
@@ -469,6 +530,28 @@ class TestDatabase(unittest.TestCase):
         # Check if equal
         self.assertTrue(new_workout.as_dict() == database_workout.as_dict())
 
+    def test_get_workout_by_attributes(self):
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+
+        workout = self.database.get_workout_by_attributes(creator_id=trainee['_id'],
+                                                          about='workout',
+                                                          name='testing')
+        assert workout is not None
+        assert workout.creator_id == str(trainee['_id'])
+        assert workout.about == 'workout'
+        assert workout.name == 'testing'
+
+        with self.assertRaises(WorkoutNotFound):
+            self.database.get_workout_by_attributes(about='not a workout at all',
+                                                    name='nope not a name')
+
+        workout = self.database.get_workout_by_attributes(_id=str(workout._id))
+        assert workout is not None
+        
+
     def test_get_workout_class_by_id(self):
         new_workout = deepcopy(self.test_workout)
 
@@ -477,8 +560,8 @@ class TestDatabase(unittest.TestCase):
             self.test_trainee.username)
 
         # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+        database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                   creator_id=trainee._id)
 
         # Need to pass in the mongo id
         new_workout._id = database_workout._id
@@ -500,8 +583,8 @@ class TestDatabase(unittest.TestCase):
             self.test_trainee.username)
 
         # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+        database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                   creator_id=trainee._id)
 
         # Need to pass in the mongo id
         new_workout._id = database_workout._id
@@ -513,7 +596,7 @@ class TestDatabase(unittest.TestCase):
 
     def test_set_workout_creator_id(self):
 
-        try: 
+        try:
             new_workout = deepcopy(self.test_workout)
 
             # Get trainee from database
@@ -524,56 +607,69 @@ class TestDatabase(unittest.TestCase):
             trainer = self.database.get_trainer_by_username(
                 self.test_trainer.username)
 
-            database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                                trainee._id)
+            database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                       creator_id=trainee._id)
             assert database_workout is not None
 
             # Set to trainer id
             self.database.set_workout_creator_id(database_workout._id,
-            trainer._id)
+                                                 trainer._id)
 
             # Get back the new workout
-            database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                                trainer._id)
+            database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                       creator_id=trainer._id)
             assert database_workout is not None
 
-            # Check that the creator_id is now changed 
+            # Check that the creator_id is now changed
             assert database_workout.creator_id == trainer._id
-        
+
         finally:
-            # Delete it
+            trainer = self.database.get_trainer_by_username(
+                self.test_trainer.username)
             self.database.mongo.workout.delete_many({
-                '_id': ObjectId(database_workout._id)
+                'creator_id': ObjectId(trainer._id)
             })
 
     def test_set_workout_name(self):
-        new_workout = deepcopy(self.test_workout)
-        trainee = self.database.get_trainee_by_username(
-            self.test_trainee.username)
+        try:
+            new_workout = deepcopy(self.test_workout)
+            trainee = self.database.get_trainee_by_username(
+                self.test_trainee.username)
 
-        while self.database.get_workout_by_name("newname", trainee._id):
-            workout = self.database.get_workout_by_name("newname", trainee._id)
-            self.database.remove_workout(workout._id)
+            self.database.mongo.workout.delete_many(
+                {
+                    'name': "newname",
+                    'creator_id': trainee._id
+                }
+            )
 
-        # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+            # Get workout from database
+            database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                       creator_id=trainee._id)
 
-        # Get id and change name
-        new_workout._id = database_workout._id
-        new_workout.name = "newname"
-        new_workout.creator_id = database_workout.creator_id
+            # Get id and change name
+            new_workout._id = database_workout._id
+            new_workout.name = "newname"
+            new_workout.creator_id = database_workout.creator_id
 
-        # Set it in database
-        self.database.set_workout_name(new_workout._id, new_workout.name)
+            # Set it in database
+            self.database.set_workout_name(new_workout._id, new_workout.name)
 
-        # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
-        self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
+            # Get workout from database
+            database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                       creator_id=trainee._id)
+            self.assertTrue(database_workout.as_dict()
+                            == new_workout.as_dict())
 
-        # Removing workout since we changed name. Teardown wont do it
-        self.database.remove_workout(new_workout._id)
+            # Removing workout since we changed name. Teardown wont do it
+            self.database.remove_workout(new_workout._id)
+
+        finally:
+            self.database.mongo.workout.delete_many(
+                {
+                    'creator_id': trainee._id
+                }
+            )
 
     def test_set_workout_difficulty(self):
         new_workout = deepcopy(self.test_workout)
@@ -583,8 +679,8 @@ class TestDatabase(unittest.TestCase):
             self.test_trainee.username)
 
         # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+        database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                   creator_id=trainee._id)
 
         # Get id and change name
         new_workout._id = database_workout._id
@@ -595,8 +691,8 @@ class TestDatabase(unittest.TestCase):
             new_workout._id, new_workout.difficulty)
 
         # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+        database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                   creator_id=trainee._id)
 
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
 
@@ -608,8 +704,8 @@ class TestDatabase(unittest.TestCase):
             self.test_trainee.username)
 
         # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+        database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                   creator_id=trainee._id)
 
         # Get id and change name
         new_workout._id = database_workout._id
@@ -619,30 +715,8 @@ class TestDatabase(unittest.TestCase):
         self.database.set_workout_about(new_workout._id, new_workout.about)
 
         # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
-
-        self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
-
-    def test_set_workout_exp(self):
-        new_workout = deepcopy(self.test_workout)
-        trainee = self.database.get_trainee_by_username(
-            self.test_trainee.username)
-
-        # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
-
-        # Get id and change name
-        new_workout._id = database_workout._id
-        new_workout.exp = "newexp"
-
-        # Set it in database
-        self.database.set_workout_exp(new_workout._id, new_workout.exp)
-
-        # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+        database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                   creator_id=trainee._id)
 
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
 
@@ -658,19 +732,19 @@ class TestDatabase(unittest.TestCase):
             self.test_trainee.username)
 
         # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+        database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                   creator_id=trainee._id)
 
         # Get id and change name
         new_workout._id = database_workout._id
         new_workout.creator_id = database_workout.creator_id
 
         self.assertTrue(database_workout.as_dict() == new_workout.as_dict())
-
         self.database.remove_workout(new_workout._id)
 
-        self.assertTrue(self.database.get_workout_by_name(
-            new_workout.name, trainee._id) is None)
+        with self.assertRaises(WorkoutNotFound):
+            self.database.get_workout_by_attributes(name=new_workout.name,
+                                                    creator_id=trainee._id)
 
     def test_add_workout(self):
         new_trainee = self.database.get_trainee_by_username(
@@ -683,8 +757,8 @@ class TestDatabase(unittest.TestCase):
             self.test_trainee.username)
 
         # Get workout from database
-        database_workout = self.database.get_workout_by_name(new_workout.name,
-                                                             trainee._id)
+        database_workout = self.database.get_workout_by_attributes(name=new_workout.name,
+                                                                   creator_id=trainee._id)
 
         # Set ids
         new_workout._id = database_workout._id
@@ -874,13 +948,112 @@ class TestDatabase(unittest.TestCase):
             creator_id=trainee._id,
             name="goingtoremove",  # tearDown removes all of these
             difficulty="novice",
-            about="something something else",
-            exp=0
+            about="something something else"
         )
 
         self.database.add_workout(new_workout)
         workouts = self.database.get_all_workouts_by_creatorid(trainee._id)
         assert len(workouts) == 2
+
+    def test_set_workout_status(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['is_complete'] is False
+
+        self.database.set_workout_status(trainee._id, workout['name'], True)
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['is_complete'] is True
+
+    def test_set_workout_total_time(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['total_time'] == "20 minutes"
+
+        self.database.set_workout_total_time(trainee._id, workout['name'], "10")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['total_time'] =="10"
+
+    def test_set_workout_reps(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['reps'] == "10"
+
+        self.database.set_workout_reps(trainee._id, workout['name'], "5")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['reps'] == "5"
+
+    def test_set_workout_miles(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['miles'] == "2"
+
+        self.database.set_workout_miles(trainee._id, workout['name'], "5")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['miles'] == "5"
+
+    def test_set_workout_category(self):
+        trainee = self.database.get_trainee_by_username(
+            self.test_trainee.username)
+
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+
+        assert workout is not None
+        assert workout['category'] == "cardio"
+
+        self.database.set_workout_category(trainee._id, workout['name'], "Abs")
+        workout = self.database.mongo.workout.find_one({
+            'name': "testing",
+            'creator_id': ObjectId(trainee._id)
+        })
+        assert workout is not None
+        assert workout['category'] == "Abs"
 
     """Invitation tests"""
 

@@ -1,12 +1,113 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row"> 
-    <h1> {{ workoutInfo.name }} </h1><br><br>
-    <div class = "col-sm-12">
-        <p><b>Difficulty: </b>{{ workoutInfo.difficulty }}</p><br>
-        <p><b>Experience Points: </b>{{ workoutInfo.exp }}</p><br>
-        <p><b>Workout Details: </b>{{ workoutInfo.about }}</p>
+<div class="row">
+    <div class="col-sm-12">
+        <h1> {{ workout_info.name }} </h1><br><br>
+    </div>
+    <div class="col-sm-12">
+        <p><b>Difficulty: </b>{{ workout_info.difficulty }}</p>
+        <br>
+        <p id="workoutExp"><b>Experience Points: </b>{{ exp }}</p>
+        <br>
+        <p><b>Workout Details: </b>{{ workout_info.about }}</p>
+        <br>
+        {% if workout_info.is_complete == False %}
+        <label for="total_time"><b>Input total time</b></label>
+        <input type="text" id="total_time" name="total_time" required/>
+        <label for="reps"><b>Input total reps</b></label>
+        <input type="text" id="reps" name="reps" required/>
+        <label for="miles"><b>(Optional) Input total miles</b></label>
+        <input type="text" id="miles" name="miles">
+
+        <br>
+
+        <label for="category"><b>Choose a category</b></label>
+        <select name="category" id="category">
+            <option value="cardio">Cardio</option>
+            <option value="weight training">Weight training</option>
+            <option value="abs">Abs</option>
+            <option value="legs">Legs</option>
+        </select>
+        {% else %}
+
+        {% if workout_info.total_time %}
+        <p><b>Total Time:</b> {{ workout_info.total_time }}</p>
+        {% else %}
+        <p><b>Total Time:</b> Not Provided</p>
+        {% endif %}
+
+        {% if workout_info.total_time %}
+        <p><b>Reps:</b> {{ workout_info.reps }}</p>
+        {% else %}
+        <p><b>Reps:</b> Not Provided</p>
+        {% endif %}
+
+        {% if workout_info.total_time %}
+        <p><b>Miles:</b> {{ workout_info.miles }}</p>
+        {% else %}
+        <p><b>Miles:</b> Not Provided</p>
+        {% endif %}
+
+        {% if workout_info.total_time %}
+        <p><b>Category:</b> {{ workout_info.category }}</p>
+        {% else %}
+        <p><b>Category:</b> Not Provided</p>
+        {% endif %}
+
+        {% endif %}
+        <input type="hidden" name="completed" value="true" />
+        <button class="text-center mt-1" type="submit" id="completed_button" onclick="submitted()">
+            Complete
+        </button>
+
     </div>
 </div>
+
+<script>
+    function submitted() {
+        total_time = $("#total_time").val();
+        reps = $("#reps").val();
+        miles = $("#miles").val();
+        category = $("#category").val();
+        if(!total_time || !reps) {
+            alert('You must fill out the total time and reps field.');
+            location.reload();
+        }else{
+            $("#completed_button").text("Workout Completed!");
+            $("#completed_button").prop('disabled', true);
+            $("#completed_button").css("background-color", "grey");
+
+            $.post('{{ url_for("workout", creator_id=g.user._id, workout_name=workout_info.name) }}', {
+                'completed': 'true', total_time:total_time, reps:reps, miles:miles, category:category
+            })
+                .done(() => {
+                    $("#completed_button").text("Workout Completed!");
+                    $("#completed_button").prop('disabled', true);
+                    $("#completed_button").css("background-color", "grey");
+                    location.reload();
+                })
+                .fail(() => {
+                    $("#completed_button").text("Could not complete!");
+                    window.setTimeout(function () {
+                        $("#completed_button").css("background-color", "#8492A6");
+                        $("#completed_button").text("Complete");
+                        $("#completed_button").prop('disabled', false);
+                    }, 2 * 1000);
+
+                });
+        }
+    }
+    window.addEventListener(
+        'load',
+        function () {
+            if ('{{workout_info.is_complete}}'.toLowerCase() == 'true') {
+                $("#completed_button").text("Workout Completed!");
+                $("#completed_button").prop('disabled', true);
+                $("#completed_button").css("background-color", "grey");
+            }
+        },
+        false);
+
+</script>
 {% endblock %}

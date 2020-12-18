@@ -41,7 +41,7 @@
                                     <a class="btn mb-1 col-sm-12" id="add"
                                         style="pointer-events: none; background-color: grey;">Already Added!</a>
                                     {% else %}
-                                    <a class="btn mb-1 col-sm-12" id="add"
+                                    <a class="btn mb-1 col-sm-12" id="add_{{trainee._id}}"
                                         onclick="add_trainee('{{ trainee._id }}')">Add</a>
                                     {% endif %}
 
@@ -59,16 +59,16 @@
     function add_trainee(trainee_id) {
         $.post("{{ url_for("add_trainee") }}", { "trainee_id": trainee_id })
             .done(() => {
-                $("#add").text("Trainee Added!");
-                $("#add").css("background-color", "grey");
-                $("#add").prop('disabled', true);
+                $(`#add_${trainee_id}`).text("Trainee Added!");
+                $(`#add_${trainee_id}`).css("background-color", "grey");
+                $(`#add_${trainee_id}`).prop('disabled', true);
             })
             .fail(() => {
-                $("#add").text("Could not add!");
+                $(`#add_${trainee_id}`).text("Could not add!");
                 var timeoutID = window.setTimeout(function () {
-                    $("#add").css("background-color", "grey");
-                    $("#add").text("Add");
-                    $('#add').prop('disabled', false);
+                    $(`#add_${trainee_id}`).css("background-color", "grey");
+                    $(`#add_${trainee_id}`).text("Add");
+                    $(`#add_${trainee_id}`).prop('disabled', false);
                 }, 2 * 1000);
             });
     };

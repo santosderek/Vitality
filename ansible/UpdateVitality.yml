@@ -1,0 +1,19 @@
+---
+
+- hosts: ocean
+  remote_user: derek
+  
+  tasks: 
+    - name: Pull latest from Vitality
+      git:
+        repo: git@github.com:santosderek/Vitality.git
+        dest: /home/derek/webservices/Vitality
+        update: yes
+
+    - name: Docker Compose API
+      community.general.docker_compose:
+        build: yes
+        project_src: /home/derek/webservices
+        pull: yes
+        remove_orphans: yes
+        services: vitality

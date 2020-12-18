@@ -8,6 +8,8 @@ from markupsafe import escape
 import re
 import hashlib
 
+from vitality import workout
+
 
 def password_sha256(password: str):
     return hashlib.sha256(escape(password).encode()).hexdigest()
@@ -170,6 +172,19 @@ class Database:
         trainee_dict.pop('lat')
         trainee_dict.pop('lng')
         self.mongo.trainee.insert_one(trainee_dict)
+
+    def add_trainee_experience(self, trainee_id: str, value: int):
+
+        self.mongo.trainee.update_one(
+            {
+                '_id': ObjectId(trainee_id)
+            },
+            {
+                '$inc': {
+                    'exp': int(value)
+                }
+            }
+        )
 
     def remove_trainee(self, id: str):
         """Deletes a trainee by trainee id."""
@@ -422,6 +437,19 @@ class Database:
         trainer_dict.pop('lat')
         self.mongo.trainer.insert_one(trainer_dict)
 
+    def add_trainer_experience(self, trainer_id: str, value: int):
+
+        self.mongo.trainer.update_one(
+            {
+                '_id': ObjectId(trainer_id)
+            },
+            {
+                '$inc': {
+                    'exp': int(value)
+                }
+            }
+        )
+
     def remove_trainer(self, id: str):
         """Deletes a trainer by trainer id."""
         self.mongo.trainer.delete_one({"_id": ObjectId(id)})
@@ -453,6 +481,24 @@ class Database:
             return self.workout_dict_to_class(found_workout)
         return None
 
+    def get_workout_by_attributes(self, **kwargs):
+        """
+        Returns a single workout based on the keyword arguments passed to the function.
+        Each key represents the attribute to append to the find function.
+        If a workout with the passed key value pairs are not found, then we raise a WorkoutNotFound
+        error. 
+        """
+        if 'creator_id' in kwargs: 
+            kwargs['creator_id'] = ObjectId(kwargs['creator_id'])
+        if '_id' in kwargs: 
+            kwargs['_id'] = ObjectId(kwargs['_id'])
+            
+        found_workout = self.mongo.workout.find_one({**kwargs})
+        if found_workout:
+            return self.workout_dict_to_class(found_workout)
+        else: 
+            raise WorkoutNotFound("Workout with key/value pairs not found.")
+
     def get_all_workouts_by_creatorid(self, creator_id: str):
         """Returns the Workout class found by the workout's id."""
         found_workouts = self.mongo.workout.find(
@@ -462,16 +508,6 @@ class Database:
             for workout in found_workouts:
                 workouts.append(self.workout_dict_to_class(workout))
         return workouts
-
-    def get_workout_by_name(self, name: str, creator_id: str):
-        """Returns the Workout class found by the workout's name."""
-        found_workout = self.mongo.workout.find_one({
-            "creator_id": ObjectId(creator_id),
-            "name": name
-        })
-        if found_workout:
-            return self.workout_dict_to_class(found_workout)
-        return None
 
     def set_workout_creator_id(self, id: str, creator_id: str):
         """Updates a workout's creator id given a workout id."""
@@ -503,6 +539,54 @@ class Database:
                 }
             })
 
+    def set_workout_total_time(self, creator_id: str, name: str, total_time: str):
+        """Updates a workout's total time given a workout id."""
+        self.mongo.workout.update_one(
+            {"creator_id": ObjectId(creator_id),
+             "name": name
+             },
+            {
+                "$set": {
+                    "total_time": total_time
+                }
+            })
+
+    def set_workout_reps(self, creator_id: str, name: str, reps: str):
+        """Updates a workout's reps given a workout id."""
+        self.mongo.workout.update_one(
+            {"creator_id": ObjectId(creator_id),
+             "name": name
+             },
+            {
+                "$set": {
+                    "reps": reps
+                }
+            })
+
+    def set_workout_miles(self, creator_id: str, name: str, miles: str):
+        """Updates a workout's miles given a workout id."""
+        self.mongo.workout.update_one(
+            {"creator_id": ObjectId(creator_id),
+             "name": name
+             },
+            {
+                "$set": {
+                    "miles": miles
+                }
+            })
+
+    def set_workout_category(self, creator_id: str, name: str, category: str):
+        """Updates a workout's category given a workout id."""
+        self.mongo.workout.update_one(
+            {"creator_id": ObjectId(creator_id),
+             "name": name
+             },
+            {
+                "$set": {
+                    "category": category
+                }
+            })
+
     def set_workout_about(self, id: str, about: str):
         """Updates a workout's about information given a workout id."""
         self.mongo.workout.update_one(
@@ -513,13 +597,15 @@ class Database:
                 }
             })
 
-    def set_workout_exp(self, id: str, exp: str):
-        """Updates a workout's experience points given a workout id."""
+    def set_workout_status(self, creator_id: str, name: str, is_complete: bool):
         self.mongo.workout.update_one(
-            {"_id": ObjectId(id)},
+            {
+                'creator_id': ObjectId(creator_id),
+                "name": name
+            },
             {
                 "$set": {
-                    "exp": exp
+                    "is_complete": is_complete
                 }
             })
 
@@ -536,7 +622,11 @@ class Database:
             'name': workout.name,
             "difficulty": workout.difficulty,
             "about": workout.about,
-            "exp": workout.exp})
+            "is_complete": workout.is_complete,
+            "total_time": workout.total_time,
+            "reps": workout.reps,
+            "miles": workout.miles,
+            "category": workout.category})
 
     """Invitation"""
 
@@ -652,6 +742,11 @@ class UsernameTakenError(ValueError):
 
 
 class UserNotFoundError(ValueError):
+    """If a username was taken within the database class"""
+    pass
+
+
+class WorkoutNotFound(ValueError):
     """If a username was taken within the database class"""
     pass
 

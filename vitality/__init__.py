@@ -1,16 +1,24 @@
+from collections import defaultdict
+from werkzeug.exceptions import default_exceptions
 from .trainee import Trainee
 from .trainer import Trainer
 from .database import (
     Database,
     UsernameTakenError,
-    WorkoutCreatorIdNotFoundError,
+    WorkoutCreatorIdNotFoundError, WorkoutNotFound,
     password_sha256,
     InvalidCharactersException,
     UserNotFoundError,
     IncorrectRecipientID,
     InvitationNotFound
 )
-from .workout import Workout
+from .workout import (
+    Workout,
+    DEFAULT_EASY_EXP,
+    DEFAULT_MEDIUM_EXP,
+    DEFAULT_HARD_EXP,
+    DEFAULT_INSANE_EXP
+)
 from flask import (
     abort,
     Flask,
@@ -27,11 +35,74 @@ from .settings import SECRET_KEY, MONGO_URI
 import json
 
 
+DEFAULT_VITALITY_PASSWORD = "DefaultVitalityTrainerPassword"
+
+
+def populate_database_defaults():
+    """Creates the default trainer and workouts for the application."""
+    default_database = Database(MONGO_URI)
+
+    if not default_database.get_trainer_by_username("vitality"):
+        # Default Vitality User
+        trainer = Trainer(
+            _id=None,
+            username="vitality",
+            password=DEFAULT_VITALITY_PASSWORD
+        )
+        default_database.add_trainer(trainer)
+    default_trainer = default_database.get_trainer_by_username("vitality")
+
+    # Default Workouts
+    default_workouts = [
+        Workout(
+            _id=None,
+            creator_id=default_trainer._id,
+            name="curls",
+            difficulty="easy",
+            about="An exercise to workout your biceps.",
+            is_complete=False
+        ),
+        Workout(
+            _id=None,
+            creator_id=default_trainer._id,
+            name="Russian Twists",
+            difficulty="medium",
+            about="An exercise to workout your abs.",
+            is_complete=False
+        ),
+        Workout(
+            _id=None,
+            creator_id=default_trainer._id,
+            name="burpees",
+            difficulty="hard",
+            about="An exercise to workout your stamina.",
+            is_complete=False
+        ),
+        Workout(
+            _id=None,
+            creator_id=default_trainer._id,
+            name="20lb plate pullups",
+            difficulty="insane",
+            about="An exercise to workout your lats, biceps, deltoids.",
+            is_complete=False
+        )
+    ]
+    for workout in default_workouts:
+        try:
+            default_database.get_workout_by_attributes(name=workout.name,
+                                                       creator_id=workout.creator_id)
+        except WorkoutNotFound:
+            default_database.add_workout(workout)
+
+
 def create_app():
     """Application factory for our flask web server"""
     app = Flask(__name__)
     app.secret_key = SECRET_KEY
 
+    populate_database_defaults()
+
+    # Input Validation
     alphaPattern = re.compile(r"^[a-zA-Z0-9\s]*$")
     numberPattern = re.compile(r"^[0-9]*$")
     stringPattern = re.compile(r"^[a-zA-Z]*$")
@@ -57,6 +128,12 @@ def create_app():
         """The home page of Vitality"""
         app.logger.info('Rendering home')
         return render_template("home.html")
+    
+    @app.route('/features', methods=["GET"])
+    def features():
+        """The features page of Vitality"""
+        app.logger.info('Rendering features page')
+        return render_template("features.html")
 
     """Account Management"""
 
@@ -147,7 +224,8 @@ def create_app():
                                 name=name,
                                 phone=phone,
                                 lng=lng,
-                                lat=lat)
+                                lat=lat,
+                                exp=0)
 
                             g.database.add_trainee(new_user)
 
@@ -159,22 +237,20 @@ def create_app():
                                 name=name,
                                 phone=phone,
                                 lng=lng,
-                                lat=lat)
+                                lat=lat,
+                                exp=0)
 
                             g.database.add_trainer(new_user)
 
                         else:
                             return render_template("account/signup.html", error_message=True)
-
                         # If username and password successful
                         return render_template("account/signup.html", creation_successful=True)
-
                     except UsernameTakenError as err:
-                        app.logger.debug(
-                            "Username {} was taken.".format(new_user))
+                        app.logger.debug(f"Username {username} was taken.")
                         return render_template("account/signup.html", username_taken=True)
 
-                # If username and password failed, render error messsage
+                # If username and password failed, render error message
                 return render_template("account/signup.html", error_message=True)
             except InvalidCharactersException as e:
                 return render_template("account/signup.html", invalid_characters=True), 400
@@ -187,10 +263,10 @@ def create_app():
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
 
-        app.logger.info('Rendering Profile')
         username = escape(username)
         user = g.database.get_trainer_by_username(username) \
             or g.database.get_trainee_by_username(username)
+
         return render_template("account/profile.html", user=user)
 
     @app.route('/usersettings', methods=["GET", "POST"])
@@ -223,16 +299,12 @@ def create_app():
                 lng = float(escape(request.form['lng']))
 
                 if g.database.get_trainee_by_id(g.user._id) is not None:
-
                     if username:
                         g.database.set_trainee_username(g.user._id, username)
-
                     if password and re_password and password == re_password:
                         g.database.set_trainee_password(g.user._id, password)
-
                     if phone:
                         g.database.set_trainee_phone(g.user._id, phone)
-
                     if name:
                         g.database.set_trainee_name(g.user._id, name)
 
@@ -244,13 +316,10 @@ def create_app():
                 elif g.database.get_trainer_by_id(g.user._id) is not None:
                     if username:
                         g.database.set_trainer_username(g.user._id, username)
-
                     if password and re_password and password == re_password:
                         g.database.set_trainer_password(g.user._id, password)
-
                     if phone:
                         g.database.set_trainer_phone(g.user._id, phone)
-
                     if name:
                         g.database.set_trainer_name(g.user._id, name)
                     
@@ -622,25 +691,38 @@ def create_app():
             return redirect(url_for('login'))
 
         if request.method == "POST":
-
+            name = escape(request.form['name'])
+            about = escape(request.form['about'])
+            difficulty = escape(request.form['difficulty'])
+            total_time = escape(request.form['total_time'])
+            reps = escape(request.form['reps'])
+            miles = escape(request.form['miles'])
+            category = escape(request.form['category'])
             try:
-                name = escape(request.form['name'])
-                about = escape(request.form['about'])
-                difficulty = escape(request.form['difficulty'])
+                existing_workout = g.database.get_workout_by_attributes(
+                    creator_id=g.user._id,
+                    name=name)
 
+                app.logger.debug("Workout already exists.")
+                return render_template("workout/new_workout.html", workout_name_invalid=True), 400
+            except WorkoutNotFound:
+                app.logger.debug("Adding new workout.")
                 g.database.add_workout(Workout(
                     _id=None,
                     creator_id=g.user._id,
                     name=name,
                     difficulty=difficulty,
                     about=about,
-                    exp=0
+                    is_complete=False,
+                    total_time=total_time,
+                    reps=reps,
+                    miles=miles,
+                    category=category
                 ))
                 return render_template("workout/new_workout.html", workout_added=True)
-
             except WorkoutCreatorIdNotFoundError:
+                app.logger.debug("Creator Id could not be found.")
                 return render_template("workout/new_workout.html", invalid_creatorid=True)
-
         return render_template("workout/new_workout.html")
 
     @app.route('/search_workout', methods=["GET"])
@@ -648,10 +730,17 @@ def create_app():
         """Page to search for a workout"""
         if not g.user:
             return redirect(url_for('login'))
+        default_vitality_user = g.database.get_trainer_by_username("vitality")
+        default_workouts = g.database.get_all_workouts_by_creatorid(
+            default_vitality_user._id)
+        return render_template("workout/search.html", 
+        default_workouts=default_workouts,
+        default_easy_exp=DEFAULT_EASY_EXP,
+        default_hard_exp=DEFAULT_HARD_EXP,
+        default_medium_exp=DEFAULT_MEDIUM_EXP,
+        default_insane_exp=DEFAULT_INSANE_EXP)
 
-        return render_template("workout/search.html")
-
-    @app.route('/workout/<creator_id>/<workout_name>', methods=["GET"])
+    @app.route('/workout/<creator_id>/<workout_name>', methods=["GET", "POST"])
     def workout(creator_id: str, workout_name: str):
         """Page that shows the workout details"""
         if not g.user:
@@ -659,12 +748,53 @@ def create_app():
         creator_id = str(escape(creator_id))
         workout_name = str(escape(workout_name))
 
-        # workout = g.database.get_workout_by_id(workout_name)
+        try:
+            workout_info = g.database.get_workout_by_attributes(name=workout_name,
+                                                                creator_id=creator_id)
+            exp_value = 0
+            if workout_info.difficulty == 'easy':
+                exp_value = DEFAULT_EASY_EXP
+                app.logger.debug('Set exp equal to DEFAULT_EASY_EXP')
 
-        if (g.database.get_workout_by_name(workout_name, creator_id) is None):
+            elif workout_info.difficulty == 'medium':
+                exp_value = DEFAULT_MEDIUM_EXP
+                app.logger.debug('Set exp equal to DEFAULT_MEDIUM_EXP')
+
+            elif workout_info.difficulty == 'hard':
+                exp_value = DEFAULT_HARD_EXP
+                app.logger.debug('Set exp equal to DEFAULT_HARD_EXP')
+
+            elif workout_info.difficulty == 'insane':
+                exp_value = DEFAULT_INSANE_EXP
+                app.logger.debug('Set exp equal to DEFAULT_INSANE_EXP')
+
+        except WorkoutNotFound:
+            app.logger.debug('Workout could not be found!')
             abort(404)
 
-        return render_template("workout/workout.html", workoutInfo=g.database.get_workout_by_name(workout_name, creator_id))
+        # Check creator_id and workout name, then update the workout to be completed in a POST req
+        if request.method == "POST":
+            completed = str(escape(request.form['completed']))
+            total_time = str(escape(request.form['total_time']))
+            reps = str(escape(request.form['reps']))
+            miles = str(escape(request.form['miles']))
+            category = str(escape(request.form['category']))
+            if completed != 'true':
+                abort(400)
+            app.logger.debug('heyyy')
+            if type(g.user) is Trainer:
+                g.database.add_trainer_experience(g.user._id, exp_value)
+            if type(g.user) is Trainee:
+                g.database.add_trainee_experience(g.user._id, exp_value)
+            g.database.set_workout_total_time(g.user._id, workout_name, total_time)
+            g.database.set_workout_reps(g.user._id, workout_name, reps)
+            g.database.set_workout_miles(g.user._id, workout_name, miles)
+            g.database.set_workout_category(g.user._id, workout_name, category)
+            g.database.set_workout_status(g.user._id, workout_name, True)
+            workout_info = g.database.get_workout_by_attributes(name=workout_name,
+                                                                creator_id=creator_id)
+
+        return render_template("workout/workout.html", workout_info=workout_info, exp=exp_value)
 
     @app.route('/workout_overview', methods=["GET"])
     def workout_overview():
