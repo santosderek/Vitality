@@ -440,12 +440,15 @@ def create_app():
 
         # Get all workouts
         workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
-
+        created_events, recieved_events = g.database.list_events_from_user_id(
+            g.user._id)
+        event_length_array = [len(created_events), len(recieved_events)]
         return render_template("user/overview.html",
                                trainees=trainees,
                                workouts=workouts,
                                events=[],
-                               invitations=invitations)
+                               invitations=invitations,
+                               event_length_array=event_length_array)
 
     @app.route('/list_trainees', methods=["GET"])
     def list_trainees():
@@ -500,11 +503,14 @@ def create_app():
 
         # Get all workouts
         workouts = g.database.get_all_workouts_by_creatorid(g.user._id)
-
+        created_events, recieved_events = g.database.list_events_from_user_id(
+            g.user._id)
+        event_length_array = [len(created_events), len(recieved_events)]
         return render_template("user/overview.html",
                                trainers=trainers,
                                workouts=workouts,
-                               invitations=invitations)
+                               invitations=invitations,
+                               event_length_array=event_length_array)
 
     @app.route('/list_trainers', methods=["GET"])
     def list_trainers():
@@ -791,7 +797,6 @@ def create_app():
 
         created_events, recieved_events = g.database.list_events_from_user_id(
             g.user._id)
-        print(recieved_events)
         return render_template("user/schedule.html",
                                created_events=created_events,
                                recieved_events=recieved_events)

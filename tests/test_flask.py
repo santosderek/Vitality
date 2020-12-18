@@ -858,32 +858,6 @@ def test_list_trainees(client):
     assert b'No trainees found' not in returned_value.data
 
 
-def test_trainer_schedule(client):
-    """Testing the trainer schedule page"""
-
-    # Trainer Overview no user
-    returned_value = client.get('/trainer_schedule', follow_redirects=True)
-    assert returned_value.status_code == 200
-    assert g.user is None
-    assert b'login' in returned_value.data
-
-    # Login as Trainee
-    login_as_testTrainee(client)
-
-    # Trainer Overview as Trainee
-    returned_value = client.get('/trainer_schedule', follow_redirects=True)
-    assert returned_value.status_code == 403
-    assert type(g.user) == Trainee
-
-    # Login as Trainer
-    login_as_testTrainer(client)
-
-    # Trainer Overview as Trainer
-    returned_value = client.get('/trainer_schedule',
-                                follow_redirects=True)
-    assert returned_value.status_code == 200
-    assert type(g.user) == Trainer
-    assert b'Schedule...' in returned_value.data
 
 
 def test_trainee_overview(client):
@@ -1146,7 +1120,7 @@ def test_trainee_schedule(client):
     """Testing the trainer overview page"""
 
     # Trainer Overview no user
-    returned_value = client.get('/trainee_schedule',
+    returned_value = client.get('/schedule',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert g.user is None
@@ -1155,19 +1129,18 @@ def test_trainee_schedule(client):
     login_as_testTrainee(client)
 
     # Trainee Overview as Trainee
-    returned_value = client.get('/trainee_schedule',
+    returned_value = client.get('/schedule',
                                 follow_redirects=True)
     assert returned_value.status_code == 200
     assert type(g.user) == Trainee
 
     login_as_testTrainer(client)
 
-    # Trainee Overview as Trainee
-    returned_value = client.get('/trainee_schedule',
+    # Trainer Overview as Trainer
+    returned_value = client.get('/schedule',
                                 follow_redirects=True)
-    assert returned_value.status_code == 403
+    assert returned_value.status_code == 200
     assert type(g.user) == Trainer
-    assert b'Page Forbidden' in returned_value.data
 
 
 def test_page_forbidden(client):
