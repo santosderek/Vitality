@@ -40,8 +40,8 @@ jobs:
         GOOGLE_MAPS_KEY: ${{ secrets.GOOGLE_MAPS_KEY }}
         GOOGLE_YOUTUBE_KEY: ${{ secrets.GOOGLE_YOUTUBE_KEY }}
       run: |
-        export GOOGLE_YOUTUBE_KEY=${{ secrets.GOOGLE_YOUTUBE_KEY }}
-        export GOOGLE_MAPS_KEY=${{ secrets.GOOGLE_MAPS_KEY }}
+        echo $GOOGLE_MAPS_KEY >> .env
+        echo $GOOGLE_YOUTUBE_KEY >> .env
         pytest -v
 
   docker-build-test:
