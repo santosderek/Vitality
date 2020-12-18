@@ -552,6 +552,22 @@ class TestDatabase(unittest.TestCase):
 
         workout = self.database.get_workout_by_attributes(_id=str(workout._id))
         assert workout is not None
+
+    def test_get_all_workout_by_attributes(self):
+        trainee = self.database.mongo.trainee.find_one({
+            'username': self.test_trainee.username
+        })
+        assert trainee is not None
+
+        workout = self.database.get_all_workout_by_attributes(creator_id=trainee['_id'],
+                                                          about='workout',
+                                                          name='testing')
+        assert workout is not None
+
+        with self.assertRaises(WorkoutNotFound):
+            self.database.get_workout_by_attributes(about='not a workout at all',
+                                                    name='nope not a name')
+
         
 
     def test_get_workout_class_by_id(self):

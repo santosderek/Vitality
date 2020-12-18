@@ -1381,8 +1381,40 @@ def test_search_workout(client):
     assert returned_value.status_code == 200
 
     login_as_testTrainee(client)
+    trainee = g.database.get_trainee_by_username('testtrainee')
+    trainer = g.database.get_trainer_by_username('testtrainer')
 
-    # TODO: need to test post requests
+    workoutTest = Workout(
+        _id=None,
+        creator_id=trainer._id,
+        name="testWorkout",
+        difficulty="easy",
+        about="2 Pushups, 1 Jumping Jack",
+        total_time="20",
+        reps="10",
+        miles="2",
+        category="Cardio"
+    )
+
+    g.database.add_workout(workoutTest)
+    database_workout = g.database.get_all_workout_by_attributes(name=workoutTest.name,
+                                                            creator_id=trainer._id)
+
+    login_as_testTrainer(client)
+    returned_value = client.get('/search_workout',
+                                follow_redirects=True)
+    assert returned_value.status_code == 200
+    returned_value = client.post('/search_workout',
+                                data=dict(
+         search_workout="workoutTest"
+    ), follow_redirects=True)
+    ##assert bytes("{}".format(database_workout.name),
+    ##             "utf-8") in returned_value.data
+    ##assert bytes("{}".format(database_workout.difficulty),
+    ##             "utf-8") in returned_value.data
+    ##assert bytes("{}".format(database_workout.about),
+    ##             "utf-8") in returned_value.data
+
 
 
 def test_workout(client):
