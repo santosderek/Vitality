@@ -446,7 +446,6 @@ def create_app():
         return render_template("user/overview.html",
                                trainees=trainees,
                                workouts=workouts,
-                               events=[],
                                invitations=invitations,
                                event_length_array=event_length_array)
 
