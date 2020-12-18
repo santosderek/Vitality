@@ -14,7 +14,7 @@
     }
 </style>
 <div id="contentblock" class="row">
-    <div class="col text-center">
+    <div class="col-sm-12 col-md-6 text-center">
         {% if user %}
         <p>Username: {{ user.username }}</p>
         <p>Name: {{ user.name }}</p>
@@ -29,5 +29,47 @@
         <p style="color: red;">No User Found!</p>
         {% endif %}
     </div>
+    {% if user %}
+    <div class="col-sm-12 col-md-6 text-center">
+       
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key={{g.google_maps_key}}&callback=initMap&libraries=places&v=weekly"
+            defer></script>
+        
+        <div style="height: 100%; width: 100%;" id="map"></div>
+        
+        <script>
+            
+            function initMap() {
+                var userLat = parseFloat("{{user.lat}}");
+                var userLng = parseFloat("{{user.lng}}");
+        
+                if ((userLng == null || userLat == null)) {
+                    userLat = 35.2270869;
+                    userLng = -80.8431267;
+                }
+        
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: userLat, lng: userLng },
+                    zoom: 12,
+                });
+        
+                const infowindow = new google.maps.InfoWindow();
+                infowindow.setContent("{{user.username}}");
+                
+                const marker = new google.maps.Marker({
+                    map,
+                    anchorPoint: new google.maps.Point(0, -29),
+                    position: map.center
+                });
+                infowindow.open(map, marker);
+                marker.addListener("click", () => {
+                    infowindow.open(map, marker);
+                });
+            }
+        </script>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

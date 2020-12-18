@@ -1,0 +1,67 @@
+<style>
+    #map {
+        height: 500px;
+        width: 100%;
+    }
+</style>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{g.google_maps_key}}&callback=initMap&libraries=places&v=weekly"
+    defer></script>
+
+<div id="map"></div>
+
+<script>
+    
+    function initMap() {
+        var userLat = parseFloat($("#lat").val());
+        var userLng = parseFloat($("#lng").val());
+
+        if ((userLng == null || userLat == null)) {
+            userLat = 35.2270869;
+            userLng = -80.8431267;
+        }
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: userLat, lng: userLng },
+            zoom: 12,
+        });
+
+        const infowindow = new google.maps.InfoWindow();
+        infowindow.setContent("Your location");
+        const marker = new google.maps.Marker({
+            map,
+            anchorPoint: new google.maps.Point(0, -29),
+            position: map.center
+        });
+        infowindow.open(map, marker);
+        marker.addListener("click", () => {
+            infowindow.open(map, marker);
+        });
+
+        data = {{ json_trainers | tojson }};
+
+        for (i = 0; i < data.length; i++) {
+            console.log("creating one marker");
+            console.log(data[i].lat, data[i].lng, data[i].username);
+            
+            let marker = new google.maps.Marker({
+                position: {'lat': data[i].lat, 'lng': data[i].lng },
+                title: data[i].username
+            });
+
+            const infowindow = new google.maps.InfoWindow({
+                content: data[i].username,
+            });
+
+
+            marker.addListener('click', () => {
+                infowindow.open(map, marker);
+            });
+
+            marker.setMap(map);
+        }
+
+    }
+</script>

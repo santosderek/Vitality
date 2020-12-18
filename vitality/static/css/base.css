@@ -32,9 +32,13 @@ button, .button_title {
     border-radius: .2em;
 }
 
-button:hover, .button_title:hover {
+button:hover, .button_title:hover, .card button {
     color: #3f6499;
     text-decoration: none;
+}
+
+.gm-style-iw-d {
+    color: #3f6499;
 }
 
 .row {
@@ -43,7 +47,7 @@ button:hover, .button_title:hover {
 
 .card {
     background-color: #8492A6;
-    border: none;
+    border: 2px solid white;
     color: white;
     border-radius: .5em;
     margin: 1em;
@@ -78,6 +82,17 @@ button:hover, .button_title:hover {
 
 .navbar li a:hover {
     color: #F95F62;
+}
+
+.view_button {
+    background-color: rgba(0, 0, 0, 0);
+    border: 1px solid white; 
+    border-radius: .5em;
+    padding: .5em; 
+}
+.view_button:hover {
+    color: #3f6499;
+    border-color: #3f6499;
 }
 
 #content {

@@ -41,9 +41,6 @@
 				<input type="password" placeholder="Re-enter Password" name="repassword" required>
 				<br />
 
-				<input type="text" placeholder="City and State" name="location" required>
-				<br />
-
 				<input type="tel" placeholder="Phone Number" name="phone" required>
 				<br />
 				<br />
@@ -52,6 +49,12 @@
 				<label for="trainer">Trainer</label><br>
 				<input type="radio" id="trainee" name="usertype" value="trainee">
 				<label for="trainee">Trainee</label><br>
+
+				{% include "user/map.html" ignore missing %}
+				<input type="hidden" id="lat" name="lat" value="0">
+				<input type="hidden" id="lng" name="lng" value="0">
+				<input type="hidden" id="userLat" name="userLat" value="35.2270869">
+				<input type="hidden" id="userLng" name="userLng" value="-80.8431267">
 
 				<button style="width: 19%; height: 50px;" type="submit">Create</button>
 			</form>
