@@ -698,7 +698,9 @@ def create_app():
         if request.method == "POST":
             name = escape(request.form["name"])
             workouts = g.database.get_all_workout_by_attributes(
-                name = name
+                name = {
+                    '$regex': r'(.+)?{}(.+)?'.format(name)
+                }
             )
 
             return render_template("workout/search.html", 
