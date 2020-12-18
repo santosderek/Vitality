@@ -786,14 +786,12 @@ def create_app():
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
 
-        if type(g.user) is not Trainer:
-            abort(403)
-
         app.logger.debug('User {} loaded Schedule.'.format(
             str(session['user_id'])))
 
         created_events, recieved_events = g.database.list_events_from_user_id(
             g.user._id)
+        print(recieved_events)
         return render_template("user/schedule.html",
                                created_events=created_events,
                                recieved_events=recieved_events)
@@ -804,12 +802,6 @@ def create_app():
         if not g.user:
             app.logger.debug('Redirecting user because there is no g.user.')
             return redirect(url_for('login'))
-
-        if type(g.user) is not Trainer:
-            abort(403)
-
-        app.logger.debug('User {} loaded event {}.'.format(
-            str(session['user_id']), s))
 
         try:
             creator_id = escape(creator_id)

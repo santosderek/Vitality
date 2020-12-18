@@ -733,11 +733,12 @@ class Database:
             event['_id'] = str(event['_id'])
             event['creator_id'] = str(event['creator_id'])
             event['participant_id'] = str(event['participant_id'])
+            event['date'] = datetime.fromisoformat(event['date'])
             created_event_classes.append(Event(**event))
 
         # Get recieved events as Event objects
         recieved_events = self.mongo.event.find({
-            'participant': ObjectId(user_id)
+            'participant_id': ObjectId(user_id)
         })
 
         recieved_event_classes = []
@@ -745,6 +746,7 @@ class Database:
             event['_id'] = str(event['_id'])
             event['creator_id'] = str(event['creator_id'])
             event['participant_id'] = str(event['participant_id'])
+            event['date'] = datetime.fromisoformat(event['date'])
             recieved_event_classes.append(Event(**event))
 
         return created_event_classes, recieved_event_classes
