@@ -1,21 +1,30 @@
-from googleapiclient.discovery import build
-from time import sleep
+import requests
+
+YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search'
+
 
 class Youtube:
 
     def __init__(self, developerKey):
-        self.youtube = build('youtube', 'v3', developerKey=developerKey)
+        self.developerKey = developerKey
 
     def search_topic(self, topic: str):
-        sleep(.5)
-        request = self.youtube.search().list(
-            part="snippet",
-            maxResults=6,
-            q=topic
-        )
-        response = request.execute()
-        return response
 
-    def __del__(self):
-        if hasattr(self, 'youtube'): 
-            self.youtube.close()
+        returned_value = requests.get(YOUTUBE_SEARCH_URL,
+                                      headers={
+                                          'Accept': 'application/json'
+                                      },
+                                      params={
+                                          'part': "snippet",
+                                          'maxResults': 6,
+                                          'q': topic,
+                                          'key': self.developerKey
+                                      })
+
+        if returned_value.status_code == 200: 
+            return returned_value.json()
+        else:
+           raise YoutubeRequestFailed('Status == {}'.format(returned_value.status_code))
+
+class YoutubeRequestFailed(Exception): 
+    pass 
