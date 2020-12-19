@@ -38,7 +38,7 @@ from .settings import (
 import json
 from datetime import datetime
 from bson.errors import InvalidId
-from .youtube import Youtube
+from .youtube import Youtube, YoutubeRequestFailed
 import random
 from googleapiclient.errors import HttpError
 
@@ -721,6 +721,9 @@ def create_app():
             list_of_workout_videos = youtube.search_topic(workout_topic)['items']
         except HttpError:
             list_of_workout_videos = [] 
+        except YoutubeRequestFailed:
+            list_of_workout_videos = [] 
+
 
         if request.method == "POST":
             name = escape(request.form["name"])
@@ -978,6 +981,8 @@ def create_app():
         except Exception:
             youtube_videos = [] 
         except AttributeError:
+            youtube_videos = [] 
+        except YoutubeRequestFailed:
             youtube_videos = [] 
             
         return render_template('diet/videos.html', youtube_videos=youtube_videos)
