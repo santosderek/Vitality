@@ -38,7 +38,10 @@ from .settings import (
 import json
 from datetime import datetime
 from bson.errors import InvalidId
-from .youtube import Youtube, YoutubeRequestFailed
+from .youtube import (Youtube,
+                      YoutubeRequestFailed,
+                      DEFAULT_YOUTUBE_DIET_SEARCH,
+                      DEFAULT_YOUTUBE_WORKOUT_SEARCH)
 import random
 from googleapiclient.errors import HttpError
 
@@ -715,15 +718,15 @@ def create_app():
         default_workouts = g.database.get_all_workouts_by_creatorid(
             default_vitality_user._id)
 
-        try: 
+        try:
             youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
             workout_topic = random.choice(predefined_workout_topics)
-            list_of_workout_videos = youtube.search_topic(workout_topic)['items']
+            list_of_workout_videos = youtube.search_topic(workout_topic)[
+                'items']
         except HttpError:
-            list_of_workout_videos = [] 
+            list_of_workout_videos = []
         except YoutubeRequestFailed:
             list_of_workout_videos = DEFAULT_YOUTUBE_DIET_SEARCH
-
 
         if request.method == "POST":
             name = escape(request.form["name"])
@@ -975,16 +978,16 @@ def create_app():
         if not category in categories:
             abort(400)
 
-        try: 
+        try:
             youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
             youtube_videos = youtube.search_topic(category)['items']
         except Exception:
-            youtube_videos = [] 
+            youtube_videos = []
         except AttributeError:
-            youtube_videos = [] 
+            youtube_videos = []
         except YoutubeRequestFailed:
             youtube_videos = DEFAULT_YOUTUBE_DIET_SEARCH
-            
+
         return render_template('diet/videos.html', youtube_videos=youtube_videos)
 
     @app.errorhandler(400)
