@@ -4,8 +4,9 @@ from os.path import exists
 from vitality.settings import GOOGLE_MAPS_KEY
 from dotenv import load_dotenv 
 from time import sleep
+import pytest 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 def test_search_topic():
     sleep(.5)
     load_dotenv('.env')

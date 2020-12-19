@@ -1477,6 +1477,7 @@ def test_new_workout(client):
     assert b'Create Routine' in returned_value.data
 
 
+@pytest.mark.skip
 def test_search_workout(client):
     """Testing the search workout page"""
 
