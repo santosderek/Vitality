@@ -43,7 +43,6 @@ from .youtube import (Youtube,
                       DEFAULT_YOUTUBE_DIET_SEARCH,
                       DEFAULT_YOUTUBE_WORKOUT_SEARCH)
 import random
-from googleapiclient.errors import HttpError
 
 DEFAULT_VITALITY_PASSWORD = "DefaultVitalityTrainerPassword"
 
@@ -723,8 +722,6 @@ def create_app():
             workout_topic = random.choice(predefined_workout_topics)
             list_of_workout_videos = youtube.search_topic(workout_topic)[
                 'items']
-        except HttpError:
-            list_of_workout_videos = []
         except YoutubeRequestFailed:
             list_of_workout_videos = DEFAULT_YOUTUBE_DIET_SEARCH
 
