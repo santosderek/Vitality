@@ -4,3 +4,4 @@ pymongo
 pytest
 python-dotenv
 google-api-python-client
+oauth2client
