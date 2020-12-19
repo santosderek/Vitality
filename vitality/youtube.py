@@ -24,9 +24,300 @@ class Youtube:
         if returned_value.status_code == 200:
             return returned_value.json()
         else:
-           raise YoutubeRequestFailed('Status == {}'.format(returned_value.status_code))
+            raise YoutubeRequestFailed(
+                'Status == {}'.format(returned_value.status_code))
 
 
-DEFAULT_FALL_BACK_WORKOUT_DICT = {'kind': 'youtube#searchListResponse', 'etag': 'h1FYP32fQ1WpzTrG218-R5U2WOE', 'nextPageToken': 'CAYQAA', 'regionCode': 'US', 'pageInfo': {'totalResults': 1000000, 'resultsPerPage': 6}, 'items': [{'kind': 'youtube#searchResult', 'etag': '_z-mApBYzZK4CpjH8kitCBUsU5s', 'id': {'kind': 'youtube#video', 'videoId': 'cC9r0jHF-Fw'}, 'snippet': {'publishedAt': '2016-11-09T17:00:07Z', 'channelId': 'UCI-Ho-GaKYbtMzXJWmWAsrg', 'title': '2 Hours of Beautiful Coral Reef Fish, Relaxing Ocean Fish, &amp; Stunning Aquarium Relax Music', 'description': 'Enjoy 2 hours of relaxing coral reef aquarium. This video features beautiful coral reef fish and relaxing music that is ideal for sleep, study and meditation.', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/cC9r0jHF-Fw/default.jpg', 'width': 120, 'height': 90}, 'medium': {'url': 'https://i.ytimg.com/vi/cC9r0jHF-Fw/mqdefault.jpg', 'width': 320, 'height': 180}, 'high': {'url': 'https://i.ytimg.com/vi/cC9r0jHF-Fw/hqdefault.jpg', 'width': 480, 'height': 360}}, 'channelTitle': 'Cat Trumpet', 'liveBroadcastContent': 'none', 'publishTime': '2016-11-09T17:00:07Z'}}, {'kind': 'youtube#searchResult', 'etag': '8Z34-YmyQ1GvrF8HItUF4bfAfAg', 'id': {'kind': 'youtube#video', 'videoId': '0gT8Ty0ClHc'}, 'snippet': {'publishedAt': '2020-10-04T16:13:03Z', 'channelId': 'UCj8f0ZLB8gML9iHDxWDne4g', 'title': 'Betta Koi Pleco Snail Carp Fish Goldfish Angelfish Guppy Guppies Catfish animals Videos', 'description': 'Betta Koi Pleco Snail Carp Fish Goldfish Angelfish Guppy Guppies Catfish animals Videos #betta #fish #goldfish #koi #koifish #snail #carps #carp #guppy ...', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/0gT8Ty0ClHc/default.jpg', 'width': 120, 'height': 90}, 'medium': {'url': 'https://i.ytimg.com/vi/0gT8Ty0ClHc/mqdefault.jpg', 'width': 320, 'height': 180}, 'high': {'url': 'https://i.ytimg.com/vi/0gT8Ty0ClHc/hqdefault.jpg', 'width': 480, 'height': 360}}, 'channelTitle': 'The Animals Around Us', 'liveBroadcastContent': 'none', 'publishTime': '2020-10-04T16:13:03Z'}}, {'kind': 'youtube#searchResult', 'etag': '8RqhHygcDhICyiN4azvZu086n_0', 'id': {'kind': 'youtube#channel', 'channelId': 'UC7MCFUG5oKKsfVDl7gT7BRA'}, 'snippet': {'publishedAt': '2016-04-06T06:35:52Z', 'channelId': 'UC7MCFUG5oKKsfVDl7gT7BRA', 'title': 'Catch Em All Fishing', 'description': 'Stories Fade, but REEL LEGENDS NEVER DIE! My Apparel Store is Available Online https://reellegendsneverdie.com/ RAW WILD REAL FOOTAGE AND ...', 'thumbnails': {'default': {'url': 'https://yt3.ggpht.com/ytc/AAUvwnhie2Wl8buLx7ONTQQRa7ARxXiZH0c225TuCVa6rA=s88-c-k-c0xffffffff-no-rj-mo'}, 'medium': {'url': 'https://yt3.ggpht.com/ytc/AAUvwnhie2Wl8buLx7ONTQQRa7ARxXiZH0c225TuCVa6rA=s240-c-k-c0xffffffff-no-rj-mo'}, 'high': {'url': 'https://yt3.ggpht.com/ytc/AAUvwnhie2Wl8buLx7ONTQQRa7ARxXiZH0c225TuCVa6rA=s800-c-k-c0xffffffff-no-rj-mo'}}, 'channelTitle': 'Catch Em All Fishing', 'liveBroadcastContent': 'upcoming', 'publishTime': '2016-04-06T06:35:52Z'}}, {'kind': 'youtube#searchResult', 'etag': 'YtS4Np2RaPVZzWS5FQxpKWWBghc', 'id': {'kind': 'youtube#video', 'videoId': 'ilqbT-uaaVg'}, 'snippet': {'publishedAt': '2020-12-15T08:00:14Z', 'channelId': 'UCYU6l9Ws7ciniwyJtODjong', 'title': 'Survival Skills: Primitive Couple Unique Hand Fishing Catch Big Fish - Cooking Delicous Fish', 'description': 'Survival Skills: Primitive Couple Unique Hand Fishing Catch Big Fish - Cooking Delicous Fish #PrimitiveCookingKT #SurvivalSkills #CookingFish ...', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/ilqbT-uaaVg/default.jpg', 'width': 120, 'height': 90}, 'medium': {'url': 'https://i.ytimg.com/vi/ilqbT-uaaVg/mqdefault.jpg', 'width': 320, 'height': 180}, 'high': {'url': 'https://i.ytimg.com/vi/ilqbT-uaaVg/hqdefault.jpg', 'width': 480, 'height'Result', 'etag': 'Gqu28yZB7tfnOrcnv6UmjvwvzC8', 'id': {'kind': 'youtube#video', 'videoId': 'vA-FizFqXV8'}, 'snippet': {'publishedAt': '2020-12-11T22:57:25Z', 'channelId': 'UCZdNPWAwux7zPVODRguoYMg', 'title': 'Trained Colorful Aquarium Fish Feed From My hand!!', 'description': 'instagram - https://www.instagram.com/franklinseeber/ Rawwfam Merch -https://www.rawwfishing.com/shop.', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/vA-FizFqXV8/default.jpg', 'width': 120, 'height': 90}, 'medium': {'url': 'https://i.ytimg.com/vi/vA-FizFqXV8/mqdefault.jpg', 'width': 320, 'height': 180}, 'high': {'url': 'https://i.ytimg.com/vi/vA-FizFqXV8/hqdefault.jpg', 'width': 480, 'height': 360}}, 'channelTitle': 'RAWWFishing', 'liveBroadcastContent': 'none', 'publishTime': '2020-12-11T22:57:25Z'}}, {'kind': 'youtube#searchResult', 'etag': 'K_Cc5GwdZ8cIadxQNT6wwqmDYHg', 'id': {'kind': 'youtube#video', 'videoId': 'POLneoshHUI'}, 'snippet': {'publishedAt': '2020-12-13T20:57:10Z', 'channelId': 'UC7MCFUG5oKKsfVDl7gT7BRA', 'title': 'CATCHING GIANT Rare WHITE LIGHTNING FISH!', 'description': 'Catching rare giant white lightning blue talapia. CATCH EM GEAR is HERE: https://catchemfishing.com/ Check out my Inmedium': {'url': 'https://i.ytimg.com/vi/POLneoshHUI/mqdefault.jpg', 'width': 320, 'height': 180}, 'high': {'url': 'https://i.ytimg.com/vi/POLneoshHUI/hqdefault.jpg', 'width': 480, 'height': 360}}, 'channelTitle': 'Catch Em All Fishing', 'liveBroadcastContent': 'none', 'publishTime': '2020-12-13T20:57:10Z'}}]}
+DEFAULT_YOUTUBE_WORKOUT_SEARCH = {'etag': 'oww2YjQMhgQkbCus-YCrHhCOLa0',
+                                  'items': [{'etag': 'Gpuq22nNnxce7jTqmVdoGRgLaQo',
+                                             'id': {'kind': 'youtube#video', 'videoId': 'UItWltVZZmE'},
+                                             'kind': 'youtube#searchResult',
+                                             'snippet': {'channelId': 'UChVRfsT_ASBZk10o0An7Ucg',
+                                                         'channelTitle': 'Pamela Reif',
+                                                         'description': 'Finally: a workout suitable for '
+                                                         'BEGINNERS. // Werbung What makes this '
+                                                         '"beginner friendly"? 1. I used BASIC '
+                                                         'movements, that are not too '
+                                                         'complicated or hard to ...',
+                                                         'liveBroadcastContent': 'none',
+                                                         'publishTime': '2019-09-01T10:12:36Z',
+                                                         'publishedAt': '2019-09-01T10:12:36Z',
+                                                         'thumbnails': {'default': {'height': 90,
+                                                                                    'url': 'https://i.ytimg.com/vi/UItWltVZZmE/default.jpg',
+                                                                                    'width': 120},
+                                                                        'high': {'height': 360,
+                                                                                 'url': 'https://i.ytimg.com/vi/UItWltVZZmE/hqdefault.jpg',
+                                                                                 'width': 480},
+                                                                        'medium': {'height': 180,
+                                                                                   'url': 'https://i.ytimg.com/vi/UItWltVZZmE/mqdefault.jpg',
+                                                                                   'width': 320}},
+                                                         'title': '20 MIN FULL BODY WORKOUT - Beginner Version '
+                                                         '// No Equipment I Pamela Reif'}},
+                                            {'etag': 'YGk-gsxMrm-QwKtKxQuAU5ms9bE',
+                                             'id': {'kind': 'youtube#video', 'videoId': '2pLT-olgUJs'},
+                                             'kind': 'youtube#searchResult',
+                                             'snippet': {'channelId': 'UCCgLoMYIyP0U56dEhEL1wXQ',
+                                                         'channelTitle': 'Chloe Ting',
+                                                         'description': 'Abs Abs Abs! Everyone seems to be '
+                                                         'asking for a QUICK and short schedule, '
+                                                         'so I put together a 2 weeks schedule '
+                                                         'to help you get closer to those '
+                                                         'defined abs ...',
+                                                         'liveBroadcastContent': 'none',
+                                                         'publishTime': '2019-08-12T11:45:00Z',
+                                                         'publishedAt': '2019-08-12T11:45:00Z',
+                                                         'thumbnails': {'default': {'height': 90,
+                                                                                    'url': 'https://i.ytimg.com/vi/2pLT-olgUJs/default.jpg',
+                                                                                    'width': 120},
+                                                                        'high': {'height': 360,
+                                                                                 'url': 'https://i.ytimg.com/vi/2pLT-olgUJs/hqdefault.jpg',
+                                                                                 'width': 480},
+                                                                        'medium': {'height': 180,
+                                                                                   'url': 'https://i.ytimg.com/vi/2pLT-olgUJs/mqdefault.jpg',
+                                                                                   'width': 320}},
+                                                         'title': 'Get Abs in 2 WEEKS | Abs Workout Challenge'}},
+                                            {'etag': 'z4pOk82cpA8D1vXsOpG7SzlHRPg',
+                                             'id': {'kind': 'youtube#video', 'videoId': 'JkVHrA5o23o'},
+                                             'kind': 'youtube#searchResult',
+                                             'snippet': {'channelId': 'UCpQ34afVgk8cRQBjSJ1xuJQ',
+                                                         'channelTitle': 'MadFit',
+                                                         'description': 'A 20 minute APARTMENT FRIENDLY full '
+                                                         'body hiit workout AT HOME! Low impact, '
+                                                         'no jumping, equipment free, and NO '
+                                                         'REPEAT! ⭐️SHOP MY COOKBOOKS!',
+                                                         'liveBroadcastContent': 'none',
+                                                         'publishTime': '2020-03-24T13:00:15Z',
+                                                         'publishedAt': '2020-03-24T13:00:15Z',
+                                                         'thumbnails': {'default': {'height': 90,
+                                                                                    'url': 'https://i.ytimg.com/vi/JkVHrA5o23o/default.jpg',
+                                                                                    'width': 120},
+                                                                        'high': {'height': 360,
+                                                                                 'url': 'https://i.ytimg.com/vi/JkVHrA5o23o/hqdefault.jpg',
+                                                                                 'width': 480},
+                                                                        'medium': {'height': 180,
+                                                                                   'url': 'https://i.ytimg.com/vi/JkVHrA5o23o/mqdefault.jpg',
+                                                                                   'width': 320}},
+                                                         'title': 'Low Impact FULL BODY HIIT Workout (No '
+                                                         'Equipment + No Jumping)'}},
+                                            {'etag': 'DQXmS61nI7nVM1gZR-hn398J_vo',
+                                             'id': {'kind': 'youtube#video', 'videoId': 'gC_L9qAHVJ8'},
+                                             'kind': 'youtube#searchResult',
+                                             'snippet': {'channelId': 'UCFjc9H89-RpWuIStDqhO7AQ',
+                                                         'channelTitle': 'Body Project',
+                                                         'description': 'https://teambodyproject.com Create a '
+                                                         'free account today. This workout is '
+                                                         'part of Real Start and Real Start Plus '
+                                                         '- a workout plan made for real people '
+                                                         'with real ...',
+                                                         'liveBroadcastContent': 'none',
+                                                         'publishTime': '2019-03-24T20:07:35Z',
+                                                         'publishedAt': '2019-03-24T20:07:35Z',
+                                                         'thumbnails': {'default': {'height': 90,
+                                                                                    'url': 'https://i.ytimg.com/vi/gC_L9qAHVJ8/default.jpg',
+                                                                                    'width': 120},
+                                                                        'high': {'height': 360,
+                                                                                 'url': 'https://i.ytimg.com/vi/gC_L9qAHVJ8/hqdefault.jpg',
+                                                                                 'width': 480},
+                                                                        'medium': {'height': 180,
+                                                                                   'url': 'https://i.ytimg.com/vi/gC_L9qAHVJ8/mqdefault.jpg',
+                                                                                   'width': 320}},
+                                                         'title': '30 minute fat burning home workout for '
+                                                         'beginners. Achievable, low impact results.'}},
+                                            {'etag': 'wMQLWReXyXNnNF3-O33IwfdUAtE',
+                                             'id': {'kind': 'youtube#video', 'videoId': 'H2U3HwAyBXg'},
+                                             'kind': 'youtube#searchResult',
+                                             'snippet': {'channelId': 'UCpQ34afVgk8cRQBjSJ1xuJQ',
+                                                         'channelTitle': 'MadFit',
+                                                         'description': 'a 20 min fat burning, full body '
+                                                         'workout you can do at home without any '
+                                                         'equipment! A workout designed for '
+                                                         'TOTAL BEGINNERS! Wether you are just '
+                                                         'getting into ...',
+                                                         'liveBroadcastContent': 'none',
+                                                         'publishTime': '2020-08-13T13:47:17Z',
+                                                         'publishedAt': '2020-08-13T13:47:17Z',
+                                                         'thumbnails': {'default': {'height': 90,
+                                                                                    'url': 'https://i.ytimg.com/vi/H2U3HwAyBXg/default.jpg',
+                                                                                    'width': 120},
+                                                                        'high': {'height': 360,
+                                                                                 'url': 'https://i.ytimg.com/vi/H2U3HwAyBXg/hqdefault.jpg',
+                                                                                 'width': 480},
+                                                                        'medium': {'height': 180,
+                                                                                   'url': 'https://i.ytimg.com/vi/H2U3HwAyBXg/mqdefault.jpg',
+                                                                                   'width': 320}},
+                                                         'title': '20 min FULL BODY Workout for TOTAL BEGINNERS '
+                                                         '(No Equipment)'}},
+                                            {'etag': 'XbPBVBQQkwFJNqHfFiNAvQKt634',
+                                             'id': {'kind': 'youtube#video', 'videoId': 'ml6cT4AZdqI'},
+                                             'kind': 'youtube#searchResult',
+                                             'snippet': {'channelId': 'UCGiSCVGNukLqv8hwpKCsQKQ',
+                                                         'channelTitle': 'SELF',
+                                                         'description': 'In this high intensity cardio '
+                                                         'bodyweight workout from trainer Lita '
+                                                         "Lewis, you'll spike your heart rate "
+                                                         'with high-knees, fast feet, and star '
+                                                         'jumps; plus work your core ...',
+                                                         'liveBroadcastContent': 'none',
+                                                         'publishTime': '2018-05-21T16:01:33Z',
+                                                         'publishedAt': '2018-05-21T16:01:33Z',
+                                                         'thumbnails': {'default': {'height': 90,
+                                                                                    'url': 'https://i.ytimg.com/vi/ml6cT4AZdqI/default.jpg',
+                                                                                    'width': 120},
+                                                                        'high': {'height': 360,
+                                                                                 'url': 'https://i.ytimg.com/vi/ml6cT4AZdqI/hqdefault.jpg',
+                                                                                 'width': 480},
+                                                                        'medium': {'height': 180,
+                                                                                   'url': 'https://i.ytimg.com/vi/ml6cT4AZdqI/mqdefault.jpg',
+                                                                                   'width': 320}},
+                                                         'title': '30-Minute HIIT Cardio Workout with Warm Up - '
+                                                         'No Equipment at Home | SELF'}}],
+                                  'kind': 'youtube#searchListResponse',
+                                  'nextPageToken': 'CAYQAA',
+                                  'pageInfo': {'resultsPerPage': 6, 'totalResults': 1000000},
+                                  'regionCode': 'US'}
+
+DEFAULT_YOUTUBE_DIET_SEARCH = {'etag': 'GjebS7ncm1hcm7yey5lCN3V52w4',
+                               'items': [{'etag': 'Q7fao2AwqNGthYPjkJmfRIIf-_M',
+                                          'id': {'kind': 'youtube#video', 'videoId': 'SWLbVHROXvg'},
+                                          'kind': 'youtube#searchResult',
+                                          'snippet': {'channelId': 'UCr_-k8z6_RKKxkjWkt8RFvA',
+                                                      'channelTitle': 'TheSeriousfitness',
+                                                      'description': 'http://serious-fitness-programs.com/weightloss '
+                                                      'Follow Us On Facebook: ⇨ '
+                                                      'https://www.facebook.com/TheSeriousfitness '
+                                                      '⇨Tools and ingredients: Olive Oil ...',
+                                                      'liveBroadcastContent': 'none',
+                                                      'publishTime': '2019-12-29T11:15:02Z',
+                                                      'publishedAt': '2019-12-29T11:15:02Z',
+                                                      'thumbnails': {'default': {'height': 90,
+                                                                                 'url': 'https://i.ytimg.com/vi/SWLbVHROXvg/default.jpg',
+                                                                                 'width': 120},
+                                                                     'high': {'height': 360,
+                                                                              'url': 'https://i.ytimg.com/vi/SWLbVHROXvg/hqdefault.jpg',
+                                                                              'width': 480},
+                                                                     'medium': {'height': 180,
+                                                                                'url': 'https://i.ytimg.com/vi/SWLbVHROXvg/mqdefault.jpg',
+                                                                                'width': 320}},
+                                                      'title': '6 Healthy Low Carb Recipes For Weight Loss'}},
+                                         {'etag': 'qzanPsKtiEHPCA4aGDWspcN_5ms',
+                                          'id': {'kind': 'youtube#video', 'videoId': 'GDS1OVF46UY'},
+                                          'kind': 'youtube#searchResult',
+                                          'snippet': {'channelId': 'UCJFp8uSYCjXOMnkUyb3CQ3Q',
+                                                      'channelTitle': 'Tasty',
+                                                      'description': 'Check out these healthy and low carb '
+                                                      'recipes! Subscribe to Tasty: '
+                                                      'https://bzfd.it/2ri82Z1 About Tasty: '
+                                                      'The official YouTube channel of all '
+                                                      "things Tasty, the world's ...",
+                                                      'liveBroadcastContent': 'none',
+                                                      'publishTime': '2019-07-23T16:00:01Z',
+                                                      'publishedAt': '2019-07-23T16:00:01Z',
+                                                      'thumbnails': {'default': {'height': 90,
+                                                                                 'url': 'https://i.ytimg.com/vi/GDS1OVF46UY/default.jpg',
+                                                                                 'width': 120},
+                                                                     'high': {'height': 360,
+                                                                              'url': 'https://i.ytimg.com/vi/GDS1OVF46UY/hqdefault.jpg',
+                                                                              'width': 480},
+                                                                     'medium': {'height': 180,
+                                                                                'url': 'https://i.ytimg.com/vi/GDS1OVF46UY/mqdefault.jpg',
+                                                                                'width': 320}},
+                                                      'title': '7 Healthy And Low Carb Recipes • Tasty'}},
+                                         {'etag': 'AgfiNXuTY33RQuRvAVSzUvL_CeA',
+                                          'id': {'kind': 'youtube#video', 'videoId': 'MdarLkKDjWA'},
+                                          'kind': 'youtube#searchResult',
+                                          'snippet': {'channelId': 'UCevU8VNx7XRwo5jkFqzrDXw',
+                                                      'channelTitle': 'Sweet Peas Saffron',
+                                                      'description': 'These low carb meal prep recipes will '
+                                                      'help you stick to a low carb diet! '
+                                                      'Whether you enjoy them for lunch or '
+                                                      'dinner, you are going to be glad you '
+                                                      'spent the time ...',
+                                                      'liveBroadcastContent': 'none',
+                                                      'publishTime': '2020-04-24T15:00:19Z',
+                                                      'publishedAt': '2020-04-24T15:00:19Z',
+                                                      'thumbnails': {'default': {'height': 90,
+                                                                                 'url': 'https://i.ytimg.com/vi/MdarLkKDjWA/default.jpg',
+                                                                                 'width': 120},
+                                                                      'high': {'height': 360,
+                                                                               'url': 'https://i.ytimg.com/vi/MdarLkKDjWA/hqdefault.jpg',
+                                                                               'width': 480},
+                                                                      'medium': {'height': 180,
+                                                                                 'url': 'https://i.ytimg.com/vi/MdarLkKDjWA/mqdefault.jpg',
+                                                                                 'width': 320}},
+                                                      'title': '4 LOW CARB meal prep recipes'}},
+                                         {'etag': 'mdh5Y-Jbxqq_GMXVr8RRjFFz63s',
+                                          'id': {'kind': 'youtube#video', 'videoId': 'mrk7YxMSzY4'},
+                                          'kind': 'youtube#searchResult',
+                                          'snippet': {'channelId': 'UCQOQ3RxX_o-B-68wSKdcfMQ',
+                                                      'channelTitle': 'The Domestic Geek',
+                                                      'description': 'SAVE 50% on my 12 WEEK MEAL PLAN! Use '
+                                                      "code 'EATWELL' at checkout: ...",
+                                                      'liveBroadcastContent': 'none',
+                                                      'publishTime': '2019-10-07T20:00:34Z',
+                                                      'publishedAt': '2019-10-07T20:00:34Z',
+                                                      'thumbnails': {'default': {'height': 90,
+                                                                                 'url': 'https://i.ytimg.com/vi/mrk7YxMSzY4/default.jpg',
+                                                                                 'width': 120},
+                                                                     'high': {'height': 360,
+                                                                              'url': 'https://i.ytimg.com/vi/mrk7YxMSzY4/hqdefault.jpg',
+                                                                              'width': 480},
+                                                                     'medium': {'height': 180,
+                                                                                'url': 'https://i.ytimg.com/vi/mrk7YxMSzY4/mqdefault.jpg',
+                                                                                'width': 320}},
+                                                      'title': '3 Low Carb Dinner Recipes | Quick + Easy '
+                                                      'Weeknight Dinner Ideas'}},
+                                         {'etag': 'JCZIjh0PqXJKyRjtSOLrUriOiqI',
+                                          'id': {'kind': 'youtube#video', 'videoId': 'V1lmaPqMzAg'},
+                                          'kind': 'youtube#searchResult',
+                                          'snippet': {'channelId': 'UCZvoUuniFzmOjfBt67lNsEQ',
+                                                      'channelTitle': 'Tasty Recipes',
+                                                      'description': "We're mindful of how the current "
+                                                      'coronavirus outbreak might be '
+                                                      'affecting your access to stores and '
+                                                      'general grocery items. Please know '
+                                                      'that many of these ...',
+                                                      'liveBroadcastContent': 'none',
+                                                      'publishTime': '2020-10-11T22:00:03Z',
+                                                      'publishedAt': '2020-10-11T22:00:03Z',
+                                                      'thumbnails': {'default': {'height': 90,
+                                                                                 'url': 'https://i.ytimg.com/vi/V1lmaPqMzAg/default.jpg',
+                                                                                 'width': 120},
+                                                                     'high': {'height': 360,
+                                                                              'url': 'https://i.ytimg.com/vi/V1lmaPqMzAg/hqdefault.jpg',
+                                                                              'width': 480},
+                                                                     'medium': {'height': 180,
+                                                                                'url': 'https://i.ytimg.com/vi/V1lmaPqMzAg/mqdefault.jpg',
+                                                                                'width': 320}},
+                                                      'title': '10 Easy Low-Carb Dinners • Tasty Recipes'}},
+                                         {'etag': 'tLQiWqydIfnJ_VVJz9igl5BnMVc',
+                                          'id': {'kind': 'youtube#video', 'videoId': 'nigbuPqz658'},
+                                          'kind': 'youtube#searchResult',
+                                          'snippet': {'channelId': 'UCBXV31q0rnDbCP9bnwMR7WA',
+                                                      'channelTitle': 'Well Done',
+                                                      'description': 'Enjoy this compilation of 18 different '
+                                                      'Keto recipes - great for weeknight '
+                                                      'meals or weekend gatherings. See below '
+                                                      'for links to all recipes. You can also '
+                                                      'use the ...',
+                                                      'liveBroadcastContent': 'none',
+                                                      'publishTime': '2019-02-06T22:43:36Z',
+                                                      'publishedAt': '2019-02-06T22:43:36Z',
+                                                      'thumbnails': {'default': {'height': 90,
+                                                                                 'url': 'https://i.ytimg.com/vi/nigbuPqz658/default.jpg',
+                                                                                 'width': 120},
+                                                                     'high': {'height': 360,
+                                                                              'url': 'https://i.ytimg.com/vi/nigbuPqz658/hqdefault.jpg',
+                                                                              'width': 480},
+                                                                     'medium': {'height': 180,
+                                                                                'url': 'https://i.ytimg.com/vi/nigbuPqz658/mqdefault.jpg',
+                                                                                'width': 320}},
+                                                      'title': '18 Keto Recipes | Low Carb Super Comp | Well '
+                                                      'Done'}}],
+                               'kind': 'youtube#searchListResponse',
+                               'nextPageToken': 'CAYQAA',
+                               'pageInfo': {'resultsPerPage': 6, 'totalResults': 1000000},
+                               'regionCode': 'US'}
+
+
 class YoutubeRequestFailed(Exception):
     pass

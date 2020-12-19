@@ -722,7 +722,7 @@ def create_app():
         except HttpError:
             list_of_workout_videos = [] 
         except YoutubeRequestFailed:
-            list_of_workout_videos = [] 
+            list_of_workout_videos = DEFAULT_YOUTUBE_DIET_SEARCH
 
 
         if request.method == "POST":
@@ -983,7 +983,7 @@ def create_app():
         except AttributeError:
             youtube_videos = [] 
         except YoutubeRequestFailed:
-            youtube_videos = [] 
+            youtube_videos = DEFAULT_YOUTUBE_DIET_SEARCH
             
         return render_template('diet/videos.html', youtube_videos=youtube_videos)
 
