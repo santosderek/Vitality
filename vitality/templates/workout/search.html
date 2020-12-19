@@ -74,6 +74,11 @@
     <div class="col-sm-12">
         <h3>Recommended Videos:</h3>
     </div>
+    {% if list_of_workout_videos|length == 0 %}
+    <div class="col-sm-12 text-center">
+        <p style="color: white;">Youtube API Quota was reached! We have been rate limited!<br />You will not recieve youtube recommendations.</p>
+    </div>
+    {% endif %}
     {% for youtube in list_of_workout_videos %}
     <div class="col-sm-12 col-md-4">
         <div class="card">

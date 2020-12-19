@@ -1,4 +1,5 @@
 from collections import defaultdict
+from logging import exception
 from werkzeug.exceptions import default_exceptions
 from .trainee import Trainee
 from .trainer import Trainer
@@ -39,6 +40,7 @@ from datetime import datetime
 from bson.errors import InvalidId
 from .youtube import Youtube
 import random
+from googleapiclient.errors import HttpError
 
 DEFAULT_VITALITY_PASSWORD = "DefaultVitalityTrainerPassword"
 
@@ -713,9 +715,12 @@ def create_app():
         default_workouts = g.database.get_all_workouts_by_creatorid(
             default_vitality_user._id)
 
-        youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
-        workout_topic = random.choice(predefined_workout_topics)
-        list_of_workout_videos = youtube.search_topic(workout_topic)['items']
+        try: 
+            youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
+            workout_topic = random.choice(predefined_workout_topics)
+            list_of_workout_videos = youtube.search_topic(workout_topic)['items']
+        except HttpError:
+            list_of_workout_videos = [] 
 
         if request.method == "POST":
             name = escape(request.form["name"])
@@ -967,8 +972,14 @@ def create_app():
         if not category in categories:
             abort(400)
 
-        youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
-        youtube_videos = youtube.search_topic(category)['items']
+        try: 
+            youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
+            youtube_videos = youtube.search_topic(category)['items']
+        except Exception:
+            youtube_videos = [] 
+        except AttributeError:
+            youtube_videos = [] 
+            
         return render_template('diet/videos.html', youtube_videos=youtube_videos)
 
     @app.errorhandler(400)
