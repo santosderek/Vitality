@@ -1,5 +1,5 @@
 from googleapiclient.discovery import build
-
+from time import sleep
 
 class Youtube:
 
@@ -7,6 +7,7 @@ class Youtube:
         self.youtube = build('youtube', 'v3', developerKey=developerKey)
 
     def search_topic(self, topic: str):
+        sleep(.5)
         request = self.youtube.search().list(
             part="snippet",
             maxResults=6,
