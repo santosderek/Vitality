@@ -39,6 +39,7 @@ from datetime import datetime
 from bson.errors import InvalidId
 from .youtube import Youtube
 import random
+from googleapiclient.errors import HttpError
 
 DEFAULT_VITALITY_PASSWORD = "DefaultVitalityTrainerPassword"
 
@@ -713,10 +714,13 @@ def create_app():
         default_workouts = g.database.get_all_workouts_by_creatorid(
             default_vitality_user._id)
 
-        youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
-        workout_topic = random.choice(predefined_workout_topics)
-        list_of_workout_videos = youtube.search_topic(workout_topic)['items']
-
+        try: 
+            youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
+            workout_topic = random.choice(predefined_workout_topics)
+            list_of_workout_videos = youtube.search_topic(workout_topic)['items']
+        except HttpError:
+            list_of_workout_videos = [] 
+            
         if request.method == "POST":
             name = escape(request.form["name"])
             workouts = g.database.get_all_workout_by_attributes(
