@@ -3,6 +3,11 @@
 {% block content %}
 
 <div class="row">
+    {% if youtube_videos|length == 0 %}
+    <div class="col-sm-12 text-center darkbg">
+        <p style="color: white;">Youtube API Quota was reached! We have been rate limited!<br />You will not recieve youtube recommendations.</p>
+    </div>
+    {% endif %}
     {% for youtube in youtube_videos %}
     <div class="col-sm-12 col-md-4">
         <div class="card">

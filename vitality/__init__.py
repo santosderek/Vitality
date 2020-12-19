@@ -1,4 +1,5 @@
 from collections import defaultdict
+from logging import exception
 from werkzeug.exceptions import default_exceptions
 from .trainee import Trainee
 from .trainer import Trainer
@@ -720,7 +721,7 @@ def create_app():
             list_of_workout_videos = youtube.search_topic(workout_topic)['items']
         except HttpError:
             list_of_workout_videos = [] 
-            
+
         if request.method == "POST":
             name = escape(request.form["name"])
             workouts = g.database.get_all_workout_by_attributes(
@@ -971,8 +972,14 @@ def create_app():
         if not category in categories:
             abort(400)
 
-        youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
-        youtube_videos = youtube.search_topic(category)['items']
+        try: 
+            youtube = Youtube(g.GOOGLE_YOUTUBE_KEY)
+            youtube_videos = youtube.search_topic(category)['items']
+        except Exception:
+            youtube_videos = [] 
+        except AttributeError:
+            youtube_videos = [] 
+            
         return render_template('diet/videos.html', youtube_videos=youtube_videos)
 
     @app.errorhandler(400)
